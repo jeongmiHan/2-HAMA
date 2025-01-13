@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>もふもふ</title>
+  <link rel="stylesheet" href="/log.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+  <style>
+  </style>
+  <script src="/log.js"></script>
+</head>
+
+<body>
+  <div class="wrapper"> <!--wrapper : 전체 페이지를 감싸는 컨테이너-->
+    <!-- Sidebar -->
+    <nav class="sidebar"> <!--sidebar :  왼쪽 메뉴를 담당하는 사이드 바-->
+      <div class="sidebar-header">
+        <h2>프로필</h2>
+      </div>
+      <ul class="sidebar-menu">
+        <li><a href="#">Dashboard</a></li>
+      </ul>
+    </nav>
+
+    <!-- Content Wrapper --> <!--Content Wrapper : 메인 콘텐츠와 상단 네비게이션 바를 감싸는 컨테이너 -->
+    <div class="content-wrapper">
+      <!-- Navbar --> <!--Navbar: 페이지 상단에 위치한 검색창과 알림 프로필 등-->
+      <nav class="navbar">
+      <div class="search-container">
+        <input type="text" placeholder="Search for..." class="search-bar">
+        <button class="search-button">
+          <i class="fas fa-search"></i>
+        </button>
+      </div>
+      <div class="navbar-icons">
+        <div class="icon-group">
+          <div class="icon-item">
+            <i class="fas fa-bell"></i>
+            <span class="notification-badge">3</span>알람
+          </div>
+          <div class="icon-item">
+            <i class="fas fa-envelope"></i>
+            <span class="notification-badge">7</span>메세지
+          </div>
+        </div>
+        <div class="profile-group">
+          <span class="divider"></span>
+          <img src="profile.jpg" alt="Profile Picture" class="profile-pic">
+          <span class="profile-name">간단한 프로필</span>
+        </div>
+      </div>
+      </nav>
+
+      <!-- Main Content --> <!--Main Content : 메인 콘텐츠 영역-->
+      <div class="logBanner">
+	  <a href="https://www.zooseyo.or.kr/zooseyo_or_kr.html?" target="_blank">
+	    <img src="/banner.jpg" alt="배너 이미지" class="banner-image" />
+	  </a>
+	</div>
+      <div id="logApp">
+        <!-- 글쓰기 버튼 -->
+        <button id="writeButton">글쓰기</button>
+        
+		<!-- 글쓰기 팝업 -->
+		<div id="logPopupContainer" class="popup-container" style="display: none;">
+		    <div class="popup">
+		        <h2>글쓰기</h2>
+		        <textarea id="logContentInput" rows="5" placeholder="내용을 입력하세요"></textarea>
+		
+		        <!-- 이미지 업로드 폼 추가 -->
+		        <form id="uploadForm" method="POST" enctype="multipart/form-data" action="/log/add">
+		            <input type="file" id="logImageInput" name="logFiles" multiple />
+		        </form>
+		
+		        <button id="logSubmitButton">저장</button>
+		        <button id="logCloseButton">닫기</button>
+		    </div>
+		</div>
+		
+		<!-- 게시물 리스트 -->
+		<div id="logPostContainer">
+		    <!-- 게시물은 JavaScript에서 동적으로 추가됩니다 -->
+
+		</div>
+
+
+    </div>
+  </div>
+</body>
+</html>

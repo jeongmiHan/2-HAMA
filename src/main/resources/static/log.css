@@ -1,0 +1,565 @@
+@charset "UTF-8";
+
+/* 기본 세팅 */
+body, h1, h2, p, ul, li, a, input {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* 바디 수정은 필요시 말해주세요 */
+body { 
+  font-family: Arial, sans-serif;
+  background-color: #f8f9fc;
+  color: #333;
+}
+
+.wrapper {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* 사이드바 */
+.sidebar {
+  width: 350px;
+  background-color: #4e73df;
+  color: white;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-header {
+  padding: 20px;
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.sidebar-menu {
+  list-style: none;
+  flex: 1;
+}
+
+.sidebar-menu li {
+  padding: 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-menu a {
+  color: white;
+  text-decoration: none;
+  display: block;
+}
+
+.sidebar-menu a:hover {
+  background-color: #2e59d9;
+}
+
+/* 메인 콘텐츠와 상단 네비게이션 바를 감싸는 컨테이너 */
+.content-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 메뉴바 */
+.navbar {
+  background-color: white;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #ddd;
+}
+
+.search-bar {
+  width: 300px;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 15px;
+}
+
+.navbar-icons {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* 네비게이션 바 아이콘 그룹 */
+.navbar-icons {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+/* 아이콘 그룹 스타일 */
+.icon-group {
+  display: flex;
+  gap: 15px;
+}
+
+.icon-item {
+  position: relative;
+  font-size: 18px;
+  color: #6c757d;
+}
+
+/* 알림 배지 스타일 */
+.notification-badge {
+  position: absolute;
+  top: -5px;
+  right: -10px;
+  background-color: red;
+  color: white;
+  border-radius: 50%;
+  font-size: 12px;
+  padding: 2px 6px;
+  font-weight: bold;
+}
+
+/* 프로필 그룹 스타일 */
+.profile-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.divider {
+  width: 1px;
+  height: 30px;
+  background-color: #ddd;
+}
+
+.profile-pic {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.profile-name {
+  font-size: 14px;
+  color: #6c757d;
+}
+
+
+/* 상단 바 알람, 메세지창 */
+.notification, .message { 
+  background-color: red;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 12px;
+}
+
+.profile {
+  font-weight: bold;
+  color: #333;
+}
+
+/* 메인 */
+.content {
+  padding: 20px;
+  text-align: center;
+}
+
+.content h1 {
+  margin-bottom: 20px;
+  color: #333;
+}
+
+/* 검색창 컨테이너 */
+.search-container {
+  display: flex;
+  align-items: center;
+  gap: 5px; /* 검색창과 버튼 사이 간격 */
+}
+
+/* 검색창 */
+.search-bar {
+  width: 300px;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* 검색 버튼 */
+.search-button {
+  background-color: #4e73df;
+  border: none;
+  padding: 8px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.search-button i {
+  font-size: 14px; /* 돋보기 크기 */
+}
+
+/* 검색 버튼 호버 효과 */
+.search-button:hover {
+  background-color: #2e59d9;
+}
+
+
+
+
+
+
+
+/* 글쓰기 버튼 */
+#writeButton {
+  position: absolute;
+  left: 50%;
+  cursor: pointer;
+}
+
+/* 일기 쓰기 팝업창 */
+#logPopupContainer {
+  display: none; /* 기본적으로 보이지 않음 */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* 반투명 배경 */
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* 팝업이 게시글 위에 나타나도록 설정 */
+}
+
+.popup {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 800px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+#logTitleInput, #logContentInput, #logImageInput {
+  width: 100%;
+  margin: 10px 0;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+#logSubmitButton {
+  margin-top: 10px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: #2ecc71;
+  color: white;
+}
+
+#logCloseButton {
+  margin-top: 10px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: #e74c3c;
+  color: white;
+}
+
+
+/* 일기 피드 */
+#logPostContainer {
+  max-width: 900px;
+  margin: 20px auto;
+  padding: 20px;
+  position: relative;
+  z-index: 1; /* 게시글은 팝업보다 뒤로 이동 */
+}
+
+.logPost {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #ccc;
+  border-radius: 5px; /* 각 게시물 모서리 둥글게 */
+  margin-bottom: 15px; /* 게시물 간 간격 추가 */
+  padding: 10px 10PX 0 10PX;
+  background-color: #fff;
+  position: relative; /* 이미지 배치를 위한 상대 위치 */
+}
+
+/* 헤더 스타일 */
+.logPostHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+  color: #555;
+}
+
+.logPostAuthor {
+  font-weight: bold;
+}
+
+.logPostFollow {
+  color: #1e90ff;
+  cursor: pointer;
+}
+
+.logPostFollow:hover {
+  text-decoration: underline;
+}
+
+.logPostTime {
+  font-size: 12px;
+  color: #aaa;
+}
+
+
+/* 일기 본문 */
+.logPostContent {
+  margin: 10px 0;
+  padding: 10px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #333;
+  text-align: left;
+  white-space: pre-wrap; /* 공백과 줄바꿈을 그대로 유지 */
+}
+
+/* Footer 섹션 */
+.logPostFooter {
+  display: flex;
+  justify-content: space-between; /* 요소 간 간격 균등 배치 */
+  align-items: center; /* 세로 정렬 */
+  font-size: 14px;
+  color: #aaa;
+  border-top: 1px solid #eee; /* 상단 구분선 */
+  padding: 10px 0; /* 구분선과 아이콘 간 간격 */
+  color: #333; /* 텍스트 색상 흰색 */
+  width: 100%; /* 가로 전체 채우기 */
+  text-align: center; /* 텍스트 가운데 정렬 */
+  margin-top: auto; /* 상단 요소와의 간격 유지 */
+}
+
+.logPostFooter div {
+  cursor: pointer;
+  display: inline;
+  align-items: center; /* 아이콘과 텍스트 세로 정렬 */
+  gap: 5px; /* 아이콘과 텍스트 간 간격 */
+  flex: 1; /* 요소가 동일한 간격으로 확장 */
+  text-align: center; /* 텍스트와 아이콘을 가운데 정렬 */
+  border-right: 1px solid #eee; /* 오른쪽 구분선 */
+}
+
+.logPostFooter div span {
+  margin-left: 5px;
+}
+
+.logPostFooter div:last-child {
+  border-right: none; /* 마지막 요소는 구분선 제거 */
+}
+
+
+
+/* 댓글 */
+.logReplyContentSection {
+  border-top: 1px solid #eee;
+  padding: 10px;
+}
+
+.logReplyContentInput {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+}
+
+.logReplyContentInput textarea {
+  height: 50px;
+  resize: none;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 8px;
+  margin-bottom: 10px;
+  resize: none;
+}
+
+.logReplyContentInput button {
+  align-self: flex-end;
+  padding: 6px 12px;
+  background-color: #2e89ff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.logReplyContentInput button:hover {
+  background-color: #1c6ed3;
+}
+
+.logReplyContentList {
+  margin-top: 10px;
+}
+
+.logReplyContent {
+  padding: 5px 0;
+  border-bottom: 1px solid #eee;
+  font-size: 14px;
+}
+
+.logReplyContent strong {
+  color: #333;
+}
+/* 자식 댓글 들여쓰기 */
+.reply-item {
+    padding-left: 20px; /* 기본 댓글 들여쓰기 */
+    margin-bottom: 10px;
+}
+
+.reply-item[data-parent-reply-id] {
+    padding-left: 40px; /* 자식 댓글은 더 깊게 들여쓰기 */
+}
+
+/* 게시물 이미지 스타일 */
+.logPostImage {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 5px;
+  position: absolute;
+  top: 35px;
+  right: 10px;
+}
+
+.logPostImageWrapper img {
+    width: 120px; /* 원하는 크기 */
+    height: auto;
+    object-fit: contain;
+}
+
+
+/* 모달 기본 스타일 */
+/* 기본 스타일 */
+.imageGalleryModal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.modal-content {
+    position: relative;
+    margin: 5% auto;
+    padding: 0;
+    width: 90%;
+    max-width: 1200px;
+}
+
+.close {
+    color: white;
+    position: absolute;
+    top: 10px;
+    right: 25px;
+    font-size: 35px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.modal-content img {
+    width: 100%;
+    max-height: 80vh;
+    margin-bottom: 20px;
+}
+
+.arrow {
+    font-size: 50px;
+    color: gray;
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.left-arrow {
+    left: 10px;
+}
+
+.right-arrow {
+    right: 10px;
+}
+
+.imageGalleryModal img {
+    width: 80%; /* 또는 원하는 크기 */
+    height: auto; /* 비율 유지 */
+    max-height: 80vh; /* 화면 높이에 맞게 조정 */
+    display: block;
+    margin: 0 auto; /* 가운데 정렬 */
+    object-fit: contain; /* 비율 유지하면서 잘리지 않게 */
+}
+
+/* 배너 이미지 사이즈 */
+.logBanner img {
+    height: auto; /* 비율을 유지 */
+    border-radius: 15px; /* 테두리 둥글게 */
+    max-width: 900px;
+    margin: 20px auto; /* 위아래: 20px, 좌우 자동 정렬 */
+    object-fit: contain;
+    display: block; /* 가운데 정렬 보장 */
+    padding: 0; /* 패딩 제거 */
+}
+        
+/* 더보기 꾸미기 */
+.show-more {
+    color: blue;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.show-more:hover {
+    color: darkblue;
+}
+
+.show-more:active {
+    color: navy;
+}
+.image-count {
+    font-size: 14px;
+    font-weight: bold;
+    color: #555;
+    margin-bottom: 10px;
+}
+
+.log-images {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+}
+
+.thumbnail {
+    width: 150px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 5px;
+    cursor: pointer;
+}   
+        
+        
+        
+        
+        
+        
+        
+        
+        
