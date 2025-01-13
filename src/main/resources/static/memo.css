@@ -1,0 +1,59 @@
+/* 검색창 및 버튼 스타일 */
+#calendarSearch {
+    display: inline-block;
+    margin-left: 10px;
+}
+
+#calendarSearch input {
+	 width: 150px;
+    margin-right: 5px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+#calendarSearch button {
+    padding: 5px 10px;
+    background-color: #87CEFA;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* 검색 모달 스타일 */
+#searchModal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    z-index: 1000;
+}
+
+#resultsList {
+    list-style: none;
+    padding: 0;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+#resultsList li {
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+    cursor: pointer;
+}
+
+#closeSearchModal {
+    margin-top: 10px;
+    padding: 5px 10px;
+    border: none;
+    background: #87CEFA;
+    color: #fff;
+    border-radius: 5px;
+    cursor: pointer;
+}

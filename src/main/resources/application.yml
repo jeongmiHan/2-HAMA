@@ -1,0 +1,38 @@
+server:
+  port: 9000
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/sdjpa
+    username: root
+    password: root
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+
+  servlet:
+    multipart:
+      max-file-size: 100MB  # 한 파일당 최대용량 제한
+      max-request-size: 500MB  # 모든 파일의 최대용량 제한
+
+  data:
+    web:
+      pageable:
+        default-page-size: 10
+        one-indexed-parameters: true  # 첫페이지를 0이 아닌 1로 설정
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 248467110710-j51o3egh48p66uue56pgmnpo1pnluma2.apps.googleusercontent.com
+            client-secret: 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
+            redirect-uri: "{baseUrl}/login/oauth2/code/google"
+            authorization-grant-type: authorization_code
+            scope:
+              - email
+              - profile

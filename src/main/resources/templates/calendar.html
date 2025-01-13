@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="kor">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- FullCalendar 라이브러리 및 구글 캘린더 플러그인 스크립트 추가 -->
+<script
+	src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.14/index.global.min.js"></script>
+<script
+	src="https://cdn.jsdelivr.net/npm/@fullcalendar/google-calendar@6.1.14/index.global.min.js"></script>
+
+<!-- 외부 CSS 파일 및 Font Awesome 추가 -->
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="/default.css">
+<link rel="stylesheet" href="/modal.css">
+<link rel="stylesheet" href="/memo.css">
+<link
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+	rel="stylesheet">
+
+<title>もふもふ</title>
+
+</head>
+<body>
+	<div class="wrapper">
+		<!--wrapper : 전체 페이지를 감싸는 컨테이너-->
+		<!-- Sidebar -->
+		<nav class="sidebar">
+			<!--sidebar :  왼쪽 메뉴를 담당하는 사이드 바-->
+			<div class="sidebar-header">
+				<h2>프로필</h2>
+			</div>
+			<ul class="sidebar-menu">
+				<li><a href="#">Dashboard</a></li>
+			</ul>
+		</nav>
+
+		<!-- Content Wrapper -->
+		<!--Content Wrapper : 메인 콘텐츠와 상단 네비게이션 바를 감싸는 컨테이너 -->
+		<div class="content-wrapper">
+			<!-- Navbar -->
+			<!--Navbar: 페이지 상단에 위치한 검색창과 알림 프로필 등-->
+			<nav class="navbar">
+				<div class="search-container">
+					<input type="text" placeholder="Search for..." class="search-bar">
+					<button class="search-button">
+						<i class="fas fa-search"></i>
+					</button>
+				</div>
+				<div class="navbar-icons">
+					<div class="icon-group">
+						<div class="icon-item">
+							<i class="fas fa-bell"></i> <span class="notification-badge">3</span>알람
+						</div>
+						<div class="icon-item">
+							<i class="fas fa-envelope"></i> <span class="notification-badge">7</span>메세지
+						</div>
+					</div>
+					<div class="profile-group">
+						<span class="divider"></span> <img src="profile.jpg"
+							alt="Profile Picture" class="profile-pic"> <span
+							class="profile-name">간단한 프로필</span> <span>닉네임: <span
+							th:text="${nickname}"></span></span>
+						<button id="logoutButton" onclick="window.location.href='/user/logout'">로그아웃</button>
+					</div>
+				</div>
+			</nav>
+			<div class="content">
+				<div id='calendar'></div>
+
+				<!-- 모달 배경(작동시 필수) -->
+				<div id="modalBackdrop"></div>
+
+				<!-- 이벤트 추가 모달 -->
+				<div id="eventModal">
+					<h3>もふもふ</h3>
+					<label for="eventTitle">일정명:</label> <input type="text"
+						id="eventTitle" required> <label>시작일자 및 시작시간:
+						<button id="allDayButton">*</button>
+					</label>
+					<div class="time-container">
+						<input type="date" id="startDate" required> <input
+							type="time" id="startTime" required>
+					</div>
+					<label>종료일자 및 종료시간:</label>
+					<div class="time-container">
+						<input type="date" id="endDate" required> <input
+							type="time" id="endTime" required>
+					</div>
+					<label for="eventDescription">일정내용:</label>
+					<textarea id="eventDescription"></textarea>
+					<!-- 색상 선택 -->
+					<label for="eventColorSelect">일정 종류:</label> <select
+						id="eventColorSelect" onchange="selectColor(this.value)">
+						<option value="#F08080" style="background-color: #F08080;"
+							selected>병원예약</option>
+						<option value="#F3E591" style="background-color: #F3E591;">약시간</option>
+						<option value="#98FB98" style="background-color: #98FB98;">유치원</option>
+						<option value="#87CEFA" style="background-color: #87CEFA;">중요</option>
+						<option value="#8080FF" style="background-color: #8080FF;">기타</option>
+					</select> <input type="hidden" id="eventColor" value="#F08080">
+					<!-- 버튼을 같은 줄에 배치 -->
+					<div class="button-container">
+						<button id="addEventButton">일정등록</button>
+						<button id="updateEventButton" style="display: none;">일정수정</button>
+						<button id="deleteEventButton" style="display: none;">일정삭제</button>
+						<button id="closeModal">취소</button>
+					</div>
+				</div>
+
+				<!-- 필터끼리 보여주는 기능-->
+				<div id="filterDropdown" style="display: inline-block;">
+					<select id="filterColor" onchange="filterByColor(this.value)">
+						<option value="all">전체 보기</option>
+						<option value="#F08080" style="background-color: #F08080;">병원예약</option>
+						<option value="#F3E591" style="background-color: #F3E591;">약시간</option>
+						<option value="#98FB98" style="background-color: #98FB98;">유치원</option>
+						<option value="#87CEFA" style="background-color: #87CEFA;">중요</option>
+						<option value="#8080FF" style="background-color: #8080FF;">기타</option>
+					</select>
+				</div>
+				<script src="/assets/js/calander.js"></script>
+</body>
+</html>
