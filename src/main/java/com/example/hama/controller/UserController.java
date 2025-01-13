@@ -1,4 +1,4 @@
-package com.example.hama.controller.user;
+package com.example.hama.controller;
 
 import com.example.hama.model.user.User;
 import com.example.hama.model.user.UserJoin;

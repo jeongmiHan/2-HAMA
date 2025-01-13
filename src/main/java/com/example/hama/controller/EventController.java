@@ -1,4 +1,4 @@
-package com.example.hama.controller.calendar;
+package com.example.hama.controller;
 
 import com.example.hama.config.CustomUserDetails;
 import com.example.hama.model.Events;

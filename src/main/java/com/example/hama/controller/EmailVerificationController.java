@@ -1,4 +1,4 @@
-package com.example.hama.controller.user;
+package com.example.hama.controller;
 
 import com.example.hama.model.GlobalResponse;
 import com.example.hama.model.user.UserEmailRequestDto;
