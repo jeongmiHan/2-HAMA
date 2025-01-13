@@ -1,4 +1,4 @@
-package com.example.hama.controller;
+package com.example.hama.controller.user;
 
 import java.util.HashMap;
 import java.util.Map;
