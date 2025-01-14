@@ -1,5 +1,5 @@
+const logId = window.location.pathname.split("/").pop();
 document.addEventListener("DOMContentLoaded", async () => {
-    const logId = window.location.pathname.split("/").pop(); // URL에서 ID 추출
 	
 	const imageContainer = document.getElementById("logImages");
 	const modal = document.getElementById("imageGalleryModal");
@@ -10,13 +10,128 @@ document.addEventListener("DOMContentLoaded", async () => {
 	let currentImageIndex = 0;
 	let imageList = [];
 	
-	
     const commentInput = document.getElementById("commentInput");
     const submitComment = document.getElementById("submitComment");
     const commentList = document.getElementById("commentList");
     
     let parentReplyId = null; // 부모 댓글 ID
 	
+	const popupContainer = document.getElementById("logPopupContainer");
+	const logContentInput = document.getElementById("logContentInput");
+	const logImageInput = document.getElementById("logImageInput");
+	const logSubmitButton = document.getElementById("logSubmitButton");
+	const logCloseButton = document.getElementById("logCloseButton");
+
+	let deletedFiles = []; // 삭제된 파일 목록
+
+	// 팝업 열기
+	window.openEditPopup = async function () {
+	    const logFileListContainer = document.getElementById("logFileListContainer");
+
+	    try {
+	        const response = await fetch(`/log/${logId}`);
+	        if (!response.ok) throw new Error("일기 조회 실패");
+
+	        const logData = await response.json();
+	        document.getElementById("logContentInput").value = logData.content || "";
+
+	        // 기존 첨부파일 목록 표시
+	        logFileListContainer.innerHTML = logData.images
+	            .map(
+	                (image) => `
+	                <div class="file-item" data-filename="${image}">
+	                    <a href="/log/images/${image}" target="_blank">${image}</a>
+	                    <button type="button" class="delete-file-button" data-filename="${image}">삭제</button>
+	                </div>`
+	            )
+	            .join("");
+
+	        // 삭제 버튼 이벤트 추가
+	        document.querySelectorAll(".delete-file-button").forEach((button) => {
+	            button.addEventListener("click", () => {
+	                const filename = button.getAttribute("data-filename");
+	                deletedFiles.push(filename);
+	                button.parentElement.style.display = "none"; // UI에서 숨기기
+	            });
+	        });
+
+	        document.getElementById("logPopupContainer").style.display = "flex";
+	    } catch (error) {
+	        console.error("팝업 열기 실패:", error);
+	        alert("일기 데이터를 불러오지 못했습니다.");
+	    }
+	};
+
+	// 팝업 닫기 (취소 버튼 클릭)
+	logCloseButton.addEventListener("click", () => {
+	    // 모달 닫기
+	    popupContainer.style.display = "none";
+
+	    // 입력 내용 초기화
+	    logContentInput.value = "";
+	    logImageInput.value = null;
+
+	    // 삭제 대기 목록 초기화 (삭제 예정 상태 취소)
+	    deletedFiles = [];
+
+	    // 기존 상태 복원은 하지 않음 (모달 닫고 끝냄)
+	});
+
+	// 팝업 저장 버튼 클릭
+	logSubmitButton.addEventListener("click", async () => {
+	    const content = logContentInput.value.trim();
+	    if (!content) {
+	        alert("내용을 입력하세요!");
+	        return;
+	    }
+
+	    const formData = new FormData();
+	    formData.append("content", content);
+	    Array.from(logImageInput.files).forEach(file => formData.append("logFiles", file));
+	    formData.append("deletedFiles", JSON.stringify(deletedFiles)); // 삭제 예정 파일 목록 전송
+
+	    try {
+	        const response = await fetch(`/log/${logId}/update`, {
+	            method: "PUT",
+	            body: formData,
+	        });
+
+	        if (!response.ok) throw new Error("일기 수정 실패");
+
+	        alert("일기가 수정되었습니다.");
+	        location.reload();
+	    } catch (error) {
+	        console.error("일기 수정 중 오류:", error);
+	        alert("일기 수정에 실패했습니다.");
+	    }
+	});
+
+	// 수정 첨부파일 삭제
+	async function deleteLog() {
+	    const confirmation = confirm("정말로 삭제하시겠습니까?");
+	    if (!confirmation) return;
+
+	    try {
+	        const response = await fetch(`/log/${logId}/delete`, { method: "DELETE" });
+	        if (!response.ok) throw new Error("삭제 실패");
+
+	        // DOM에서 항목 제거
+	        document.getElementById(`log-${logId}`).remove();
+
+	        alert("일기가 삭제되었습니다.");
+	    } catch (error) {
+	        console.error("삭제 중 오류:", error);
+	    }
+	}
+
+	// UI 업데이트 함수
+	function updateImageList(images) {
+	    const imageContainer = document.getElementById("logImages");
+	    imageContainer.innerHTML = images
+	        .map((image) => `<img src="/log/images/${image}" alt="${image}" />`)
+	        .join("");
+	}
+
 	// 게시글 로드
 	async function loadLogDetail() {
 	    try {
@@ -223,8 +338,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 	    }
 	};
 
-
-
     // 댓글 삭제 함수
     window.deleteReply = async function(button, replyId) {
         const confirmed = confirm("정말로 삭제하시겠습니까?");
@@ -296,98 +409,109 @@ document.addEventListener("DOMContentLoaded", async () => {
 	        }
 	    }
 	});
-	  const menuButton = document.getElementById("menuButton");
-	  const menuDropdown = document.getElementById("menuDropdown");
+    const menuButton = document.getElementById("menuButton");
+    const menuDropdown = document.getElementById("menuDropdown");
 
-	  // 드롭다운 토글
-	  menuButton.addEventListener("click", () => {
+	// 드롭다운 토글
+	menuButton.addEventListener("click", (event) => {
+	    event.stopPropagation(); // 이벤트 버블링 방지
 	    const isVisible = menuDropdown.style.display === "block";
 	    menuDropdown.style.display = isVisible ? "none" : "block";
-	  });
-
-	  // 드롭다운 외부 클릭 시 닫기
-	  document.addEventListener("click", (event) => {
-	    if (!menuButton.contains(event.target)) {
-	      menuDropdown.style.display = "none";
-	    }
-	  });
-
-	// 수정 기능
-	function editLog() {
-	  const logId = window.location.pathname.split("/").pop();
-	  location.href = `/edit/${logId}`; // 수정 페이지로 이동
-	}
-	function toggleEditMode(isEdit) {
-	  const logContent = document.getElementById("logContent");
-	  const logEditContent = document.getElementById("logEditContent");
-	  const saveButton = document.getElementById("saveLogButton");
-
-	  if (isEdit) {
-	    // 수정 모드 활성화
-	    logEditContent.style.display = "block";
-	    logEditContent.value = logContent.textContent.trim();
-	    logContent.style.display = "none";
-	    saveButton.style.display = "inline-block";
-	  } else {
-	    // 수정 모드 비활성화
-	    logEditContent.style.display = "none";
-	    logContent.style.display = "block";
-	    saveButton.style.display = "none";
-	  }
-	}
-
-	function saveLog() {
-	  const logId = window.location.pathname.split("/").pop();
-	  const logEditContent = document.getElementById("logEditContent");
-
-	  fetch(`/log/${logId}/update`, {
-	    method: "PUT",
-	    headers: { "Content-Type": "application/json" },
-	    body: JSON.stringify({ content: logEditContent.value.trim() }),
-	  })
-	    .then((response) => {
-	      if (!response.ok) throw new Error("일기 저장 실패");
-	      return response.json();
-	    })
-	    .then((data) => {
-	      if (data.status === "success") {
-	        alert("일기가 저장되었습니다.");
-	        document.getElementById("logContent").textContent = logEditContent.value.trim();
-	        toggleEditMode(false);
-	      } else {
-	        throw new Error(data.message || "일기 저장 실패");
-	      }
-	    })
-	    .catch((error) => {
-	      console.error("일기 저장 오류:", error);
-	      alert("일기를 저장하는 중 오류가 발생했습니다.");
-	    });
-	}
-
-	// 수정 버튼 이벤트 추가
-	document.getElementById("menuDropdown").addEventListener("click", (event) => {
-	  if (event.target.textContent === "수정") {
-	    toggleEditMode(true);
-	  }
 	});
+
+	// 드롭다운 외부 클릭 시 닫기
+	document.addEventListener("click", () => {
+	    menuDropdown.style.display = "none";
+	});
+
+	// 수정 버튼 클릭
+	document.querySelector("#menuDropdown li:nth-child(1)").addEventListener("click", () => {
+	    menuDropdown.style.display = "none";
+	    openEditPopup();
+	});
+
+	function openEditPopup() {
+	    const popupContainer = document.getElementById("logPopupContainer");
+	    popupContainer.style.display = "flex";
+	}
 	// 삭제 기능
 	window.deleteLog = async function() {
-	  const logId = window.location.pathname.split("/").pop();
-	  const confirmation = confirm("정말로 삭제하시겠습니까?");
-	  if (confirmation) {
+	    const confirmation = confirm("정말로 삭제하시겠습니까?");
+	    if (!confirmation) return;
 	    try {
-	      const response = await fetch(`/log/${logId}/delete`, { method: "DELETE" });
-	      if (response.ok) {
+	        const response = await fetch(`/log/${logId}/delete`, { method: "DELETE" });
+	        if (!response.ok) throw new Error("삭제 실패");
+	        // DOM에서 항목 제거
+	        document.getElementById(`log-${logId}`).remove();
 	        alert("일기가 삭제되었습니다.");
-	        location.href = "/"; // 삭제 후 목록으로 이동
-	      } else {
-	        throw new Error("삭제 실패");
-	      }
 	    } catch (error) {
-	      alert("삭제 중 오류가 발생했습니다.");
-	      console.error(error);
+	        console.error("삭제 중 오류:", error);
+	        alert("삭제에 실패했습니다.");
 	    }
-	  }
 	};
+	
+	function toggleEditMode(isEdit) {
+	    const logContent = document.getElementById("logContent");
+	    const logEditContent = document.getElementById("logEditContent");
+	    const saveButton = document.getElementById("saveLogButton");
+	    const logEditFileContainer = document.getElementById("logEditFileContainer");
+	    const logEditFileInput = document.getElementById("logEditFileInput");
+
+	    if (isEdit) {
+	        // 수정 모드 활성화
+	        logEditContent.style.display = "block";
+	        logEditContent.value = logContent.textContent.trim();
+	        logContent.style.display = "none";
+	        saveButton.style.display = "inline-block";
+	        logEditFileContainer.style.display = "block";
+
+	        // 기존 첨부파일 프리뷰 로드 (가정: currentLogAttachment는 서버에서 받은 첨부파일 정보)
+	        if (currentLogAttachment) {
+	            const attachmentPreview = document.createElement("p");
+	            attachmentPreview.id = "logAttachmentPreview";
+	            attachmentPreview.textContent = `첨부된 파일: ${currentLogAttachment}`;
+	            logEditFileContainer.prepend(attachmentPreview);
+	        }
+	    } else {
+	        // 수정 모드 비활성화
+	        logEditContent.style.display = "none";
+	        logContent.style.display = "block";
+	        saveButton.style.display = "none";
+	        logEditFileContainer.style.display = "none";
+
+	        // 기존 프리뷰 제거
+	        const attachmentPreview = document.getElementById("logAttachmentPreview");
+	        if (attachmentPreview) {
+	            attachmentPreview.remove();
+	        }
+	    }
+	}
+
+	async function saveLog() {
+	    const logEditContent = document.getElementById("logContentInput").value.trim();
+	    const logImageInput = document.getElementById("logImageInput");
+
+	    const formData = new FormData();
+	    formData.append("content", logEditContent);
+	    Array.from(logImageInput.files).forEach(file => formData.append("logFiles", file));
+	    formData.append("deletedFiles", JSON.stringify(deletedFiles)); // 삭제 대기 목록 전송
+
+	    try {
+	        const response = await fetch(`/log/${logId}/update`, {
+	            method: "PUT",
+	            body: formData,
+	        });
+
+	        if (response.ok) {
+	            alert("일기가 수정되었습니다.");
+	            location.reload(); // 수정 후 페이지 새로고침
+	        } else {
+	            throw new Error("일기 수정 실패");
+	        }
+	    } catch (error) {
+	        console.error("일기 수정 중 오류 발생:", error);
+	        alert("일기 수정에 실패했습니다.");
+	    }
+	}
 	
 });

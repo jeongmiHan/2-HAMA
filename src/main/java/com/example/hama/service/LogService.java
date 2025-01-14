@@ -52,16 +52,59 @@ public class LogService {
         }
     }
 
-    public void updateLog(Long logId, Log updatedLog) {
-        Log existingLog = logRepository.findById(logId)
-            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 일기입니다."));
+    public void updateLog(Long logId, String content, List<MultipartFile> logFiles, List<String> deletedFiles) {
+        Log log = logRepository.findById(logId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 일기입니다."));
 
-        // 필요한 필드만 업데이트
-        existingLog.setLogContent(updatedLog.getLogContent());
-        existingLog.setUpdatedAt(LocalDateTime.now()); // 수정 시간 기록
+        log.setLogContent(content);
 
-        logRepository.save(existingLog); // 저장
+        // 삭제 예정 파일 처리
+        if (deletedFiles != null && !deletedFiles.isEmpty()) {
+            for (String filename : deletedFiles) {
+                deleteLogFile(logId, filename);
+            }
+        }
+
+        // 새 파일 저장
+        if (logFiles != null && !logFiles.isEmpty()) {
+            List<LogAttachedFile> attachedFiles = logFileService.logSaveFiles(logFiles);
+            for (LogAttachedFile file : attachedFiles) {
+                file.setLog(log);
+                logFileRepository.save(file);
+            }
+        }
+
+        logRepository.save(log);
     }
+
+    
+    public void deleteLogFile(Long logId, String filename) {
+        Log log = logRepository.findById(logId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 일기입니다."));
+
+        LogAttachedFile fileToDelete = log.getLogAttachedFiles().stream()
+                .filter(file -> file.getLog_saved_filename().equalsIgnoreCase(filename.trim()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 파일입니다."));
+
+        // 파일 삭제
+        Path filePath = Paths.get(uploadPath).resolve(filename).normalize();
+        try {
+            Files.deleteIfExists(filePath);
+        } catch (IOException e) {
+            throw new RuntimeException("파일 삭제 실패: " + filename, e);
+        }
+
+        // 데이터베이스에서 파일 삭제
+        logFileRepository.delete(fileToDelete);
+
+        // 로그 객체에서 파일 제거
+        log.getLogAttachedFiles().remove(fileToDelete);
+        logRepository.save(log);
+    }
+
+
+
 	    
 	// ID로 로그 조회
 	public Optional<Log> findById(Long id) {
@@ -85,14 +128,6 @@ public class LogService {
 		return log.orElse(null);
 	}
 
-    // 일기 삭제 (첨부파일 포함)
-    public void removeLog(Log log) {
-        List<LogAttachedFile> attachedFiles = log.getLogAttachedFiles();
-        if (attachedFiles != null && !attachedFiles.isEmpty()) {
-            //attachedFiles.forEach(this::removeFile); // 파일 삭제
-        }
-        logRepository.deleteById(log.getLogId()); // 로그 삭제
-    }
     public void deleteLog(Long logId) {
         Log log = logRepository.findById(logId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 일기입니다."));
