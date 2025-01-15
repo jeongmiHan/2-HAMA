@@ -13,6 +13,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -30,7 +31,7 @@ public class Log {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long logId;	//일지 아이디
 	
-	@ManyToOne // 한명이 여러개의 일지를 쓰니까
+	@ManyToOne(fetch = FetchType.EAGER) // 한명이 여러개의 일지를 쓰니까
 	@JoinColumn(name="user_id")
 	private User user;	   //사용자
 	

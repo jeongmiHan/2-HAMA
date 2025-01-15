@@ -45,9 +45,11 @@
           </div>
         </div>
         <div class="profile-group">
-          <span class="divider"></span>
-          <img src="" alt="Profile Picture" class="profile-pic">
-          <span class="profile-name">간단한 프로필</span>
+		  <span class="divider"></span> <img src="profile.jpg"
+			alt="Profile Picture" class="profile-pic"> <span
+			class="profile-name">간단한 프로필</span> <span>닉네임: <span
+			th:text="${nickname}"></span></span>
+		<button id="logoutButton" onclick="window.location.href='/user/logout'">로그아웃</button>
         </div>
       </div>
       </nav>

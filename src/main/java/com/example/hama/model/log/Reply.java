@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.hama.model.user.User;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -11,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -33,7 +35,11 @@ public class Reply {
 	@JoinColumn(name="log_id")
 	@JsonIgnore // 부모 댓글에서 참조 방지
 	private Log log;
-
+	
+	@ManyToOne(fetch = FetchType.EAGER) // 한명이 여러개의 일지를 쓰니까
+	@JoinColumn(name="user_id")
+	private User user;	   //사용자
+	
 	@Column
 	private String logReplyContent;
 	
