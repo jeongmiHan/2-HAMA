@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
@@ -36,7 +37,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         String provider = userRequest.getClientRegistration().getRegistrationId();
         String providerUserId = oAuth2User.getAttribute("sub");
         String email = oAuth2User.getAttribute("email");
-        String name = oAuth2User.getAttribute("name");
+
+        // "google_" 접두사와 8자리 난수 생성
+        String randomUsername = generateRandomUsername(provider);
 
         log.info("OAuth2 로그인 시도: provider={}, providerUserId={}", provider, providerUserId);
 
@@ -48,7 +51,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             newUser.setProvider(provider);
             newUser.setProviderUserId(providerUserId);
             newUser.setEmail(email);
-            newUser.setName(name);
+            newUser.setName(randomUsername); // "google_8자리" 형식으로 사용자 이름 설정
             newUser.setRole(Role.USER);
             newUser.setJoinDate(LocalDate.now());
             userRepository.save(newUser);
@@ -66,6 +69,15 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 oAuth2User.getAttributes(),
                 "name" // 기본 필드 이름 매핑
         );
+    }
+
+    /**
+     * "google_8자리" 형식으로 난수 생성
+     */
+    private String generateRandomUsername(String provider) {
+        Random random = new Random();
+        int number = random.nextInt(100000000); // 8자리 숫자 생성
+        return provider + "_" + String.format("%08d", number); // "google_00000000" 형식
     }
 
     /**

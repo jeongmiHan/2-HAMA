@@ -1,4 +1,5 @@
 const logId = window.location.pathname.split("/").pop();
+
 document.addEventListener("DOMContentLoaded", async () => {
 	
 	const imageContainer = document.getElementById("logImages");
@@ -24,7 +25,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 	let deletedFiles = []; // 삭제된 파일 목록
 
-	// 팝업 열기
+		// 팝업 열기
 	window.openEditPopup = async function () {
 	    const logFileListContainer = document.getElementById("logFileListContainer");
 
@@ -139,7 +140,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 	        const log = await response.json();
 
 	        // 화면에 데이터 적용
-	        document.getElementById("logAuthor").innerText = log.author || "익명";
+	        document.getElementById("nickname").innerText = log.author || nickname;
 	        document.getElementById("logTime").innerText = log.timeAgo || "시간 정보 없음";
 	        document.getElementById("logContent").innerText = log.content || "내용 없음";
 
@@ -223,7 +224,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 	      }
 	    } else {
 	      // 삭제되지 않은 댓글 처리
-	      replyElement.querySelector(".author-name").textContent = reply.author || "익명";
+	      replyElement.querySelector(".author-name").textContent = reply.author;
 	      replyElement.querySelector(".comment-time").textContent = reply.timeAgo || "방금 전";
 	      replyElement.querySelector(".comment-content p").textContent = reply.logReplyContent;
 	      replyElement.querySelector(".like-count").textContent = reply.likes || 0;

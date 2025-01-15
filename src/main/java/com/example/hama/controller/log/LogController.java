@@ -17,7 +17,10 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,6 +39,7 @@ import com.example.hama.dto.LogDTO;
 import com.example.hama.model.log.Log;
 import com.example.hama.model.log.LogAttachedFile;
 import com.example.hama.model.log.LogWrite;
+import com.example.hama.model.user.User;
 import com.example.hama.repository.LogFileRepository;
 import com.example.hama.repository.LogRepository;
 import com.example.hama.repository.ReplyRepository;
@@ -62,6 +66,12 @@ public class LogController {
 	    @GetMapping("indexLog")
 	    public String showIndexLog() {
 	        return "log/indexLog"; // src/main/resources/templates/log/indexLog.html
+	    }
+	    @GetMapping("/log")
+	    public String indexLog(Model model, @AuthenticationPrincipal UserDetails user) {
+	        String nickname = user.getUsername(); // 로그인된 사용자 닉네임 가져오기
+	        model.addAttribute("nickname", nickname);
+	        return "indexLog"; // indexLog.html로 이동
 	    }
 		// 일기 등록
 		@PostMapping("add")

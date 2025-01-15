@@ -72,7 +72,16 @@
 
         <!-- 일기 내용 -->
 		<div id="logDetailContainer">
-		    <p id="logAuthor"></p>
+	        <div id="logAuthor" class="logAuthor">
+	          <img src="/path/to/profile.jpg" alt="프로필 사진" class="profile-image">
+	          <div class="author-info">
+			    <span class="author-name" id="nickname"></span>
+			    <div class="profile-group">
+			      <span th:text="${nickname}" id="nickname"></span>
+			    </div>
+	          </div>
+	        </div>
+				  
 		    <p id="logTime"></p>
 		    <div id="logContentContainer">
 			    <div id="logContent" contenteditable="false"></div>
@@ -116,8 +125,11 @@
 		      <div class="comment-author">
 		        <img src="/path/to/profile.jpg" alt="프로필 사진" class="profile-image">
 		        <div class="author-info">
-		          <p class="author-name">익명</p>
-		          <p class="comment-time">방금 전</p>
+				  <span class="author-name" id="nickname"></span>
+				  <div class="profile-group">
+				    <span th:text="${nickname}"></span>
+				  </div>
+		          <p class="comment-time"></p>
 		        </div>
 		      </div>
 		      <!-- 수정/삭제 버튼 -->
@@ -132,7 +144,7 @@
 		    <div class="comment-footer">
 		      <button class="reply-button">답글</button>
 		      <span class="like">
-		        <i class="fas fa-heart"></i> <span class="like-count">0</span>
+		        <i class="fas fa-heart"></i> <span class="like-count"></span>
 		      </span>
 		    </div>
 		  </div>

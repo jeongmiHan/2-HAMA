@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.hama.model.log.Log;
+import com.example.hama.model.user.User;
 import com.example.hama.repository.LogFileRepository;
 import com.example.hama.service.LogService;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -30,9 +32,11 @@ public class LogDetailController {
 
     private final LogService logService;
     private final LogFileRepository logFileRepository;
-
+    
     @GetMapping("/detail/{logId}")
-    public String getLogDetail(@PathVariable("logId") Long logId, Model model) {
+    public String getLogDetail(@PathVariable("logId") Long logId
+    						   , Model model
+    						   , @RequestParam("name") String nickname) {
         // ID를 통해 로그 정보 조회
         Log log = logService.findById(logId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid log ID: " + logId));
@@ -43,6 +47,8 @@ public class LogDetailController {
         // logDetail.html로 이동
         return "log/logDetail";
     }
+
+
     @DeleteMapping("/log/{logId}/delete")
     public ResponseEntity<?> deleteLog(@PathVariable("logId") Long logId) {
         try {
