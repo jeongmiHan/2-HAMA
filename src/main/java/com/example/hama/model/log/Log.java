@@ -32,7 +32,7 @@ public class Log {
 	private Long logId;	//일지 아이디
 	
 	@ManyToOne(fetch = FetchType.EAGER) // 한명이 여러개의 일지를 쓰니까
-	@JoinColumn(name="user_id")
+	@JoinColumn(name="user_id", nullable = false)
 	private User user;	   //사용자
 	
 	@Column

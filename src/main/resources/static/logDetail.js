@@ -140,7 +140,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 	        const log = await response.json();
 
 	        // 화면에 데이터 적용
-	        document.getElementById("nickname").innerText = log.author || nickname;
+	        document.getElementById("nickname").innerText = log.author || "익명";
 	        document.getElementById("logTime").innerText = log.timeAgo || "시간 정보 없음";
 	        document.getElementById("logContent").innerText = log.content || "내용 없음";
 

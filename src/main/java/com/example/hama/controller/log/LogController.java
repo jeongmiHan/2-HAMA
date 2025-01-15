@@ -17,8 +17,11 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -35,6 +38,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.hama.config.CustomUserDetails;
 import com.example.hama.dto.LogDTO;
 import com.example.hama.model.log.Log;
 import com.example.hama.model.log.LogAttachedFile;
@@ -45,6 +49,7 @@ import com.example.hama.repository.LogRepository;
 import com.example.hama.repository.ReplyRepository;
 import com.example.hama.service.LogFileService;
 import com.example.hama.service.LogService;
+import com.example.hama.service.UserService;
 import com.example.hama.util.SNSTime;
 
 import lombok.RequiredArgsConstructor;
@@ -58,20 +63,34 @@ public class LogController {
 	private String uploadPath;
 
     private final LogService logService;
+    private final UserService userService;
 	private final LogFileService logFileService;
 	private final LogRepository logRepository;
 	private final ReplyRepository replyRepository;
 	private final LogFileRepository logFileRepository;
 	
 	    @GetMapping("indexLog")
-	    public String showIndexLog() {
+	    public String showIndexLog(Model model
+	    							, @RequestParam(name = "name", required = false) String nickname) {
+	    	User user = getAuthenticatedUser();
+	        if(user == null) {
+	           return "redirect:/user/login";
+	        }
+	        model.addAttribute("nickname", user.getName());
 	        return "log/indexLog"; // src/main/resources/templates/log/indexLog.html
 	    }
-	    @GetMapping("/log")
-	    public String indexLog(Model model, @AuthenticationPrincipal UserDetails user) {
-	        String nickname = user.getUsername(); // 로그인된 사용자 닉네임 가져오기
-	        model.addAttribute("nickname", nickname);
-	        return "indexLog"; // indexLog.html로 이동
+	    private User getAuthenticatedUser() {
+	        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	        if (authentication != null && authentication.isAuthenticated()) {
+	            Object principal = authentication.getPrincipal();
+	            if (principal instanceof CustomUserDetails userDetails) {
+	                return userDetails.getUser();
+	            } else if (principal instanceof DefaultOAuth2User oAuth2User) {
+	                String providerUserId = (String) oAuth2User.getAttributes().get("sub");
+	                return userService.findUserByProviderUserId(providerUserId);
+	            }
+	        }
+	        return null;
 	    }
 		// 일기 등록
 		@PostMapping("add")
@@ -83,12 +102,18 @@ public class LogController {
 
 		    Log log = LogWrite.toLog(logWrite);
 		    
+		    User user = getAuthenticatedUser();
+		      if(user == null) {
+		    	  return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+		      }
+		      log.setUser(user);
+		      
 		    if (parentId != null) {
 		        Log parentLog = logRepository.findById(parentId)
 		                .orElseThrow(() -> new IllegalArgumentException("Invalid parent ID"));
 		        log.setParent(parentLog);
 		    }
-
+		    
 		    log = logRepository.save(log);
 
 		    // 여러 파일 저장 처리
@@ -140,13 +165,18 @@ public class LogController {
 		@GetMapping("/list")
 		public ResponseEntity<?> getAllLogs() {
 		    try {
+			    User user = getAuthenticatedUser();
+			      if(user == null) {
+			    	  return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+			      }
 		        List<Log> logs = logRepository.findAll();
 		        List<Map<String, Object>> response = logs.stream().map(log -> {
 		            Map<String, Object> logData = new HashMap<>();
+		            User logUser = log.getUser(); // 로그 작성자
+		            logData.put("author", logUser != null ? logUser.getName() : "익명");
 		            
 		            logData.put("id", log.getLogId());
 		            logData.put("content", log.getLogContent());
-		            logData.put("author", "익명");
 		            // 절대 시간
 		            LocalDateTime createdDate = log.getLogCreatedDate();
 		            logData.put("time", createdDate); 

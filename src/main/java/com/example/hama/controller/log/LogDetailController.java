@@ -5,7 +5,10 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,10 +20,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.hama.config.CustomUserDetails;
 import com.example.hama.model.log.Log;
 import com.example.hama.model.user.User;
 import com.example.hama.repository.LogFileRepository;
 import com.example.hama.service.LogService;
+import com.example.hama.service.UserService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -31,24 +36,43 @@ import lombok.RequiredArgsConstructor;
 public class LogDetailController {
 
     private final LogService logService;
+    private final UserService userService;
     private final LogFileRepository logFileRepository;
     
     @GetMapping("/detail/{logId}")
-    public String getLogDetail(@PathVariable("logId") Long logId
-    						   , Model model
-    						   , @RequestParam("name") String nickname) {
-        // ID를 통해 로그 정보 조회
+    public String getLogDetail(
+        @PathVariable("logId") Long logId,
+        Model model,
+        @RequestParam(name = "name", required = false) String nickname
+    ) {
         Log log = logService.findById(logId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid log ID: " + logId));
+        
 
-        // 모델에 데이터 추가
+    	User user = getAuthenticatedUser();
+        if(user == null) {
+           return "redirect:/user/login";
+        }
+        model.addAttribute("nickname", user.getName());
         model.addAttribute("log", log);
-
-        // logDetail.html로 이동
-        return "log/logDetail";
+        
+        return "log/logDetail"; // logDetail.html 반환
     }
 
 
+    private User getAuthenticatedUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            Object principal = authentication.getPrincipal();
+            if (principal instanceof CustomUserDetails userDetails) {
+                return userDetails.getUser();
+            } else if (principal instanceof DefaultOAuth2User oAuth2User) {
+                String providerUserId = (String) oAuth2User.getAttributes().get("sub");
+                return userService.findUserByProviderUserId(providerUserId);
+            }
+        }
+        return null;
+    }
     @DeleteMapping("/log/{logId}/delete")
     public ResponseEntity<?> deleteLog(@PathVariable("logId") Long logId) {
         try {
