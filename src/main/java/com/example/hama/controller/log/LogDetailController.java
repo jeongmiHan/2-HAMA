@@ -1,5 +1,6 @@
 package com.example.hama.controller.log;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,10 +23,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.hama.config.CustomUserDetails;
 import com.example.hama.model.log.Log;
+import com.example.hama.model.log.LogAttachedFile;
 import com.example.hama.model.user.User;
 import com.example.hama.repository.LogFileRepository;
+import com.example.hama.repository.LogRepository;
 import com.example.hama.service.LogService;
 import com.example.hama.service.UserService;
+import com.example.hama.util.SNSTime;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -38,6 +42,7 @@ public class LogDetailController {
     private final LogService logService;
     private final UserService userService;
     private final LogFileRepository logFileRepository;
+    private final LogRepository logRepository;
     
     @GetMapping("/detail/{logId}")
     public String getLogDetail(
@@ -129,6 +134,37 @@ public class LogDetailController {
                                  .body("일기 수정 중 오류 발생: " + e.getMessage());
         }
     }
+	@GetMapping("/log/{logId}")
+	public ResponseEntity<?> getLogById(@PathVariable("logId") Long logId
+									   , @RequestParam(name = "name", required = false) String nickname) {
+	    try {
+	        Log log = logRepository.findById(logId)
+	            .orElseThrow(() -> new IllegalArgumentException("Log not found"));
+	    	User user = getAuthenticatedUser();
+	        if(user == null) {
+	        	return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+	        }
+
+	        // 상대 시간 계산 추가
+	        String timeAgo = SNSTime.getTimeAgo(log.getLogCreatedDate());
+
+	        Map<String, Object> logData = new HashMap<>();
+            User logUser = log.getUser(); // 로그 작성자
+            logData.put("author", logUser != null ? logUser.getName() : "익명");
+	        logData.put("id", log.getLogId());
+	        logData.put("content", log.getLogContent());
+	        logData.put("time", log.getLogCreatedDate());
+	        logData.put("timeAgo", timeAgo); // 상대 시간 추가
+	        logData.put("images", log.getLogAttachedFiles().stream()
+	            .map(LogAttachedFile::getLog_saved_filename)
+	            .toList());
+
+	        return ResponseEntity.ok(logData);
+	    } catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+	                             .body("Error retrieving log details: " + e.getMessage());
+	    }
+	}
 
     
 

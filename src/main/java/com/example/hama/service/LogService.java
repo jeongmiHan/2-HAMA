@@ -110,6 +110,7 @@ public class LogService {
 	public Optional<Log> findById(Long id) {
 	    return logRepository.findById(id);
 	}
+	
 	//일기 전체 조회
 	public List<Log> findLogs() {
 		List<Log> log = logRepository.findAll();

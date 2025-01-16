@@ -77,7 +77,6 @@
 	          <div class="author-info">
 			    <span class="author-name" id="nickname"></span>
 			    <div class="profile-group">
-			      <span th:text="${nickname}"></span>
 			    </div>
 	          </div>
 	        </div>
@@ -121,17 +120,28 @@
 		<!-- 댓글 템플릿 -->
 		<template id="comment-template">
 		  <div class="reply-item">
+		  
 		    <div class="comment-header">
 		      <div class="comment-author">
 		        <img src="/path/to/profile.jpg" alt="프로필 사진" class="profile-image">
 		        <div class="author-info">
 				  <span class="author-name" id="nickname"></span>
 				  <div class="profile-group">
-				    <span th:text="${nickname}"></span>
 				  </div>
+				  
+			  <div class="comment-author">
+		          <img src="/path/to/profile.jpg" alt="프로필 사진" class="profile-image">
+		          <div class="author-info">
+				    <span class="author-name" id="nickname"><span
+				th:text="${nickname}"></span></span>
+				    <div class="profile-group">
+				    </div>
+		          </div>
+	          </div>
 		          <p class="comment-time"></p>
 		        </div>
 		      </div>
+		      
 		      <!-- 수정/삭제 버튼 -->
 		      <div class="comment-actions">
 		        <button class="edit-button">수정</button>

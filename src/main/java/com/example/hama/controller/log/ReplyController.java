@@ -8,6 +8,10 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,13 +19,17 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.hama.config.CustomUserDetails;
 import com.example.hama.dto.ReplyDTO;
 import com.example.hama.model.log.Log;
 import com.example.hama.model.log.Reply;
+import com.example.hama.model.user.User;
 import com.example.hama.repository.LogRepository;
 import com.example.hama.repository.ReplyRepository;
+import com.example.hama.service.UserService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -31,10 +39,26 @@ import lombok.RequiredArgsConstructor;
 public class ReplyController {
 	
 	private final LogRepository logRepository;
-	private final ReplyRepository replyRepository;
+ 	private final ReplyRepository replyRepository;
+ 	private final UserService userService;
 	
-	@PostMapping("/log/{postId}/reply")
-	public ResponseEntity<?> addReply(@PathVariable("postId") Long postId, @RequestBody Map<String, Object> request) {
+    private User getAuthenticatedUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            Object principal = authentication.getPrincipal();
+            if (principal instanceof CustomUserDetails userDetails) {
+                return userDetails.getUser();
+            } else if (principal instanceof DefaultOAuth2User oAuth2User) {
+                String providerUserId = (String) oAuth2User.getAttributes().get("sub");
+                return userService.findUserByProviderUserId(providerUserId);
+            }
+        }
+        return null;
+    }
+	@PostMapping("/log/{logId}/reply")
+	public ResponseEntity<?> addReply(@PathVariable("logId") Long logId
+													, @RequestBody Map<String, Object> request
+													, @RequestParam(name = "name", required = false) String nickname) {
 	    try {
 	        // 댓글 내용 및 부모 ID 추출
 	        String logReplyContent = (String) request.get("logReplyContent");
@@ -44,12 +68,16 @@ public class ReplyController {
 	        if (logReplyContent == null || logReplyContent.trim().isEmpty()) {
 	            throw new IllegalArgumentException("댓글 내용이 비어있습니다.");
 	        }
-
-	        Log log = logRepository.findById(postId)
+		    User user = getAuthenticatedUser();
+		      if(user == null) {
+		    	  return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+		      }
+	        Log log = logRepository.findById(logId)
 	                .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
 
 	        // 댓글 객체 생성
 	        Reply reply = new Reply();
+	        reply.setUser(user);
 	        reply.setLog(log);
 	        reply.setLogReplyContent(logReplyContent);
 	        reply.setLogCreatedTime(LocalDateTime.now());
@@ -116,14 +144,18 @@ public class ReplyController {
 	    }
 	}
 	// 댓글 목록 조회
-	@GetMapping("/log/{postId}/replies")
-	public ResponseEntity<?> getReplies(@PathVariable("postId") Long postId) {
+	@GetMapping("/log/{logId}/replies")
+	public ResponseEntity<?> getReplies(@PathVariable("logId") Long logId
+									  , @RequestParam(name = "name", required = false) String nickname) {
 	    try {
-	        Log log = logRepository.findById(postId)
+	        Log log = logRepository.findById(logId)
 	                .orElseThrow(() -> new IllegalArgumentException("Invalid log ID"));
-
+		    User user = getAuthenticatedUser();
+	        if(user == null) {
+	    	    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+	        }
 	        List<Reply> replies = replyRepository.findByLog(log);
-
+		    log.setUser(user);
 	        return ResponseEntity.ok(Map.of(
 	            "status", "success",
 	            "replies", buildReplyHierarchy(replies)
@@ -140,6 +172,8 @@ public class ReplyController {
 
 	    for (Reply reply : replies) {
 	        ReplyDTO dto = new ReplyDTO(reply);
+	        // 댓글 작성자 정보 추가
+	        
 	        replyMap.put(dto.getId(), dto);
 	    }
 

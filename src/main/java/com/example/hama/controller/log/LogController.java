@@ -94,10 +94,10 @@ public class LogController {
 	    }
 		// 일기 등록
 		@PostMapping("add")
-		public ResponseEntity<?> write(
-		    @Validated @ModelAttribute LogWrite logWrite,
-		    @RequestParam(value = "parentId", required = false) Long parentId,
-		    @RequestParam(value = "logFiles", required = false) List<MultipartFile> logFiles
+		public ResponseEntity<?> write( @Validated @ModelAttribute LogWrite logWrite
+									  , @RequestParam(value = "parentId", required = false) Long parentId
+									  , @RequestParam(value = "logFiles", required = false) List<MultipartFile> logFiles
+									  , @RequestParam(name = "name", required = false) String nickname
 		) throws IOException {
 
 		    Log log = LogWrite.toLog(logWrite);
@@ -216,31 +216,7 @@ public class LogController {
 		    }
 		}
 
-		@GetMapping("/{logId}")
-		public ResponseEntity<?> getLogById(@PathVariable("logId") Long logId) {
-		    try {
-		        Log log = logRepository.findById(logId)
-		            .orElseThrow(() -> new IllegalArgumentException("Log not found"));
 
-		        // 상대 시간 계산 추가
-		        String timeAgo = SNSTime.getTimeAgo(log.getLogCreatedDate());
-
-		        Map<String, Object> logData = new HashMap<>();
-		        logData.put("id", log.getLogId());
-		        logData.put("content", log.getLogContent());
-		        logData.put("author", "익명");
-		        logData.put("time", log.getLogCreatedDate());
-		        logData.put("timeAgo", timeAgo); // 상대 시간 추가
-		        logData.put("images", log.getLogAttachedFiles().stream()
-		            .map(LogAttachedFile::getLog_saved_filename)
-		            .toList());
-
-		        return ResponseEntity.ok(logData);
-		    } catch (Exception e) {
-		        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-		                             .body("Error retrieving log details: " + e.getMessage());
-		    }
-		}
 
 
 

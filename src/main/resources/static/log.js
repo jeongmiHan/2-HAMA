@@ -264,7 +264,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 		    : "";	
         postElement.innerHTML = `
 			<div class="logPostHeader">
-			    <div class="logPostAuthor">${post.author}</div>
+			    <div class="logPostAuthor" id="nickname">${post.author}</div>
 			    <div class="logPostTime">${post.timeAgo}</div>
 			</div>
 			<div class="logPostContent" data-id="${post.id}">${displayContent}</div>
