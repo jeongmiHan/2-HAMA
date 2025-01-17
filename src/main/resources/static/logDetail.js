@@ -223,7 +223,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 	        renderReplies(reply.childReplies, childContainer); // 자식 댓글 재귀 렌더링
 	      }
 	    } else {
-	      replyElement.querySelector("#nickname").textContent = reply.author || nickname;
+	      replyElement.querySelector("[data-nickname]").textContent = reply.author || nickname;
 	      replyElement.querySelector(".comment-time").textContent = reply.timeAgo || "방금 전";
 	      replyElement.querySelector(".comment-content p").textContent = reply.logReplyContent;
 	      replyElement.querySelector(".like-count").textContent = reply.likes || 0;

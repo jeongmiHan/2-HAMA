@@ -76,8 +76,7 @@
 	          <img src="/path/to/profile.jpg" alt="프로필 사진" class="profile-image">
 	          <div class="author-info">
 			    <span class="author-name" id="nickname"></span>
-			    <div class="profile-group">
-			    </div>
+			    <div class="profile-group"></div>
 	          </div>
 	        </div>
 				  
@@ -119,46 +118,33 @@
 		
 		<!-- 댓글 템플릿 -->
 		<template id="comment-template">
-		  <div class="reply-item">
-		  
-		    <div class="comment-header">
-		      <div class="comment-author">
-		        <img src="/path/to/profile.jpg" alt="프로필 사진" class="profile-image">
-		        <div class="author-info">
-				  <span class="author-name" id="nickname"></span>
-				  <div class="profile-group">
-				  </div>
-				  
-			  <div class="comment-author">
-		          <img src="/path/to/profile.jpg" alt="프로필 사진" class="profile-image">
-		          <div class="author-info">
-				    <span class="author-name" id="nickname"><span
-				th:text="${nickname}"></span></span>
-				    <div class="profile-group">
-				    </div>
-		          </div>
-	          </div>
-		          <p class="comment-time"></p>
+		    <div class="reply-item">
+		        <div class="comment-header">
+		            <div class="comment-author">
+		                <img src="/path/to/profile.jpg" alt="프로필 사진" class="profile-image">
+		                <div class="author-info">
+		                    <span class="author-name" data-nickname></span>
+		                    <div class="profile-group"></div>
+		                    <p class="comment-time"></p>
+		                </div>
+		            </div>
+		            <div class="comment-actions">
+		                <button class="edit-button">수정</button>
+		                <button class="delete-button">삭제</button>
+		            </div>
 		        </div>
-		      </div>
-		      
-		      <!-- 수정/삭제 버튼 -->
-		      <div class="comment-actions">
-		        <button class="edit-button">수정</button>
-		        <button class="delete-button">삭제</button>
-		      </div>
+		        <div class="comment-content">
+		            <p>댓글 내용</p>
+		        </div>
+		        <div class="comment-footer">
+		            <button class="reply-button">답글</button>
+		            <span class="like">
+		                <i class="fas fa-heart"></i> <span class="like-count"></span>
+		            </span>
+		        </div>
 		    </div>
-		    <div class="comment-content">
-		      <p>댓글 내용</p>
-		    </div>
-		    <div class="comment-footer">
-		      <button class="reply-button">답글</button>
-		      <span class="like">
-		        <i class="fas fa-heart"></i> <span class="like-count"></span>
-		      </span>
-		    </div>
-		  </div>
 		</template>
+
 
 
         <!-- 댓글 목록 -->
