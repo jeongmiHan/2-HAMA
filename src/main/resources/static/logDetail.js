@@ -252,7 +252,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 	      // 답글 버튼 이벤트
 	      replyElement.querySelector(".reply-button").addEventListener("click", () => {
-	        setReplyParent(reply.id);
+	        setReplyParent(reply.id, reply.author);
 	      });
 
 	      // 자식 댓글 처리
@@ -271,15 +271,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 	let isEditMode = false; // 수정 모드 여부
 	let editReplyId = null; // 수정할 댓글 ID
 	
-	// 부모 ID 설정 함수
-	window.setReplyParent = function(replyId) {
+	// 부모 ID 설정 후 답글
+	window.setReplyParent = function(replyId, author) {
 	    isEditMode = false; // 답글 모드로 설정
 	    parentReplyId = replyId; // 부모 ID 설정
 	    commentInput.focus(); // 입력창에 포커스
 
 	    // 입력창에 @replyId 추가
-	    commentInput.placeholder = `@${replyId} 답글을 입력하세요...`;
-	    commentInput.value = `@${replyId} `;
+	    commentInput.placeholder = `@${author} 답글을 입력하세요...`;
+	    commentInput.value = `@${author} `;
 	};
 	// 댓글 수정 
 	window.prepareEditReply = function(replyId, content) {
