@@ -264,7 +264,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 		    : "";	
         postElement.innerHTML = `
 			<div class="logPostHeader">
-			    <div class="logPostAuthor" id="nickname">${post.author}</div>
+			    <div class="logPostAuthor">${post.author}</div>
 			    <div class="logPostTime">${post.timeAgo}</div>
 			</div>
 			<div class="logPostContent" data-id="${post.id}">${displayContent}</div>
@@ -341,7 +341,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 	        renderPost({
 	            id: data.id,
 	            author: data.author,
-	            timeAgo: "방금 전",
+	            timeAgo: data.timeAgo,
 	            content: data.content,
 	            images: data.images || [],
 	            likes: data.likes || 0,

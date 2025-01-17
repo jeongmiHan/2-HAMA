@@ -128,6 +128,7 @@ public class LogController {
 
 		    Map<String, Object> response = new HashMap<>();
 		    response.put("id", log.getLogId());
+		    response.put("author", user.getName());
 		    response.put("content", log.getLogContent());
 		    response.put("images", attachedFiles.stream()
 		            .map(LogAttachedFile::getLog_saved_filename)
