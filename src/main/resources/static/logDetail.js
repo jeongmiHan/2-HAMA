@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 	let deletedFiles = []; // 삭제된 파일 목록
 
-		// 팝업 열기
+	// 팝업 열기
 	window.openEditPopup = async function () {
 	    const logFileListContainer = document.getElementById("logFileListContainer");
 
@@ -513,5 +513,18 @@ document.addEventListener("DOMContentLoaded", async () => {
 	        alert("일기 수정에 실패했습니다.");
 	    }
 	}
+	// 댓글 페이지 이동 URL에 해시 값이 있는 경우 처리 
+	window.addEventListener("load", () => {
+	    if (window.location.hash === "#commentList") {
+	        const commentSection = document.getElementById("commentList");
+	        if (commentSection) {
+	            setTimeout(() => {
+	                commentSection.scrollIntoView({ behavior: "smooth" });
+	            }, 200); // 약간의 지연 추가
+	        } else {
+	            console.error("댓글 섹션을 찾을 수 없습니다.");
+	        }
+	    }
+	});
 	
 });

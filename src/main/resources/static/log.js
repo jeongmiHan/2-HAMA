@@ -6,9 +6,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     const closeButton = document.getElementById("logCloseButton");
     const imageInput = document.getElementById("logImageInput");
 
-    let uploadedImages = []; // 이미지 URL을 저장할 배열
-    let currentImageIndex = 0; // 현재 보고 있는 이미지의 인덱스
-
     // 팝업 열기 이벤트
     writeButton.addEventListener("click", () => {
         popupContainer.style.display = "flex";
@@ -17,238 +14,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     closeButton.addEventListener("click", () => {
         popupContainer.style.display = "none";
         uploadedImages = []; // 업로드된 이미지 초기화
-    });
-
-	
-	
-	// 댓글
-	// 댓글 추가
-	window.addReply = async (button, parentReplyId = null) => {
-	    try {
-	        const parentElement = button.closest(".reply-item");
-	        let parentList;
-
-	        if (parentElement) {
-	            parentReplyId = parentElement.dataset.replyId; // 부모 ID 설정
-	            parentList = parentElement.querySelector(".logReplyContentList");
-	            if (!parentList) {
-	                parentList = document.createElement("div");
-	                parentList.classList.add("logReplyContentList");
-	                parentElement.appendChild(parentList);
-	            }
-	        } else {
-	            const postElement = button.closest(".logPost");
-	            parentList = postElement.querySelector(".logReplyContentList");
-	        }
-
-	        const commentInput = button.closest(".logReplyContentInput").querySelector("textarea");
-	        const replyText = commentInput.value.trim();
-	        if (!replyText) {
-	            alert("댓글 내용을 입력하세요!");
-	            return;
-	        }
-
-	        const postElement = button.closest(".logPost");
-	        const postId = postElement.querySelector(".logPostContent").dataset.id;
-
-	        const response = await fetch(`/reply/log/${postId}/reply`, {
-	            method: 'POST',
-	            headers: { 'Content-Type': 'application/json' },
-	            body: JSON.stringify({
-	                logReplyContent: replyText,
-	                parentReplyId: parentReplyId || null // 부모 ID 설정
-	            }),
-	        });
-
-	        if (!response.ok) throw new Error("댓글 추가 실패");
-
-	        const responseData = await response.json();
-	        if (responseData.status !== "success") {
-	            throw new Error(responseData.message || "댓글 추가 실패");
-	        }
-
-	        renderReplies([{
-	            id: responseData.replyId,
-	            logReplyContent: replyText,
-	            parentReplyId: parentReplyId || null,
-	            childReplies: []
-	        }], parentList);
-
-	        commentInput.value = "";
-	    } catch (error) {
-	        console.error("댓글 추가 오류:", error);
-	        alert("댓글 추가 중 오류가 발생했습니다.");
-	    }
-	};
-
-	// 댓글 수정
-	window.editReply = async (replyId) => {
-	    const newContent = prompt("수정할 내용을 입력하세요:");
-	    if (!newContent) return;
-	    try {
-	        const response = await fetch(`/reply/${replyId}`, {
-	            method: 'PUT',
-	            headers: { 'Content-Type': 'application/json' },
-	            body: JSON.stringify({ logReplyContent: newContent }),
-	        });
-	        if (!response.ok) throw new Error('댓글 수정 실패');
-	        alert('댓글이 수정되었습니다.');
-	        location.reload(); // 새로고침으로 UI 업데이트
-	    } catch (error) {
-	        console.error("댓글 수정 오류:", error);
-	    }
-	};
-	// 댓글 삭제
-	window.deleteReply = async (button, replyId) => {
-	    const replyElement = button.closest(".reply-item"); // 댓글 요소 찾기
-	    const postElement = button.closest(".logPost");
-	    const postId = postElement.querySelector(".logPostContent").dataset.id; // 게시글 ID 가져오기
-
-	    if (!replyId || !postId) {
-	        alert("댓글 ID 또는 게시글 ID가 없습니다.");
-	        return;
-	    }
-
-	    if (!confirm("정말로 삭제하시겠습니까?")) return;
-
-	    try {
-	        const response = await fetch(`/reply/log/${replyId}/del`, { method: 'DELETE' });
-	        if (!response.ok) throw new Error('댓글 삭제 실패');
-	        
-	        // 성공 메시지
-	        alert('댓글이 삭제되었습니다.');
-
-	        // 댓글 내용을 '댓글이 삭제되었습니다.'로 변경 (대댓글은 유지)
-	        const contentElement = replyElement.querySelector("p");
-	        contentElement.innerText = "댓글이 삭제되었습니다.";
-	        contentElement.style.color = "gray";
-
-	        // 답글 입력창 유지
-	        const replyInputContainer = replyElement.querySelector(".childReplyInputContainer");
-	        if (!replyInputContainer) {
-	            replyElement.innerHTML += `
-	                <div class="childReplyInputContainer">
-	                    <div class="logReplyContentInput">
-	                        <textarea placeholder="답글을 입력하세요"></textarea>
-	                        <button onclick="addReply(this, '${replyId}')">답글 등록</button>
-	                    </div>
-	                </div>`;
-	        }
-	    } catch (error) {
-	        console.error("댓글 삭제 오류:", error);
-	        alert("댓글 삭제 중 오류가 발생했습니다.");
-	    }
-	};
-	// 댓글 랜더링
-	const renderReplies = (replies, parentElement) => {
-	    replies.forEach(reply => {
-	        const replyElement = document.createElement("div");
-	        replyElement.classList.add("reply-item");
-
-	        replyElement.dataset.replyId = reply.id;
-	        const content = reply.logReplyContent || reply.content; 
-	        replyElement.innerHTML = `
-	            <p>${reply.parentReplyId ? `@${reply.parentReplyId}` : ''} ${content}</p>
-	            <button onclick="toggleReplyInput(this)">답글 달기</button>
-	            <button onclick="editReply('${reply.id}')">수정</button>
-	            <button onclick="deleteReply(this, '${reply.id}')">삭제</button>
-	        `;
-
-	        let childContainer = parentElement.querySelector(".logReplyContentList");
-	        if (!childContainer) {
-	            childContainer = document.createElement("div");
-	            childContainer.classList.add("logReplyContentList");
-	            parentElement.appendChild(childContainer);
-	        }
-	        childContainer.appendChild(replyElement);
-
-	        if (reply.childReplies && reply.childReplies.length > 0) {
-	            renderReplies(reply.childReplies, replyElement);
-	        }
-	    });
-	};
-	// DB 댓글 갯수 동기화
-	window.updateReplyCount = async (postId) => {
-		try {
-		    const response = await fetch(`/reply/log/${postId}/count`);
-		    if (!response.ok) throw new Error("댓글 수 조회 실패");
-
-			const data = await response.json();
-		    const countElement = document.getElementById(`comment-count-${postId}`); // ID로 찾기
-			countElement.textContent = data.count;
-			if (countElement) {
-			    countElement.textContent = data.count; // 댓글 수 동기화
-			}
-		} catch (error) {
-		    console.error("댓글 수 조회 오류:", error);
-		}
-	};
-	// 댓글 목록 불러오기 함수
-	window.fetchReplies = async (postId, commentList) => {
-	    try {
-	        const response = await fetch(`/reply/log/${postId}/replies`);
-	        if (!response.ok) throw new Error('댓글 조회 실패');
-
-	        const result = await response.json();
-	        if (!result || result.status !== "success") {
-	            throw new Error("응답 상태 실패");
-	        }
-
-	        const replies = result.replies || [];
-	        console.log("불러온 댓글:", replies); // 디버깅용
-	        commentList.innerHTML = ""; // 기존 댓글 초기화
-	        renderReplies(replies, commentList); // 계층형 댓글 렌더링
-	    } catch (error) {
-	        console.error("댓글 불러오기 실패:", error);
-	    }
-	};
-	// 댓글 섹션 토글
-	window.toggleCommentSection = async (button) => {
-	    const commentSection = button.closest(".logPost").querySelector(".logReplyContentSection");
-	    const commentList = commentSection.querySelector(".logReplyContentList");
-	    const postId = button.closest(".logPost").querySelector(".logPostContent").getAttribute("data-id");
-	    commentSection.style.display =
-	        commentSection.style.display === "none" ? "block" : "none";
-	    if (commentSection.style.display === "block") {
-	        await fetchReplies(postId, commentList); // 댓글 불러오기
-	    }
-	};
-	// 답글 입력창 
-	window.toggleReplyInput = (button) => {
-	    // 기존에 열려 있는 모든 입력창 제거
-	    document.querySelectorAll(".childReplyInputContainer").forEach(input => input.remove());
-
-	    const parentReply = button.closest(".reply-item");
-
-	    // 부모 댓글 ID를 HTML 속성에서 가져오기
-	    const parentReplyId = parentReply.dataset.replyId;
-
-	    let replyInputContainer = parentReply.querySelector(".childReplyInputContainer");
-
-	    if (replyInputContainer) {
-	        replyInputContainer.remove();
-	    } else {
-	        replyInputContainer = document.createElement("div");
-	        replyInputContainer.classList.add("childReplyInputContainer");
-	        replyInputContainer.innerHTML = `
-	            <div class="logReplyContentInput">
-	                <textarea placeholder="답글을 입력하세요"></textarea>
-	                <button onclick="addReply(this, '${parentReplyId}')">답글 등록</button>
-	            </div>`;
-	        parentReply.appendChild(replyInputContainer); // 부모 댓글 아래에 추가
-	    }
-	};
-	
-	
+    });	
 	
 	// 게시글
     // 게시물 렌더링 함수
     const renderPost = (post, prepend = false) => {
         const postElement = document.createElement("div");
         postElement.classList.add("logPost");
-
-		const postId = post.id; // 게시물 ID
-		const countElement = postElement.querySelector(".logPostComment span");
 
         const contentLines = post.content.split("\n");
         let displayContent = post.content;
@@ -270,7 +42,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 			<div class="logPostContent" data-id="${post.id}">${displayContent}</div>
 			${imagesHtml}
 			<div class="logPostFooter">
-			    <div class="logPostComment" onclick="toggleCommentSection(this)">💬<span id="comment-count-${post.id}">${post.comments || 0}</span></div>
+			    <div class="logPostComment" onclick="navigateToLogDetail(this)">💬<span id="comment-count-${post.id}">${post.comments || 0}</span></div>
 			    <div class="logPostLike" onclick="increaseLike(this)">❤️ <span>${post.likes|| 0}</span></div>
 			    <div>🔖 <span>${post.saves}</span></div>
 			</div>
@@ -291,9 +63,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 		    // 기존 글은 reverse() 결과대로 추가
 		    postContainer.append(postElement);
 		}
-		// 댓글 수 동기화
-		updateReplyCount(postId, countElement);
-		
 	};
 	
 	//프론트엔드 데이터 렌더링 유지
@@ -336,7 +105,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 	        if (!response.ok) throw new Error("Failed to save log");
 
 	        const data = await response.json();
-			
 			
 	        renderPost({
 	            id: data.id,
@@ -386,6 +154,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 	        alert("좋아요 추가 중 오류가 발생했습니다.");
 	    }
 	};
+	
 	// 세부 페이지 이동
 	postContainer.addEventListener("click", (event) => {
 	    const postContent = event.target.closest(".logPostContent");
@@ -399,6 +168,19 @@ document.addEventListener("DOMContentLoaded", async () => {
 	        }
 	    }
 	});
+	
+	// 댓글 페이지 이동
+	window.navigateToLogDetail = function(commentButton) {
+	    const postId = commentButton.closest(".logPost").querySelector(".logPostContent").dataset.id;
+	    if (postId) {
+	        // logDetail로 이동하면서 해시 추가
+	        window.location.href = `/detail/${postId}#commentList`;
+	    } else {
+	        console.error("postId가 유효하지 않습니다.");
+	    }
+	};
+
+
 	
 });
 
