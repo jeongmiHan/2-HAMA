@@ -55,7 +55,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 				</div>
 			</div>
         `;
-	
+		
+		// 댓글 개수 동기화 호출
+		updateReplyCount(post.id); 
+		
 		if (prepend) {
 		    // 새 글은 항상 맨 위에 추가
 		    postContainer.prepend(postElement);
