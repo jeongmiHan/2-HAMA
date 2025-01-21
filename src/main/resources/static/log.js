@@ -179,6 +179,22 @@ document.addEventListener("DOMContentLoaded", async () => {
 	        console.error("postId가 유효하지 않습니다.");
 	    }
 	};
+	// DB 댓글 갯수 동기화
+	window.updateReplyCount = async (postId) => {
+	   try {
+	       const response = await fetch(`/reply/log/${postId}/count`);
+	       if (!response.ok) throw new Error("댓글 수 조회 실패");
+
+	      const data = await response.json();
+	       const countElement = document.getElementById(`comment-count-${postId}`); // ID로 찾기
+	      countElement.textContent = data.count;
+	      if (countElement) {
+	          countElement.textContent = data.count; // 댓글 수 동기화
+	      }
+	   } catch (error) {
+	       console.error("댓글 수 조회 오류:", error);
+	   }
+	};
 
 
 	
