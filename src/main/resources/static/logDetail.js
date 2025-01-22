@@ -1,5 +1,4 @@
 const logId = window.location.pathname.split("/").pop();
-
 document.addEventListener("DOMContentLoaded", async () => {
 	
 	const imageContainer = document.getElementById("logImages");
@@ -188,6 +187,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 	});
 	
 	loadLogDetail(); // 함수 호출
+	
     // 댓글 렌더링 함수
 	function renderReplies(replies, parentElement) {
 	  const template = document.getElementById("comment-template");
@@ -526,5 +526,42 @@ document.addEventListener("DOMContentLoaded", async () => {
 	        }
 	    }
 	});
+
+	// 좋아요 증가 또는 취소
+	window.increaseLike = async (button) => {
+		    const postElement = button.closest(".logPost");
+
+		    try {
+		        const response = await fetch(`/log/${logId}/like`, {
+		            method: 'POST',
+		            headers: {
+		                'Content-Type': 'application/json',
+		            },
+		        });
+
+		        if (!response.ok) {
+		            const errorMessage = await response.text();
+		            console.error("Server Error:", errorMessage);
+		            throw new Error('Failed to toggle like');
+		        }
+
+		        const { isLiked, totalLikes } = await response.json(); // 서버 응답 데이터
+		        console.log(`isLiked: ${isLiked}, totalLikes: ${totalLikes}`);
+
+		        // UI 업데이트
+		        const likeCount = button.querySelector("span");
+		        likeCount.textContent = totalLikes;
+
+		        // 버튼 상태 업데이트
+		        if (isLiked) {
+		            button.classList.add("liked"); // 좋아요 활성화
+		        } else {
+		            button.classList.remove("liked"); // 좋아요 비활성화
+		        }
+		    } catch (error) {
+		        console.error("Error toggling like:", error);
+		        alert("좋아요 처리 중 오류가 발생했습니다.");
+		    }
+		};
 	
 });

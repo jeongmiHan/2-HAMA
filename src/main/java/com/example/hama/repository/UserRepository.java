@@ -16,4 +16,5 @@ public interface UserRepository extends JpaRepository<User, String> {
 
     // 소셜 로그인 사용자 조회 (providerUserId를 기준으로 조회)
     Optional<User> findByProviderUserId(String providerUserId);
+    
 }

@@ -5,6 +5,7 @@ import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -33,6 +34,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttribute;
@@ -42,11 +44,14 @@ import com.example.hama.config.CustomUserDetails;
 import com.example.hama.dto.LogDTO;
 import com.example.hama.model.log.Log;
 import com.example.hama.model.log.LogAttachedFile;
+import com.example.hama.model.log.LogLikes;
 import com.example.hama.model.log.LogWrite;
 import com.example.hama.model.user.User;
 import com.example.hama.repository.LogFileRepository;
+import com.example.hama.repository.LogLikeRepository;
 import com.example.hama.repository.LogRepository;
-import com.example.hama.repository.ReplyRepository;
+import com.example.hama.repository.UserRepository;
+import com.example.hama.repository.LogReplyRepository;
 import com.example.hama.service.LogFileService;
 import com.example.hama.service.LogService;
 import com.example.hama.service.UserService;
@@ -62,11 +67,13 @@ public class LogController {
 	@Value("${file.upload.path}")
 	private String uploadPath;
 
+	private final UserService userService;
     private final LogService logService;
-    private final UserService userService;
-	private final LogFileService logFileService;
+    private final LogFileService logFileService;
+    private final UserRepository userRepository;
 	private final LogRepository logRepository;
-	private final ReplyRepository replyRepository;
+	private final LogLikeRepository logLikeRepository;
+	private final LogReplyRepository logReplyRepository;
 	private final LogFileRepository logFileRepository;
 	
 	    @GetMapping("indexLog")
@@ -200,22 +207,65 @@ public class LogController {
 		    }
 		}
 
-		// 좋아요 처리
+//		// 좋아요 처리
+//		@PostMapping("/{logId}/like")
+//		public ResponseEntity<?> addLike(@PathVariable("logId") Long logId) {
+//		    try {
+//		        // 로그를 조회
+//		        Log log = logRepository.findById(logId).orElseThrow(() -> new IllegalArgumentException("Log not found"));
+//
+//		        // 좋아요 수 증가
+//		        log.setLogLikes(log.getLogLikes() + 1);
+//		        logRepository.save(log);
+//
+//		        return ResponseEntity.ok("Like added successfully");
+//		    } catch (Exception e) {
+//		        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error adding like: " + e.getMessage());
+//		    }
+//		}
 		@PostMapping("/{logId}/like")
-		public ResponseEntity<?> addLike(@PathVariable("logId") Long logId) {
+		public ResponseEntity<?> toggleLike(@PathVariable("logId") Long logId) {
 		    try {
-		        // 로그를 조회
-		        Log log = logRepository.findById(logId).orElseThrow(() -> new IllegalArgumentException("Log not found"));
+		        // 로그 조회
+		        Log log = logRepository.findById(logId)
+		                .orElseThrow(() -> new IllegalArgumentException("Log not found"));
 
-		        // 좋아요 수 증가
-		        log.setLogLikes(log.getLogLikes() + 1);
+		        // 사용자 조회
+		        User user = getAuthenticatedUser();
+		        if (user == null) {
+		            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+		        }
+
+		        // 기존 좋아요 확인
+		        Optional<LogLikes> existingLike = logLikeRepository.findByUserAndLog(user, log);
+
+		        boolean isLiked;
+		        if (existingLike.isPresent()) {
+		            // 좋아요 상태 변경
+		            LogLikes like = existingLike.get();
+		            isLiked = !like.isLiked(); // 상태 토글
+		            like.setLiked(isLiked);
+		            log.setLogLikes(log.getLogLikes() + (isLiked ? 1 : -1)); // 좋아요 수 증감
+		            logLikeRepository.save(like);
+		        } else {
+		            // 처음 좋아요
+		            isLiked = true;
+		            LogLikes newLike = new LogLikes(user, log, true);
+		            logLikeRepository.save(newLike);
+		            log.setLogLikes(log.getLogLikes() + 1);
+		        }
+
 		        logRepository.save(log);
 
-		        return ResponseEntity.ok("Like added successfully");
+		        return ResponseEntity.ok(Map.of(
+		            "isLiked", isLiked,
+		            "totalLikes", log.getLogLikes()
+		        ));
 		    } catch (Exception e) {
-		        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error adding like: " + e.getMessage());
+		        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error toggling like: " + e.getMessage());
 		    }
 		}
+
 
 
 

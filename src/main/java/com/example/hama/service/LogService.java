@@ -13,7 +13,7 @@ import com.example.hama.model.log.Log;
 import com.example.hama.model.log.LogAttachedFile;
 import com.example.hama.repository.LogFileRepository;
 import com.example.hama.repository.LogRepository;
-import com.example.hama.repository.ReplyRepository;
+import com.example.hama.repository.LogReplyRepository;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -36,7 +36,7 @@ public class LogService {
     private final LogRepository logRepository;
     private final LogFileService logFileService;
     private final LogFileRepository logFileRepository;
-    private final ReplyRepository replyRepository;
+    private final LogReplyRepository logReplyRepository;
 
  // 일기 등록 및 수정
     public void saveLog(Log log, List<MultipartFile> logFiles) throws IOException {

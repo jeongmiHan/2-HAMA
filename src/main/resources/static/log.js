@@ -137,26 +137,44 @@ document.addEventListener("DOMContentLoaded", async () => {
 	    postContent.innerHTML = fullContent; // 전체 내용으로 교체
 	};
 	
-	// 좋아요 증가
+	// 좋아요 증가 또는 취소
 	window.increaseLike = async (button) => {
 	    const postElement = button.closest(".logPost");
 	    const postId = postElement.querySelector(".logPostContent").dataset.id; // postId 가져오기
 
 	    try {
-	        const response = await fetch(`/log/${postId}/like`, { // postId 사용
+	        const response = await fetch(`/log/${postId}/like`, {
 	            method: 'POST',
+	            headers: {
+	                'Content-Type': 'application/json',
+	            },
 	        });
-	        if (!response.ok) throw new Error('Failed to add like');
-	        const result = await response.text();
-	        console.log(result);
-	        // 좋아요 수 증가
+
+	        if (!response.ok) {
+	            const errorMessage = await response.text();
+	            console.error("Server Error:", errorMessage);
+	            throw new Error('Failed to toggle like');
+	        }
+
+	        const { isLiked, totalLikes } = await response.json(); // 서버 응답 데이터
+	        console.log(`isLiked: ${isLiked}, totalLikes: ${totalLikes}`);
+
+	        // UI 업데이트
 	        const likeCount = button.querySelector("span");
-	        likeCount.textContent = parseInt(likeCount.textContent) + 1;
+	        likeCount.textContent = totalLikes;
+
+	        // 버튼 상태 업데이트
+	        if (isLiked) {
+	            button.classList.add("liked"); // 좋아요 활성화
+	        } else {
+	            button.classList.remove("liked"); // 좋아요 비활성화
+	        }
 	    } catch (error) {
-	        console.error("Error adding like:", error);
-	        alert("좋아요 추가 중 오류가 발생했습니다.");
+	        console.error("Error toggling like:", error);
+	        alert("좋아요 처리 중 오류가 발생했습니다.");
 	    }
 	};
+
 	
 	// 세부 페이지 이동
 	postContainer.addEventListener("click", (event) => {

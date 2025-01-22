@@ -33,4 +33,14 @@ public class LogLikes {
        private Log log; // 좋아요가 눌린 로그
        
        private boolean liked;
+       
+       // 기본 생성자
+       public LogLikes() {
+       }
+       
+       public LogLikes(User user, Log log, boolean liked) {
+           this.user = user;
+           this.log = log;
+           this.liked = liked;
+       }
 }

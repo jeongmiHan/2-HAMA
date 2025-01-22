@@ -10,7 +10,7 @@ import com.example.hama.model.log.Log;
 import com.example.hama.model.log.Reply;
 
 
-public interface ReplyRepository extends JpaRepository<Reply, Long> {
+public interface LogReplyRepository extends JpaRepository<Reply, Long> {
 
 	List<Reply> findByLog(Log log);
 	List<Reply> findByParentReply(Reply parentReply);

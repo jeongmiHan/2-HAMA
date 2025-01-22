@@ -28,7 +28,7 @@ import com.example.hama.model.log.Log;
 import com.example.hama.model.log.Reply;
 import com.example.hama.model.user.User;
 import com.example.hama.repository.LogRepository;
-import com.example.hama.repository.ReplyRepository;
+import com.example.hama.repository.LogReplyRepository;
 import com.example.hama.service.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -39,7 +39,7 @@ import lombok.RequiredArgsConstructor;
 public class ReplyController {
 	
 	private final LogRepository logRepository;
- 	private final ReplyRepository replyRepository;
+ 	private final LogReplyRepository logReplyRepository;
  	private final UserService userService;
 	
     private User getAuthenticatedUser() {
@@ -84,12 +84,12 @@ public class ReplyController {
 
 	        // 부모 댓글 검증 및 설정
 	        if (parentReplyId != null) {
-	            Reply parentReply = replyRepository.findById(parentReplyId)
+	            Reply parentReply = logReplyRepository.findById(parentReplyId)
 	                    .orElseThrow(() -> new IllegalArgumentException("부모 댓글이 존재하지 않습니다."));
 	            reply.setParentReply(parentReply);
 	        }
 
-	        Reply savedReply = replyRepository.save(reply);
+	        Reply savedReply = logReplyRepository.save(reply);
 
 	        return ResponseEntity.ok(Map.of(
 	                "status", "success",
@@ -109,17 +109,17 @@ public class ReplyController {
 	        }
 
 	        // 댓글 조회
-	        Reply reply = replyRepository.findById(replyId)
+	        Reply reply = logReplyRepository.findById(replyId)
 	                .orElseThrow(() -> new IllegalArgumentException("댓글이 존재하지 않습니다."));
 
 	        // 댓글 삭제 상태로 변경 (isDeleted 추가 가정)
 	        reply.setDeleted(true); // 삭제 상태 플래그 설정
 	        reply.setLogReplyContent("댓글이 삭제되었습니다."); // 내용 변경
-	        replyRepository.save(reply); // DB 저장
+	        logReplyRepository.save(reply); // DB 저장
 
 	        // 댓글 수 동기화
 	        Log log = reply.getLog();
-	        log.setLogComments(replyRepository.countRepliesByLogId(log.getLogId()).intValue());
+	        log.setLogComments(logReplyRepository.countRepliesByLogId(log.getLogId()).intValue());
 	        logRepository.save(log);
 
 	        return ResponseEntity.ok("댓글이 삭제 처리되었습니다.");
@@ -133,7 +133,7 @@ public class ReplyController {
 	@GetMapping("/log/{postId}/count")
 	public ResponseEntity<?> getReplyCount(@PathVariable("postId") Long postId) {
 		try {
-	        Long count = replyRepository.countRepliesByLogId(postId);
+	        Long count = logReplyRepository.countRepliesByLogId(postId);
 	        
 	        if (count == null) { // null 값 검증 추가
 	            count = 0L; // 기본값 설정
@@ -154,7 +154,7 @@ public class ReplyController {
 	        if(user == null) {
 	    	    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
 	        }
-	        List<Reply> replies = replyRepository.findByLog(log);
+	        List<Reply> replies = logReplyRepository.findByLog(log);
 		    log.setUser(user);
 	        return ResponseEntity.ok(Map.of(
 	            "status", "success",
@@ -198,7 +198,7 @@ public class ReplyController {
 	public ResponseEntity<?> editReply(@PathVariable("replyId") Long replyId, @RequestBody Map<String, String> request) {
 	    try {
 	        // 댓글 조회
-	        Reply reply = replyRepository.findById(replyId)
+	        Reply reply = logReplyRepository.findById(replyId)
 	                .orElseThrow(() -> new IllegalArgumentException("댓글이 존재하지 않습니다."));
 
 	        // 댓글 내용 수정
@@ -207,7 +207,7 @@ public class ReplyController {
 	            throw new IllegalArgumentException("수정할 내용이 비어있습니다.");
 	        }
 	        reply.setLogReplyContent(newContent);
-	        replyRepository.save(reply); // 저장
+	        logReplyRepository.save(reply); // 저장
 
 	        return ResponseEntity.ok(Map.of("status", "success", "message", "댓글 수정 완료"));
 	    } catch (Exception e) {
