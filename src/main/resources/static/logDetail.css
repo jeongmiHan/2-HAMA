@@ -187,11 +187,11 @@
 /* 댓글 입력창 */
 #commentSectionFixed {
   position: fixed;
-  bottom: 0;
+  bottom: 45px; /* logPostFooter 높이만큼 위로 올림 */
   right: 0;
   width: calc(100% - 380px);
   background: #fff;
-  padding: 20px;
+  padding: 15px 20px;
   border-top: 1px solid #ddd;
   display: flex;
   align-items: center;
@@ -223,6 +223,39 @@
 
 #submitComment:hover {
   background-color: #0056b3;
+}
+/* 좋아요 및 즐겨찾기 */
+#logPostFooter {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    width: calc(100% - 380px);
+    background: #f9f9f9;
+    border-top: 1px solid #ddd;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 10px 0;
+    z-index: 9; /* 댓글창보다 아래 */
+}
+
+#logPostFooter > div {
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 5px; /* 아이콘과 텍스트 간격 */
+}
+/* 댓글창과 푸터 연결 자연스럽게 처리 */
+#logPostFooter::before {
+    content: '';
+    display: block;
+    width: 100%;
+    height: 1px;
+    background: #ddd;
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 
 /* 상단 버튼과 메뉴 */

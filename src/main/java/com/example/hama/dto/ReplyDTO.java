@@ -25,6 +25,7 @@ public class ReplyDTO {
     private String author; // 댓글 작성자 이름
     private String timeAgo; // 상대 시간 표시
     private List<ReplyDTO> childReplies = new ArrayList<>(); // 자식 댓글
+
     
 	@ManyToOne(fetch = FetchType.EAGER) // 한명이 여러개의 일지를 쓰니까
 	@JoinColumn(name="user_id", nullable = false)

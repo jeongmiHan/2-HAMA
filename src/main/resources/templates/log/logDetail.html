@@ -115,6 +115,12 @@
 		    <textarea id="commentInput" placeholder="댓글을 작성해보세요."></textarea>
 		    <button id="submitComment">완료</button>
 		</div>
+		<div id="logPostFooter">
+		    <div class="logPostComment" onclick="navigateToLogDetail(this)">💬<span id="comment-count-${post.id}"></span></div>
+		    <div class="logPostLike" onclick="increaseLike(this)">❤️ <span></span></div>
+		    <div>🔖 <span></span></div>
+		</div>
+
 		
 		<!-- 댓글 템플릿 -->
 		<template id="comment-template">
