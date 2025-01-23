@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <link rel="stylesheet" href="/calendar/css/style.css">
+    <link rel="stylesheet" href="/calendar/css/default.css">
+    <link rel="stylesheet" href="/calendar/css/modal.css">
+    <link rel="stylesheet" href="/calendar/css/memo.css">
+    <link rel="stylesheet" href="/calendar/css/notifications.css">
+<title>장소 리스트</title>
+<!-- 카카오맵 API -->
+<script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=278940b595d1bf12680c71409de85eda&libraries=services"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+#map { width: 100%; height: 400px; }
+#search-bar { margin: 10px 0; text-align: right;}
+#places-list { margin-top: 20px; }
+.searchLocation {
+	display: flex;
+    align-items: center; /* 세로 정렬 중앙 */
+    gap: 10px; /* 요소 간 간격 */
+    flex-wrap: wrap; /* 요소가 화면에 맞게 줄바꿈 */
+    margin: 10px 0;
+}
+.searchLocation .locationbuttons {
+    margin-right: auto; /* 버튼들을 오른쪽 정렬 */
+}
+.place-item {
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-bottom: 5px;      
+}
+.popup {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.5); /* 반투명 배경 */
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	z-index: 1000;
+}
+.popup.hidden {
+   display: none; /* 숨기기 */
+}
+.popup-content {
+   background: #fff;
+   padding: 20px;
+   border-radius: 8px;
+   max-width: 400px;
+   width: 100%;
+   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+   text-align: center;
+   position: relative;
+}
+.popup-content .close-btn {
+   position: absolute;
+   top: 10px;
+   right: 10px;
+   background: none; /* 배경 제거 */
+   border: none; /* 테두리 제거 */
+   font-size: 18px;
+   font-weight: bold; /* 폰트 굵기 */
+   cursor: pointer;
+   color: #333; /* 닫기 버튼 색상 */
+}
+#popup-title {
+   font-size: 20px;
+   font-weight: bold;
+   margin-bottom: 10px;
+}
+#popup-address, #popup-phone {
+   margin-bottom: 10px;
+   font-size: 14px;
+   color: #555;
+}
+#popup-route button {
+	background-color: #007bff;
+	color: white;
+	border: none;
+	padding: 10px 20px;
+	border-radius: 5px;
+	cursor: pointer;
+}
+#popup-route button:hover {
+      background-color: #0056b3;
+}	
+.location-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 0;
+    margin: 0;
+}
+.location-item {
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+.location-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+.location-title {
+    font-size: 20px;
+    color: #333;
+    text-decoration: none;
+}
+.location-title:hover {
+    text-decoration: underline;
+}
+.location-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: 14px;
+    color: #555;
+}
+.location-category,
+.location-author,
+.location-review-count,
+.location-rating,
+.location-address{
+    margin-right: 10px;
+}
+.location-distance{
+	margin-left : auto;
+}
+
+.rating-icon{
+	color: #FF69B4;
+	margin-right: 5px;
+}
+.review-count-icon {
+	color: #4CAF50;
+	margin-right: 5px;
+}
+.author-icon {
+	color: #007bff;
+	margin-right: 5px;
+}
+.category-icon {
+	margin-right: 5px;
+}
+.button-group {
+    display: flex;
+    gap: 10px; /* 버튼 간격 */
+}
+.edit-btn, .delete-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    color: #007bff; /* 파란색 아이콘 */
+    transition: color 0.3s;
+}
+.delete-btn {
+    color: #dc3545; /* 빨간색 아이콘 */
+}
+.edit-btn:hover {
+    color: #0056b3;
+}
+.delete-btn:hover {
+    color: #c82333;
+}
+
+/* 전체 페이지를 감싸는 하얀 배경 */
+.centered-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; /* 화면 전체 높이 */
+    background-color: #f0f0f0; /* 페이지 배경색 (밝은 회색) */
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* 콘텐츠 영역 */
+.white-background {
+    background-color: #ffffff; /* 하얀 배경 */
+    border-radius: 10px; /* 모서리를 둥글게 */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* 부드러운 그림자 */
+    max-width: 1200px; /* 최대 너비 */
+    width: 100%; /* 화면에 꽉 차도록 설정 */
+    padding: 20px; /* 내부 여백 */
+    box-sizing: border-box; /* 박스 크기 포함 */
+}
+
+.help-icon-container {
+    position: fixed;
+    top: 20%;
+    right: 20px;
+    z-index: 1000;
+}
+
+.help-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #007bff;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 20px;
+    font-weight: bold;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease-in-out;
+}
+
+.help-icon:hover {
+    transform: scale(1.1);
+}
+
+.help-balloon {
+    position: fixed;
+    top: 20%;
+    right: 80px;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    width: 500px;
+    padding: 15px;
+    z-index: 1001;
+}
+
+.help-balloon.hidden {
+    display: none;
+}
+
+.help-balloon .close-help {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #333;
+}
+
+.help-balloon #helpContent {
+    font-size: 14px;
+    color: #555;
+}
+.hidden {
+    display: none;
+}
+</style>
+</head>
+
+<body>
+<div class="wrapper">
+		<!--wrapper : 전체 페이지를 감싸는 컨테이너-->
+		<!-- Sidebar -->
+		<nav class="sidebar" th:replace="~{profile}"></nav>
+
+		<!-- Content Wrapper -->
+		<!--Content Wrapper : 메인 콘텐츠와 상단 네비게이션 바를 감싸는 컨테이너 -->
+		 <div class="content-wrapper">
+            <!-- Navbar -->
+            <nav class="navbar">
+                <div class="navbar-container">
+                    <a href="#" class="navbar-logo">もふもふ</a>
+                    <ul class="navbar-menu">
+                        <li><a href="#home">홈</a></li>
+                        <li><a href="#services">피드</a></li>
+                        <li><a href="#about">게시판</a></li>
+                        <li><a href="/location/locationList">장소추천</a></li>
+                    </ul>
+                    <div class="navbar-icons">
+                        <div class="icon-group">
+                            <div class="noti_icon-item" onclick="openNotificationModal()">
+                                <i class="fas fa-bell"></i>
+                                알람 <span id="notification-count" class="noti_badge" style="display: none;">0</span>
+                            </div>
+                        </div>
+                        <div class="profile-group">
+                            <span class="divider"></span>
+                            <span class="profile-name">닉네임: <span th:text="${nickname}"></span></span>
+                            <button id="logoutButton" onclick="window.location.href='/user/logout'">로그아웃</button>
+                            <!-- 관리자 페이지 버튼 -->
+                            <button id="adminButton" style="display: none;" onclick="window.location.href='/admin/adminpage'">관리자 페이지</button>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+            <!-- 알림 모달 -->
+                <div id="noti_modal" class="noti_modal">
+                    <div class="noti_modal-content">
+                        <span class="noti_close-button" onclick="closeNotificationModal()">&times;</span>
+                        <h3>현재 예정된 일정</h3>
+                        <ul id="notification-list"></ul>
+                    </div>
+                </div>
+			
+<div class="centered-container">
+<div class="white-background">			
+<h1>장소 추천</h1>
+<div id="search-bar">
+    <input type="text" id="keyword" placeholder="검색어를 입력하세요" />
+    <button onclick="searchPlaces()"><i class="fas fa-search"></i></button>
+</div>
+<div id="map">
+	<!-- 버튼 컨테이너 -->
+    <div id="mapControls" style="position:absolute; top:10px; left:10px; z-index:1000;">
+    <button onclick="setOverlayMapTypeId('traffic')" style="margin-bottom:5px; padding:8px 12px; font-size:12px; background:black; border:1px solid #ddd; border-radius:5px; cursor:pointer; box-shadow:0 2px 4px rgba(0,0,0,0.1);">
+        교통정보
+    </button>
+    <button onclick="setOverlayMapTypeId('terrain')" style="margin-bottom:5px; padding:8px 12px; font-size:12px; background:white; border:1px solid #ddd; border-radius:5px; cursor:pointer; box-shadow:0 2px 4px rgba(0,0,0,0.1);">
+        지형정보
+    </button>
+    <button onclick="setOverlayMapTypeId('bicycle')" style="margin-bottom:5px; padding:8px 12px; font-size:12px; background:white; border:1px solid #ddd; border-radius:5px; cursor:pointer; box-shadow:0 2px 4px rgba(0,0,0,0.1);">
+        자전거 도로
+    </button>
+    <button onclick="resetMap()" style="padding:8px 12px; font-size:12px; background:white; border:1px solid #ddd; border-radius:5px; cursor:pointer; box-shadow:0 2px 4px rgba(0,0,0,0.1);">
+        초기화
+    </button>
+</div>
+</div>
+<div id="places-list"></div>
+<script>
+// 지도 초기화
+var mapContainer = document.getElementById('map'); // 지도를 표시할 div
+var mapOption = {
+    center: new kakao.maps.LatLng(35.1059, 129.0377), // 초기 중심 좌표
+    level: 4 // 지도 확대 레벨
+};
+//지도 생성
+var map = new kakao.maps.Map(mapContainer, mapOption);
+// 장소 검색 서비스 객체 생성
+var ps = new kakao.maps.services.Places();
+var markers = []; // 마커 배열
+var currentInfoWindow = null; // 현재 열려 있는 인포윈도우를 저장하는 변수
+var infowindow = new kakao.maps.InfoWindow({ zIndex: 1 }); // 인포윈도우 객체 생성
+// 장소 검색 함수
+function searchPlaces() {
+	var keyword = document.getElementById('keyword').value;
+	
+	if (!keyword) {
+	    alert('키워드를 입력하세요');
+	    return;
+	}
+	// 장소 검색
+	ps.keywordSearch(keyword, placesSearchCB);
+}
+// 장소 검색 콜백 함수
+function placesSearchCB(data, status, pagination) {
+    if (status === kakao.maps.services.Status.OK) {
+        // 검색된 장소 마커와 리스트 표시
+        displayPlaces(data);
+    } else if (status === kakao.maps.services.Status.ZERO_RESULT) {
+        alert('검색 결과가 없습니다.');
+    } else {
+        alert('검색 중 오류가 발생했습니다.');
+    }
+}	
+// 검색된 장소 마커와 리스트 표시 함수
+function displayPlaces(places) {
+    // 이전 마커 및 인포윈도우 제거
+    removeMarkers();
+
+    var bounds = new kakao.maps.LatLngBounds(); // 지도 범위 객체
+    var placesList = document.getElementById('places-list');
+    placesList.innerHTML = ''; // 이전 리스트 초기화
+
+    places.forEach(function(place, index) {
+        // 마커 생성 및 지도에 표시
+        var markerPosition = new kakao.maps.LatLng(place.y, place.x);
+        var marker = new kakao.maps.Marker({
+            position: markerPosition,
+            map: map
+        });
+        // 마커 배열에 추가
+        markers.push(marker);
+
+        // 지도 범위 확장
+        bounds.extend(markerPosition);
+        
+     	// 마커 클릭 이벤트
+        kakao.maps.event.addListener(marker, 'click', function() {
+        	// 기존에 열려 있던 인포윈도우 닫기
+            if (currentInfoWindow) {
+                currentInfoWindow.close();
+            }
+            // 새로운 인포윈도우 생성 및 열기
+            var infowindowContent = `
+                <div style="padding:5px; font-size:12px;">
+                    ${place.place_name}<br>
+                    ${place.road_address_name || place.address_name}<br>
+                    <button onclick="openRoute(${place.y}, ${place.x}, '${place.place_name}')">길찾기</button>
+                </div>
+            `;
+            var infowindow = new kakao.maps.InfoWindow({
+                content: infowindowContent
+            });
+            infowindow.open(map, marker);
+
+            // 현재 열려 있는 인포윈도우 업데이트
+            currentInfoWindow = infowindow;
+        });
+
+// 리스트에 장소 추가
+var listItem = document.createElement('div');
+listItem.className = 'place-item';
+listItem.innerHTML = `
+    <strong>${place.place_name}</strong><br>
+    ${place.road_address_name || place.address_name}<br>
+    ${place.phone || '전화번호 없음'}
+`;
+// 애니메이션 적용
+setTimeout(() => {
+    listItem.classList.add('show');
+}, index * 100);
+
+//리스트 항목 클릭 이벤트
+listItem.onclick = function() {
+	openPopup(place); // 팝업띄우기
+	map.setLevel(4); // 확대 레벨
+    map.setCenter(markerPosition); // 클릭한 장소로 지도 중심 이동
+ 	// 기존에 열려 있던 인포윈도우 닫기
+    if (currentInfoWindow) {
+        currentInfoWindow.close();
+    }
+
+// 새로운 인포윈도우 생성 및 열기
+var infowindowContent = `
+    <div style="padding:5px; font-size:12px;">
+        ${place.place_name}<br>
+        ${place.road_address_name || place.address_name}<br>
+        <button onclick="openRoute(${place.y}, ${place.x}, '${place.place_name}')">길찾기</button>
+    </div>
+`;
+var infowindow = new kakao.maps.InfoWindow({
+    content: infowindowContent
+});
+infowindow.open(map, marker);
+
+// 현재 열려 있는 인포윈도우 업데이트
+currentInfoWindow = infowindow;
+};
+
+placesList.appendChild(listItem);
+});
+
+// 지도 범위를 검색된 장소에 맞게 조정
+map.setBounds(bounds);
+}
+
+// 기존 마커 및 윈포윈도우 제거 함수
+function removeMarkers() {
+    markers.forEach(function(marker) {
+        marker.setMap(null); //지도에서 마커 제거
+    });
+    markers = []; //마커배열 초기화
+ 	// 열려 있는 인포윈도우 닫기
+    if (currentInfoWindow) {
+        currentInfoWindow.close();
+        currentInfoWindow = null; // 변수 초기화
+    }
+}
+// 길찾기 URL 열기 함수
+function openRoute(lat, lng, placeName) {
+var routeUrl = `https://map.kakao.com/link/to/${encodeURIComponent(placeName)},${lat},${lng}`;
+window.open(routeUrl, '_blank'); // 새 탭에서 열기
+}
+
+// 팝업 열기 함수
+function openPopup(place) {
+    document.getElementById('popup-title').innerText = place.place_name;
+    document.getElementById('popup-address').innerText = `주소: ${place.road_address_name || place.address_name}`;
+    document.getElementById('popup-phone').innerText = `전화번호: ${place.phone || '정보 없음'}`;
+    document.getElementById('popup-route-btn').onclick = function () {
+        openRoute(place.y, place.x, place.place_name);
+    };
+    document.getElementById('popup').classList.remove('hidden');
+}
+// 팝업 닫기 함수
+function closePopup() {
+    document.getElementById('popup').classList.add('hidden');
+}
+// 팝업 길찾기 함수
+function openRoute(lat, lng, placeName) {
+    var routeUrl = `https://map.kakao.com/link/to/${encodeURIComponent(placeName)},${lat},${lng}`;
+    window.open(routeUrl, '_blank');
+}
+//지도, 위성, 확대바
+var mapContainer = document.getElementById('map'), // 지도를 표시할 div 
+mapOption = { 
+    center: new kakao.maps.LatLng(33.450701, 126.570667), // 지도의 중심좌표
+    level: 5 // 지도의 확대 레벨
+};
+
+var map = new kakao.maps.Map(mapContainer, mapOption); // 지도를 생성합니다
+
+//일반 지도와 스카이뷰로 지도 타입을 전환할 수 있는 지도타입 컨트롤을 생성합니다
+var mapTypeControl = new kakao.maps.MapTypeControl();
+
+//지도에 컨트롤을 추가해야 지도위에 표시됩니다
+//kakao.maps.ControlPosition은 컨트롤이 표시될 위치를 정의하는데 TOPRIGHT는 오른쪽 위를 의미합니다
+map.addControl(mapTypeControl, kakao.maps.ControlPosition.TOPRIGHT);
+
+//지도 확대 축소를 제어할 수 있는  줌 컨트롤을 생성합니다
+var zoomControl = new kakao.maps.ZoomControl();
+map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
+
+//지도 교통정보, 지형정보
+// 지도에 추가된 지도타입정보를 가지고 있을 변수입니다
+var currentTypeId;
+// 버튼이 클릭되면 호출되는 함수입니다
+function setOverlayMapTypeId(maptype) {
+    var changeMaptype;  
+    // maptype에 따라 지도에 추가할 지도타입을 결정합니다
+    if (maptype === 'traffic') {            
+        changeMaptype = kakao.maps.MapTypeId.TRAFFIC;     
+    } else if (maptype === 'terrain') {
+        changeMaptype = kakao.maps.MapTypeId.TERRAIN;    
+    } else if (maptype === 'bicycle') {
+        changeMaptype = kakao.maps.MapTypeId.BICYCLE;    
+    }
+    // 이미 등록된 지도 타입이 있으면 제거합니다
+    if (currentTypeId) {
+        map.removeOverlayMapTypeId(currentTypeId);    
+    }
+    
+    // maptype에 해당하는 지도타입을 지도에 추가합니다
+    map.addOverlayMapTypeId(changeMaptype);
+    
+    // 지도에 추가된 타입정보를 갱신합니다
+    currentTypeId = changeMaptype;        
+}
+//지도 초기화 함수
+function resetMap() {
+    if (currentTypeId) {
+        map.removeOverlayMapTypeId(currentTypeId); // 지도 타입 제거
+        currentTypeId = null; // 상태 초기화
+    }
+}
+</script>
+<!-- 검색 필터 선택 영역 -->
+<form method="get" action="/location/locationList" style="text-align: right;">
+<!-- 사용자의 위치를 서버로 전송 -->
+<input type="hidden" id="userLat" name="userLat" value="">
+<input type="hidden" id="userLng" name="userLng" value="">
+
+<div class="searchLocation"> 
+<div class="locationbuttons">
+    <input type="button" value="장소쓰기" onclick="window.open('/location/locationwrite', 'popup', 'width=890,height=400')">
+    <input type="button" onclick="location.href='/calendar'" value="메인으로">
+</div>
+<!-- 지역 필터 추가 -->
+<label for="region">지역:</label>
+<select id="region" name="region">
+	<option value="ALL" th:selected="${selectedRegion == 'ALL'}">전체</option>
+	<option value="SEOUL" th:selected="${selectedRegion == 'SEOUL'}">서울</option>
+	<option value="BUSAN" th:selected="${selectedRegion == 'BUSAN'}">부산</option>
+	<option value="DAEGU" th:selected="${selectedRegion == 'DAEGU'}">대구</option>
+	<option value="INCHEON" th:selected="${selectedRegion == 'INCHEON'}">인천</option>
+	<option value="GWANGJU" th:selected="${selectedRegion == 'GWANGJU'}">광주</option>
+	<option value="DAEJEON" th:selected="${selectedRegion == 'DAEJEON'}">대전</option>
+	<option value="ULSAN" th:selected="${selectedRegion == 'ULSAN'}">울산</option>
+	<option value="SEJONG" th:selected="${selectedRegion == 'SEJONG'}">세종</option>
+	<option value="GYEONGGI" th:selected="${selectedRegion == 'GYEONGGI'}">경기</option>
+	<option value="GANGWON" th:selected="${selectedRegion == 'GANGWON'}">강원</option>
+	<option value="CHUNGBUK" th:selected="${selectedRegion == 'CHUNGBUK'}">충북</option>
+	<option value="CHUNGNAM" th:selected="${selectedRegion == 'CHUNGNAM'}">충남</option>
+	<option value="JEONBUK" th:selected="${selectedRegion == 'JEONBUK'}">전북</option>
+	<option value="JEONNAM" th:selected="${selectedRegion == 'JEONNAM'}">전남</option>
+	<option value="GYEONGBUK" th:selected="${selectedRegion == 'GYEONGBUK'}">경북</option>
+	<option value="GYEONGNAM" th:selected="${selectedRegion == 'GYEONGNAM'}">경남</option>
+	<option value="JEJU" th:selected="${selectedRegion == 'JEJU'}">제주</option>
+</select>
+    	
+<!-- 카테고리 필터 추가 -->
+<label for="category">카테고리:</label>
+<select id="category" name="category">
+   	<option value="ALL" th:selected="${selectedCategory == 'ALL'}">전체</option>
+   	<option value="HOSPITAL" th:selected="${selectedCategory == 'HOSPITAL'}">🏥 병원</option>
+   	<option value="PARK" th:selected="${selectedCategory == 'PARK'}">🏞️ 공원</option>
+   	<option value="CAFE" th:selected="${selectedCategory == 'CAFE'}">☕ 카페</option>
+   	<option value="KINDERGARTEN" th:selected="${selectedCategory == 'KINDERGARTEN'}">🏠 유치원</option>
+   	<option value="PETSHOP" th:selected="${selectedCategory == 'PETSHOP'}">🛒 애견샵</option>
+   	<option value="OTHERS" th:selected="${selectedCategory == 'OTHERS'}">🏷️ 기타</option>
+</select>
+<label for="filter">정렬 기준:</label>
+<select id="filter" name="filter">
+    <option value="default" th:selected="${selectedFilter == 'default'}">기본</option>
+    <option value="reviewCount" th:selected="${selectedFilter == 'reviewCount'}">리뷰 많은 순</option>
+    <option value="rating" th:selected="${selectedFilter == 'rating'}">평점 높은 순</option>
+	<option value="distance" th:selected="${selectedFilter == 'distance'}">가까운 순</option>
+	<option value="myLocations" th:selected="${selectedFilter == 'myLocations'}">내가 쓴 추천글</option>
+</select>
+<input type="text" id="search" name="search" placeholder="장소 이름 검색" th:value="${search}">
+<button type="submit"><i class="fas fa-search"></i></button>
+</form>
+</div>
+
+<div th:if="${isEmpty}">
+	<p style="color : #555; font-size : 16px; text-align : center;">
+	선택한 조건에 해당하는 추천 장소가 없습니다.
+	</p>
+	<p style="color : #555; font-size : 16px; text-align : center;">
+		첫 추천글을 작성해보세요!
+	</p>
+</div> 
+<p>
+<div class="location-list">
+<div class="location-item" th:each="location, iterStat : ${list}" th:classappend="${iterStat.index >= 5} ? 'hidden' : ''">
+<div class="location-header">
+	<!-- 장소 이름 -->
+    <a class="location-title" th:href="@{/location/locationRead(id=${location.locationId})}" th:text="${location.locationName}"></a>
+	<!-- 수정 및 삭제 버튼 -->
+	<div class="button-group">
+  		<button class="edit-btn" th:if="${sessionUser.userId == location.user.userId}"
+         		 th:onclick="window.open('/location/locationUpdate?id=[[${location.locationId}]]', 'popup', 'width=890,height=400')">
+      	<i class="fa fa-edit"></i>
+  		</button>
+  		<button class="delete-btn" th:if="${sessionUser.userId == location.user.userId}"
+         		 th:onclick="|confirmAction('@{/location/locationDelete(id=${location.locationId})}', '삭제하시겠습니까?')|">
+      	<i class="fa fa-trash"></i>
+  		</button>
+	</div>	
+</div>     	
+<div class="location-info">
+    <span class="location-category">
+        <span th:switch="${location.locationCategory.name()}">
+			<span th:case="'HOSPITAL'" style="color:#dc3545;">🏥</span>
+			<span th:case="'PARK'" style="color:#28a745;">🏞️</span>
+			<span th:case="'CAFE'" style="color:#6f4e37;">☕</span>
+			<span th:case="'KINDERGARTEN'" style="color:#f39c12;">🏠</span>
+			<span th:case="'PETSHOP'" style="color:#6a0dad;">🛒</span>
+			<span th:case="*" style="color:#808080;">🏷️</span> <!-- 기본 아이콘 -->
+		</span>
+         <span th:text="${location.locationCategory.getDescription()}"></span>
+     </span>
+     <span class="location-author">
+     	<i class="fa fa-user author-icon"></i>
+		<span th:text="${location.user.name}"></span>   
+     </span>
+     <span class="location-review-count">
+		<i class="fa fa-comment-dots review-count-icon"></i>
+		<span th:text="${location.reviewCount}"></span>
+     </span>
+     <span class="location-rating">
+     	<i class="fa fa-paw rating-icon"></i>
+     	<span th:text="${#numbers.formatDecimal(location.locationRating, 1, 1)}">0.0</span>
+     </span>
+     <!-- 주소 (장소 이름 아래 두 번째 줄) -->
+	<span class="location-address">
+    	<i class="fa fa-map-marker-alt" style="color:#dc3545;"></i>
+    	<span th:text="${location.locationAddress}"></span>
+	</span>
+	<span class="location-distance">
+            <i class="fa fa-location-arrow" style="color: #007bff;"></i>
+            <span th:text="'내 위치에서 약 ' + ${#numbers.formatDecimal(location.locationDistance, 1, 1)} + ' km'"></span>
+    </span>
+</div>   
+</div>
+</div>
+<div style="text-align: center; margin-top: 20px;">
+    <button id="loadMoreBtn" style="padding: 10px 20px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">더보기</button>
+</div>
+</div>
+</div>
+<div class="help-icon-container">
+    <div class="help-icon" onclick="toggleHelpBalloon()">?</div>
+    <div class="help-balloon hidden" id="helpBalloon">
+        <span class="close-help" onclick="toggleHelpBalloon()">&times;</span>
+        <div id="helpContent">
+            <!-- 여기에 도움말 내용을 추가하세요 -->
+            <p>※ 지역, 카테고리, 정렬기준, 장소명 검색으로 찾아볼 수 있습니다.</p>
+            <p>※ 모든 필터를 사용할 필요는 없습니다. ex) 카테고리만 설정해서 검색도 가능</p>
+            <p>※ 지도 아래 좌측 상단에 장소 추천 글을 작성할 수 있습니다.</p>
+            <p>※ 장소 추천 글 작성 시, 장소 이름에 따라 주소는 자동으로 입력됩니다.</p>
+            <p>※ 하단의 더보기를 누르면 더 많은 게시글들을 볼 수 있습니다.</p>
+            <p>※ 조건에 맞는 게시글이 더 존재하지 않을 경우, 더보기는 사라집니다.</p>
+            <p>※ <i class="fa fa-comment-dots review-count-icon"></i>은 해당 장소에 대한 리뷰 개수입니다.</p>
+            <p>※ <i class="fa fa-paw rating-icon"></i>은 해당 장소에 대한 평점들의 평균입니다.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+// 수정 및 삭제
+function confirmAction(url, message) {
+    if (confirm(message)) {
+        window.location.href = url;
+    }
+}
+//페이지 로드 시 사용자 위치 가져오기
+window.onload = function () {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            function (position) {
+            	// 사용자의 실제 위치
+                const userLat = position.coords.latitude;
+                const userLng = position.coords.longitude;
+
+                // 숨겨진 input 요소에 사용자 위치 값을 설정하여 서버로 전송
+                document.getElementById('userLat').value = userLat;
+                document.getElementById('userLng').value = userLng;
+             	// 지도 중심을 사용자 위치로 이동
+                map.setCenter(new kakao.maps.LatLng(userLat, userLng));
+            
+            },
+            function (error) {
+                // 위치 가져오기 실패
+                console.error("위치 정보 불러오기 실패:", error);
+                alert("위치 정보를 불러올 수 없습니다.");
+            }
+        );
+    } else {
+        alert("이 브라우저에서는 위치 정보를 지원하지 않습니다.");
+    }
+};
+//페이지 로드 시 사용자 위치를 가져와 장소추천 버튼에 쿼리 추가
+document.addEventListener('DOMContentLoaded', function () {
+    const recommendButton = document.querySelector('input[value="장소추천"]');
+
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            function (position) {
+                const userLat = position.coords.latitude;
+                const userLng = position.coords.longitude;
+
+                // 장소추천 버튼에 위치를 포함한 URL 설정
+                recommendButton.onclick = function () {
+                    location.href = `/location/locationList?userLat=${userLat}&userLng=${userLng}&region=ALL&category=ALL&filter=default`;
+                };
+            },
+            function (error) {
+                console.error("위치 정보를 가져올 수 없습니다:", error);
+                // 위치 정보를 가져오지 못하면 기본 URL 사용
+                recommendButton.onclick = function () {
+                    location.href = `/location/locationList`;
+                };
+            }
+        );
+    } else {
+        console.error("브라우저가 위치 정보를 지원하지 않습니다.");
+        recommendButton.onclick = function () {
+            location.href = `/location/locationList`;
+        };
+    }
+});
+
+//도움말 말풍선
+function toggleHelpBalloon() {
+    const helpBalloon = document.getElementById('helpBalloon');
+    if (helpBalloon.classList.contains('hidden')) {
+        helpBalloon.classList.remove('hidden');
+    } else {
+        helpBalloon.classList.add('hidden');
+    }
+}
+
+//더보기
+document.addEventListener('DOMContentLoaded', function () {
+    let currentIndex = 5; // 현재 표시된 게시글의 개수
+    const items = document.querySelectorAll('.location-item'); // 게시글 목록 가져오기
+    const loadMoreBtn = document.getElementById('loadMoreBtn'); // "더보기" 버튼
+
+    // 초기 상태: 첫 5개만 표시
+    items.forEach((item, index) => {
+        if (index >= currentIndex) {
+            item.classList.add('hidden');
+        }
+    });
+
+    // "더보기" 버튼 클릭 이벤트
+    loadMoreBtn.addEventListener('click', function () {
+        let hiddenItemsCount = 0;
+
+        // 다음 5개 항목을 표시
+        for (let i = currentIndex; i < currentIndex + 5 && i < items.length; i++) {
+            items[i].classList.remove('hidden');
+            hiddenItemsCount++;
+        }
+
+        // 현재 인덱스 업데이트
+        currentIndex += hiddenItemsCount;
+
+        // 모든 항목이 표시되면 버튼 숨기기
+        if (currentIndex >= items.length) {
+            loadMoreBtn.style.display = 'none';
+        }
+    });
+});
+</script>
+        
+                <script src="/calendar/js/notifications.js"></script>
+       
+</body>
+</html>

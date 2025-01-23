@@ -10,7 +10,13 @@ import com.example.hama.LoginInterceptor;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
-
+	@Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        String uploadPath = System.getProperty("user.dir") + "/uploads/";
+        registry.addResourceHandler("/uploads/**")
+                .addResourceLocations("file:" + uploadPath);
+    }
+	
     private final LoginInterceptor loginInterceptor;
 
     public WebConfig(LoginInterceptor loginInterceptor) {

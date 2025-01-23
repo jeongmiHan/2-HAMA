@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>장소 수정</title>
+    <link rel="stylesheet" href="/default.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- 카카오맵 API -->
+    <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=278940b595d1bf12680c71409de85eda&libraries=services"></script>
+</head>
+<style>
+.modal-content {
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+.form-control {
+    border-radius: 5px;
+}
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+.category-icons span {
+    margin-right: 8px;
+    font-size: 18px;
+}
+.modal-header {
+	margin-bottom : 15px;
+}
+#placeList li {
+    padding: 8px 12px;
+    border-bottom: 1px solid #ddd; /* 항목 구분선 */
+    font-size: 14px;
+    cursor: pointer;
+}
+</style>
+<body>
+
+<body>
+<div class="container mt-5">
+	<div class="modal-dialog">
+		<th:block th:utext="${successScript}"></th:block>
+		<div class="modal-content p-4">
+			<div class="modal-header">
+				<h3 class="modal-title">장소 추천글 수정</h3>
+				<button type="button" class="btn-close" onclick="window.close()"></button>
+			</div>
+			<div class="modal-body">
+				<form id="locationForm" th:action="@{/location/locationUpdate(locationId=${locationUpdate.locationId})}" method="post" th:object="${locationUpdate}" onsubmit="return validateForm()">
+					<!-- 장소명 -->
+					<div class="mb-3">
+                        <label for="locationName" class="form-label">장소</label>
+                        <input type="text" class="form-control" id="locationName" name="locationName" th:field="*{locationName}" placeholder="장소명을 입력하세요" onkeyup="searchPlaces()" oninput="clearAddress()">
+                        <ul id="placeList" class="list-group mt-2" style="max-height: 150px; overflow-y: auto;"></ul>
+                    </div>
+                    <!-- 주소 -->
+                    <div class="mb-3">
+                        <label for="locationAddress" class="form-label">주소</label>
+                        <input type="text" class="form-control" id="locationAddress" name="locationAddress" th:field="*{locationAddress}" placeholder="장소명에 따라 주소는 자동으로 입력됩니다" readonly>
+                    </div>
+                    <!-- 숨겨진 좌표값 -->
+                    <input type="hidden" id="locationLatitude" name="locationLatitude">
+                    <input type="hidden" id="locationLongitude" name="locationLongitude">
+                    <!-- 카테고리 -->
+                    <div class="mb-3">
+                        <label class="form-label">카테고리</label>
+                        <div class="category-icons">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="locationCategory" id="hospital" value="HOSPITAL">
+                                <label class="form-check-label" for="hospital">
+                                    🏥 병원
+                                </label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="locationCategory" id="park" value="PARK">
+                                <label class="form-check-label" for="park">
+                                    🏞️ 공원
+                                </label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="locationCategory" id="cafe" value="CAFE">
+                                <label class="form-check-label" for="cafe">
+                                    ☕ 카페
+                                </label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="locationCategory" id="kindergarten" value="KINDERGARTEN">
+                                <label class="form-check-label" for="kindergarten">
+                                    🏠 유치원
+                                </label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="locationCategory" id="petshop" value="PETSHOP">
+                                <label class="form-check-label" for="petshop">
+                                    🛒 애견샵
+                                </label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="locationCategory" id="others" value="OTHERS">
+                                <label class="form-check-label" for="others">
+                                    🏷️ 기타
+                                </label>
+                            </div>
+                        </div>
+                     </div>
+                    <!-- 버튼 -->
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary me-2">수정하기</button>
+                        <button type="button" class="btn btn-secondary" onclick="window.close()">닫기</button>
+                    </div>
+				</form>
+			</div>	
+		</div>
+	</div>
+</div>
+
+<!-- JavaScript 클라이언트 검증 및 카카오맵 검색 기능 -->
+<script>
+let ps = new kakao.maps.services.Places(); // 장소 검색 객체
+let geocoder = new kakao.maps.services.Geocoder(); // 주소 변환 객체
+
+function searchPlaces() {
+  let keyword = document.getElementById('locationName').value;
+
+  if (!keyword) {
+    return; // 입력값 없으면 중단
+  }
+
+  ps.keywordSearch(keyword, function(data, status) {
+    let placeList = document.getElementById('placeList');
+    placeList.innerHTML = ""; // 기존 결과 초기화
+
+    if (status === kakao.maps.services.Status.OK) {
+      // 검색 결과 추가
+      data.forEach(function(place) {
+        let listItem = document.createElement('li');
+        listItem.innerText = place.place_name; // 장소명 표시
+
+        listItem.onclick = function() {
+          // 선택한 장소 정보를 입력
+          document.getElementById('locationName').value = place.place_name;
+          document.getElementById('locationAddress').value = place.address_name || place.road_address_name;
+
+          // 좌표 변환 및 저장
+          geocoder.addressSearch(place.address_name || place.road_address_name, function(result, status) {
+            if (status === kakao.maps.services.Status.OK) {
+              document.getElementById('locationLatitude').value = result[0].y;
+              document.getElementById('locationLongitude').value = result[0].x;
+            }
+          });
+
+          placeList.innerHTML = ""; // 목록 초기화
+        };
+        placeList.appendChild(listItem); // 결과 추가
+      });
+    } else {
+      placeList.innerHTML = "<li>검색 결과가 없습니다.</li>";
+    }
+  });
+}
+
+//장소 초기화 함수 추가
+function clearAddress() {
+    const locationName = document.getElementById('locationName').value; // 장소명 확인
+    if (!locationName) { // 입력값이 비어있으면 주소와 좌표 초기화
+        document.getElementById('locationAddress').value = ''; // 주소 초기화
+        document.getElementById('locationLatitude').value = ''; // 위도 초기화
+        document.getElementById('locationLongitude').value = ''; // 경도 초기화
+    }
+}
+
+
+function validateForm() {
+  // 입력값 검증
+  const locationName = document.getElementById('locationName').value.trim(); // 장소명
+  const locationAddress = document.getElementById('locationAddress').value.trim(); // 주소
+  const locationCategory = document.querySelector('input[name="locationCategory"]:checked'); // 카테고리
+
+  // 장소명 검증
+  if (!locationName) {
+    alert("장소명을 입력해주세요.");
+    return false; // 폼 제출 중단
+  }
+
+  // 카테고리 검증
+  if (!locationCategory) {
+    alert("카테고리를 선택해주세요.");
+    return false; // 폼 제출 중단
+  }
+  
+	//서버에서 중복 장소 확인 (AJAX 요청)
+  const isDuplicate = checkDuplicateLocation(locationName, locationAddress);
+
+  // 중복된 장소가 확인되면 경고 표시 후 폼 제출 중단
+  if (isDuplicate) {
+    alert("이미 등록된 장소입니다.");
+    return false;
+  }
+
+  // 모든 검증 통과 시 제출 허용
+  return true;
+}
+  
+//중복 장소 확인 함수 (비동기 요청)
+function checkDuplicateLocation(locationName, locationAddress) {
+  let isDuplicate = false;
+
+  // 동기 방식으로 서버에 요청
+  const xhr = new XMLHttpRequest();
+  xhr.open("POST", "/location/checkDuplicate", false); // 동기 요청
+  xhr.setRequestHeader("Content-Type", "application/json");
+  xhr.send(JSON.stringify({ locationName, locationAddress }));
+
+  if (xhr.status === 200) {
+    const response = JSON.parse(xhr.responseText);
+    isDuplicate = response.isDuplicate; // 서버에서 반환된 중복 여부
+  } else {
+    alert("서버와의 통신 중 오류가 발생했습니다.");
+  }
+
+  return isDuplicate;
+}
+</script>
+
+</body>
+</html>
