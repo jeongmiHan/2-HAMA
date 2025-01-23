@@ -14,14 +14,7 @@
 <body>
   <div class="wrapper"> <!--wrapper : 전체 페이지를 감싸는 컨테이너-->
     <!-- Sidebar -->
-    <nav class="sidebar"> <!--sidebar :  왼쪽 메뉴를 담당하는 사이드 바-->
-      <div class="sidebar-header">
-        <h2>프로필</h2>
-      </div>
-      <ul class="sidebar-menu">
-        <li><a href="#">Dashboard</a></li>
-      </ul>
-    </nav>
+	<nav class="sidebar" th:replace="~{profile}"></nav>
 
     <!-- Content Wrapper --> <!--Content Wrapper : 메인 콘텐츠와 상단 네비게이션 바를 감싸는 컨테이너 -->
     <div class="content-wrapper">
