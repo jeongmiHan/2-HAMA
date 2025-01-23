@@ -4,10 +4,8 @@ import com.example.hama.config.CustomUserDetails;
 import com.example.hama.model.user.Role;
 import com.example.hama.model.user.User;
 import com.example.hama.repository.UserRepository;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -65,7 +63,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         // DefaultOAuth2User 반환 (OAuth2User 타입 유지)
         return new DefaultOAuth2User(
-                Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")),
+                Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole())),
                 oAuth2User.getAttributes(),
                 "name" // 기본 필드 이름 매핑
         );
@@ -86,7 +84,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private void setAuthentication(User user) {
         CustomUserDetails userDetails = new CustomUserDetails(user);
         Authentication authentication = new UsernamePasswordAuthenticationToken(
-                userDetails, null, Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
+                userDetails, null, Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole()))
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
         log.info("SecurityContext 업데이트: 인증 객체={}", authentication);

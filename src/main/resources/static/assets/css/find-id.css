@@ -1,0 +1,140 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #1d3557, #457b9d);
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.container {
+    background: #f1faee;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    width: 100%;
+    max-width: 400px;
+}
+
+h1 {
+    margin-bottom: 15px;
+    color: #1d3557;
+    font-size: 24px;
+}
+
+.nav-link {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    text-decoration: none;
+    font-size: 14px;
+    color: #007bff;
+    padding: 6px 10px;
+    border: 1px solid #007bff;
+    border-radius: 4px;
+    background-color: #ffffff;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.nav-link:hover {
+    background-color: #007bff;
+    color: #ffffff;
+}
+
+.find-id-form {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #555;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 12px;
+    border: 1px solid #457b9d;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background: #457b9d;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    margin-top: 12px;
+}
+
+button:hover {
+    background: #1d3557;
+}
+
+button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.result-message {
+    margin-top: 15px;
+    padding: 15px;
+    border-radius: 5px;
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+    text-align: left;
+    font-size: 14px;
+    display: none;
+}
+
+.result-message.hidden {
+    display: none;
+}
+
+.result-message.visible {
+    display: block;
+}
+
+.result-message ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.result-message ul li {
+    margin-bottom: 8px;
+    padding: 8px;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.error-message {
+    color: red;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+button {
+    margin-top: 12px;
+}

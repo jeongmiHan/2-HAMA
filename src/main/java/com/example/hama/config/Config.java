@@ -21,7 +21,6 @@ public class Config {
 
     private final CustomOAuth2UserService customOAuth2UserService;
 
-    @Lazy
     public Config(CustomOAuth2UserService customOAuth2UserService) {
         this.customOAuth2UserService = customOAuth2UserService;
     }
@@ -41,41 +40,40 @@ public class Config {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable())
+            .csrf(csrf -> csrf.disable()) // 필요에 따라 활성화 가능
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
-                    "/", "/user/register", "/user/login", "/user/social-login",
+                    "/", "/user/register", "/user/login", "/oauth2/**", // Google OAuth2 경로
                     "/assets/**", "/images/**", "/webfonts/**", "/static/**",
-                    "/api/user/validate-password","/api/user/check-id",
-                    "/api/user/check-name","/api/email/verify-email",
-                    "/api/email/verify-code"
+                    "/api/user/validate-password", "/api/user/check-id",
+                    "/api/user/check-name", "/api/email/verify-email", "/api/user/find-id",
+                    "/api/email/verify-code", "/user/find-id", "/user/reset-password", "/api/user/reset-password"
                 ).permitAll() // 공개 URL
-                .requestMatchers("/user/mypage", "/calendar", "/api/events/**").authenticated() // 인증 필요 URL
-                .anyRequest().authenticated() // 나머지 모든 요청 인증 필요
+                .requestMatchers("/admin/**").hasRole("ADMIN") // 관리자 페이지
+                .anyRequest().authenticated() // 나머지 요청 인증 필요
             )
             .formLogin(form -> form
-                .loginPage("/user/login")
-                .defaultSuccessUrl("/calendar", true)
-                .failureUrl("/user/login?error=true")
-                .usernameParameter("userId")
-                .passwordParameter("password")
+                .loginPage("/user/login") // 사용자 로그인 페이지
+                .defaultSuccessUrl("/calendar", true) // 로그인 성공 후 리다이렉트
+                .failureUrl("/user/login?error=true") // 로그인 실패
+                .usernameParameter("userId") // 사용자 ID
+                .passwordParameter("password") // 비밀번호
                 .permitAll()
             )
             .logout(logout -> logout
-                .logoutUrl("/user/logout")
-                .logoutSuccessUrl("/")
-                .invalidateHttpSession(true)
+                .logoutUrl("/user/logout") // 로그아웃 URL
+                .logoutSuccessUrl("/") // 로그아웃 성공 후 리다이렉트
+                .invalidateHttpSession(true) // 세션 무효화
                 .permitAll()
             )
             .oauth2Login(oauth2 -> oauth2
-                .loginPage("/user/login")
-                .defaultSuccessUrl("/calendar", true)
+                .loginPage("/user/login") // OAuth2 로그인 페이지
+                .defaultSuccessUrl("/calendar", true) // 성공 후 리다이렉트
                 .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
             );
 
         return http.build();
     }
-
 
     /**
      * Authentication Provider

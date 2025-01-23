@@ -87,4 +87,31 @@ public class VerificationCodeService {
             log.error("이메일 발송 실패: {}", e.getMessage(), e);
         }
     }
+    /**
+     * 이메일 인증 여부 확인
+     */
+    public boolean isVerified(String email) {
+        VerificationCode verificationCode = verificationCodeRepository.findByEmail(email);
+        if (verificationCode != null && verificationCode.isUsed()) {
+            log.info("이메일 인증 완료: {}", email);
+            return true; // 인증 완료
+        }
+        log.warn("이메일 인증이 완료되지 않음: {}", email);
+        return false; // 인증되지 않음
+    }
+    public boolean verifyAndConsumeCode(String email, String code) {
+        VerificationCode verificationCode = verificationCodeRepository.findByEmail(email);
+
+        if (verificationCode != null && verificationCode.getCode().equals(code) && !verificationCode.isUsed()) {
+            verificationCode.setUsed(true); // 인증 코드 사용 처리
+            verificationCodeRepository.save(verificationCode);
+            log.info("인증 코드 사용 완료: 이메일={}, 코드={}", email, code);
+            return true; // 인증 성공
+        }
+
+        log.warn("인증 실패 또는 코드가 이미 사용됨: 이메일={}, 코드={}", email, code);
+        return false; // 인증 실패
+    }
+
+
 }
