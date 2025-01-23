@@ -27,7 +27,7 @@ public class WebConfig implements WebMvcConfigurer {
                     "/assets/**", "/images/**", "/webfonts/**", "/static/**",
                     "/api/user/validate-password", "/api/user/check-id",
                     "/api/user/check-name", "/api/email/verify-email",
-                    "/api/email/verify-code", "/api/user/find-id", "/user/reset-password",
+                    "/api/email/verify-code", "/api/user/find-id", "/user/reset-password", "/api/user/reset-password",
                     "/admin/**" // 관리자 페이지도 제외
                 );
     }
