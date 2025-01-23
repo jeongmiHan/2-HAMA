@@ -28,7 +28,6 @@ public class LogUpdate {
 		log.setUser(log.getUser());
 		log.setLogContent(log.getLogContent());
 		log.setLogCreatedDate(LocalDateTime.now());
-		log.setLogHit(0L);
 		
 		return log;
 	}

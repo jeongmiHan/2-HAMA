@@ -26,7 +26,6 @@ public class LogWrite {
 		log.setUser(logWrite.getUser());
 		log.setLogContent(logWrite.getLogContent());
 		log.setLogCreatedDate(LocalDateTime.now());
-		log.setLogHit(0L);
 		
 		return log;
 	}

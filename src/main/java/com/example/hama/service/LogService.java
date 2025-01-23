@@ -12,6 +12,7 @@ import com.example.hama.dto.LogDTO;
 import com.example.hama.model.log.Log;
 import com.example.hama.model.log.LogAttachedFile;
 import com.example.hama.repository.LogFileRepository;
+import com.example.hama.repository.LogLikeRepository;
 import com.example.hama.repository.LogRepository;
 import com.example.hama.repository.LogReplyRepository;
 
@@ -37,6 +38,7 @@ public class LogService {
     private final LogFileService logFileService;
     private final LogFileRepository logFileRepository;
     private final LogReplyRepository logReplyRepository;
+    private final LogLikeRepository logLikeRepository;
 
  // 일기 등록 및 수정
     public void saveLog(Log log, List<MultipartFile> logFiles) throws IOException {
@@ -132,6 +134,8 @@ public class LogService {
     public void deleteLog(Long logId) {
         Log log = logRepository.findById(logId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 일기입니다."));
+        // 연관된 데이터 삭제
+        logLikeRepository.delete(log.getLogLikes());
         logRepository.delete(log);
     }
     

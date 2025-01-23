@@ -442,12 +442,18 @@ document.addEventListener("DOMContentLoaded", async () => {
 	        const response = await fetch(`/log/${logId}/delete`, { method: "DELETE" });
 	        if (!response.ok) throw new Error("삭제 실패");
 	        // DOM에서 항목 제거
-	        document.getElementById(`log-${logId}`).remove();
-	        alert("일기가 삭제되었습니다.");
-	    } catch (error) {
-	        console.error("삭제 중 오류:", error);
-	        alert("삭제에 실패했습니다.");
-	    }
+		    // DOM에서 항목 제거
+		    const logElement = document.getElementById(`log-${logId}`);
+		    if (logElement) {
+		        logElement.remove();
+		        alert("일기가 삭제되었습니다.");
+		    } else {
+		        console.warn(`Element with ID "log-${logId}" not found.`);
+		    }
+		} catch (error) {
+		    console.error("삭제 중 오류:", error);
+		    alert("삭제에 실패했습니다.");
+		}
 	};
 	
 	function toggleEditMode(isEdit) {

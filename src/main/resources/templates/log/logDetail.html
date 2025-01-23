@@ -9,6 +9,13 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
   <style></style>
   <script type="module" src="/logDetail.js"></script>
+  <!-- FullCalendar 라이브러리 및 구글 캘린더 플러그인 스크립트 추가 -->
+	    <!-- 외부 CSS 파일 및 Font Awesome 추가 -->
+	    <link rel="stylesheet" href="/calendar/css/style.css">
+	    <link rel="stylesheet" href="/calendar/css/notifications.css">
+	<link
+		href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+		rel="stylesheet">
 </head>
 
 <body>
@@ -25,34 +32,40 @@
 
     <!-- Content Wrapper --> <!--Content Wrapper : 메인 콘텐츠와 상단 네비게이션 바를 감싸는 컨테이너 -->
     <div class="content-wrapper">
-      <!-- Navbar --> <!--Navbar: 페이지 상단에 위치한 검색창과 알림 프로필 등-->
       <nav class="navbar">
-      <div class="search-container">
-        <input type="text" placeholder="Search for..." class="search-bar">
-        <button class="search-button">
-          <i class="fas fa-search"></i>
-        </button>
-      </div>
-      <div class="navbar-icons">
-        <div class="icon-group">
-          <div class="icon-item">
-            <i class="fas fa-bell"></i>
-            <span class="notification-badge">3</span>알람
+          <div class="navbar-container">
+              <a href="#" class="navbar-logo">もふもふ</a>
+              <ul class="navbar-menu">
+                  <li><a href="/calendar">홈</a></li>
+                  <li><a href="/log/indexLog">피드</a></li>
+                  <li><a href="#about">게시판</a></li>
+                  <li><a href="#contact">장소추천</a></li>
+              </ul>
+              <div class="navbar-icons">
+                  <div class="icon-group">
+                      <div class="noti_icon-item" onclick="openNotificationModal()">
+                          <i class="fas fa-bell"></i>
+                          알람 <span id="notification-count" class="noti_badge" style="display: none;">0</span>
+                      </div>
+                  </div>
+                  <div class="profile-group">
+                      <span class="divider"></span>
+                      <span class="profile-name">닉네임: <span th:text="${nickname}"></span></span>
+                      <button id="logoutButton" onclick="window.location.href='/user/logout'">로그아웃</button>
+                      <!-- 관리자 페이지 버튼 -->
+                      <button id="adminButton" style="display: none;" onclick="window.location.href='/admin/adminpage'">관리자 페이지</button>
+                  </div>
+              </div>
           </div>
-          <div class="icon-item">
-            <i class="fas fa-envelope"></i>
-            <span class="notification-badge">7</span>메세지
-          </div>
-        </div>
-        <div class="profile-group">
-		  <span class="divider"></span> <img src="profile.jpg"
-			alt="Profile Picture" class="profile-pic"> <span
-			class="profile-name">간단한 프로필</span> <span>닉네임: <span
-			th:text="${nickname}"></span></span>
-		<button id="logoutButton" onclick="window.location.href='/user/logout'">로그아웃</button>
-        </div>
-      </div>
       </nav>
+      <!-- 알림 모달 -->
+      <div id="noti_modal" class="noti_modal">
+          <div class="noti_modal-content">
+              <span class="noti_close-button" onclick="closeNotificationModal()">&times;</span>
+              <h3>현재 예정된 일정</h3>
+              <ul id="notification-list"></ul>
+          </div>
+      </div>
 
       <!-- Main Content --> <!--Main Content : 메인 콘텐츠 영역-->
       <div id="logDetailContainer">
@@ -168,5 +181,6 @@
       </div>
     </div>
   </div>
+  <script src="/calendar/js/notifications.js"></script>
 </body>
 </html>
