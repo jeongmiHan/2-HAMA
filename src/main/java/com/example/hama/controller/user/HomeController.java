@@ -1,4 +1,4 @@
-package com.example.hama.controller;
+package com.example.hama.controller.user;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -1,34 +1,38 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>로그인 페이지</title>
+    <title>로그인</title>
     <link rel="stylesheet" href="/assets/css/login.css">
 </head>
 <body>
-    <h2>로그인</h2>
-    <form action="/user/login" method="POST" th:object="${userLogin}">
-        <label for="userId">아이디:</label>
-        <input type="text" id="userId" name="userId" required th:field="*{userId}"/>
-        <span th:if="${#fields.hasErrors('userId')}" th:text="${#fields.errors('userId')}"></span>
-
-        <label for="password">비밀번호:</label>
-        <input type="password" id="password" name="password" required th:field="*{password}"/>
-        <span th:if="${#fields.hasErrors('password')}" th:text="${#fields.errors('password')}"></span>
-
-        <button type="submit">로그인</button>
-    </form>
-
-    <div class="signup-social-container">
-    <a href="/user/register" class="btn-signup">회원가입</a>
-    <a th:href="@{/oauth2/authorization/google}" class="btn-google">
-        <img src="/assets/css/images/google-icon.png" alt="Google Logo" class="google-icon" />
-        Google 로그인
-    </a>
-</div>
-
-
-    <script src="/assets/js/login.js"></script>
+    <div class="container">
+        <div class="login-form">
+            <h1>로그인</h1>
+            <form action="/user/login" method="POST">
+                <div class="form-group">
+                    <label for="userId">아이디</label>
+                    <input type="text" id="userId" name="userId" placeholder="아이디를 입력하세요" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">비밀번호</label>
+                    <input type="password" id="password" name="password" placeholder="비밀번호를 입력하세요" required>
+                </div>
+                <button type="submit" class="btn">로그인</button>
+            </form>
+            <div class="additional-links">
+                <a href="/user/find-id">아이디 찾기</a>
+                <a href="/user/reset-password">비밀번호 찾기</a>
+                <a href="/user/register">회원가입</a>
+            </div>
+            <!-- 소셜 로그인 버튼 -->
+            <div class="social-login">
+                <a href="/oauth2/authorization/google" class="btn social-btn google">
+                    Google로 로그인
+                </a>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

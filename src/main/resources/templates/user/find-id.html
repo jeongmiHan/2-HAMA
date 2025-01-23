@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>아이디 찾기</title>
+    <link rel="stylesheet" href="/assets/css/find-id.css">
+</head>
+<body>
+    <a href="/user/login" class="nav-link">로그인</a>
+    <div class="container">
+        <h1>아이디 찾기</h1>
+        <form id="findIdForm" action="#" method="POST" class="find-id-form">
+            <!-- 이메일 입력 -->
+            <div class="form-group">
+                <label for="email">이메일</label>
+                <input type="email" id="email" name="email" placeholder="가입한 이메일을 입력하세요" required>
+                <div id="emailError" class="error-message"></div>
+                <button type="button" id="emailVerificationButton" class="btn">인증 요청</button>
+            </div>
+            
+            <!-- 인증 코드 입력 -->
+            <div class="form-group">
+                <label for="verificationCode">인증 코드</label>
+                <input type="text" id="verificationCode" name="verificationCode" placeholder="인증 코드를 입력하세요" required disabled>
+                <div id="verificationCodeError" class="error-message"></div>
+                <button type="button" id="verificationCodeButton" class="btn" disabled>코드 확인</button>
+            </div>
+            
+            <!-- 아이디 찾기 -->
+            <button type="submit" id="findIdButton" class="btn" disabled>아이디 찾기</button>
+        </form>
+
+        <!-- 결과 메시지 -->
+        <div id="result" class="result-message hidden"></div>
+    </div>
+    <script src="/assets/js/find-id.js"></script>
+</body>
+</html>

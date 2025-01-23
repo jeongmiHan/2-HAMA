@@ -4,10 +4,8 @@ import com.example.hama.config.CustomUserDetails;
 import com.example.hama.model.user.Role;
 import com.example.hama.model.user.User;
 import com.example.hama.repository.UserRepository;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -20,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
@@ -36,7 +35,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         String provider = userRequest.getClientRegistration().getRegistrationId();
         String providerUserId = oAuth2User.getAttribute("sub");
         String email = oAuth2User.getAttribute("email");
-        String name = oAuth2User.getAttribute("name");
+
+        // "google_" 접두사와 8자리 난수 생성
+        String randomUsername = generateRandomUsername(provider);
 
         log.info("OAuth2 로그인 시도: provider={}, providerUserId={}", provider, providerUserId);
 
@@ -48,7 +49,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             newUser.setProvider(provider);
             newUser.setProviderUserId(providerUserId);
             newUser.setEmail(email);
-            newUser.setName(name);
+            newUser.setName(randomUsername); // "google_8자리" 형식으로 사용자 이름 설정
             newUser.setRole(Role.USER);
             newUser.setJoinDate(LocalDate.now());
             userRepository.save(newUser);
@@ -62,10 +63,19 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         // DefaultOAuth2User 반환 (OAuth2User 타입 유지)
         return new DefaultOAuth2User(
-                Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")),
+                Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole())),
                 oAuth2User.getAttributes(),
                 "name" // 기본 필드 이름 매핑
         );
+    }
+
+    /**
+     * "google_8자리" 형식으로 난수 생성
+     */
+    private String generateRandomUsername(String provider) {
+        Random random = new Random();
+        int number = random.nextInt(100000000); // 8자리 숫자 생성
+        return provider + "_" + String.format("%08d", number); // "google_00000000" 형식
     }
 
     /**
@@ -74,7 +84,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private void setAuthentication(User user) {
         CustomUserDetails userDetails = new CustomUserDetails(user);
         Authentication authentication = new UsernamePasswordAuthenticationToken(
-                userDetails, null, Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
+                userDetails, null, Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole()))
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
         log.info("SecurityContext 업데이트: 인증 객체={}", authentication);

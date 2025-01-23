@@ -1,0 +1,159 @@
+/* 전체 컨테이너 스타일 */
+.content {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+
+/* D-day 섹션 스타일 */
+.d-day-container {
+    width: 190px;
+    padding: 20px;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #f5f7fa, #e2ebf0);
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: absolute;
+    right: 20px;
+    top: 90px;
+}
+
+.d-day-container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.d-day-container h3 {
+    font-size: 1.6em;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    color: #333;
+    text-align: center;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 10px;
+}
+
+/* D-day 버튼 스타일 */
+.dday-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.dday-buttons button {
+     background-color: #87cefa;
+    border: none;
+    color: white;
+    padding: 3px 8px; /* 버튼 크기 줄이기 */
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.8em; /* 버튼 글자 크기 줄이기 */
+}
+
+.dday-buttons button:hover {
+    background-color: #4682b4;
+    transform: scale(1.1);
+}
+
+.dday-buttons button:focus {
+    outline: none;
+}
+
+/* 이벤트 선택 섹션 스타일 */
+#event-select-container, #custom-date-container {
+    margin-top: 15px;
+    display: none;
+}
+
+#event-select {
+    width: 100%;
+    padding: 12px 10px;
+    font-size: 1em;
+    margin-bottom: 5px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: border-color 0.2s;
+}
+
+#event-select:focus {
+    border-color: #87cefa;
+    outline: none;
+}
+
+#custom-date-input {
+    width: calc(100% - 10px);
+    padding: 10px;
+    font-size: 1em;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px;
+}
+
+#custom-date-confirm {
+    width: 100%;
+    padding: 10px;
+    background-color: #87cefa;
+    color: white;
+    font-size: 1em;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+#custom-date-confirm:hover {
+    background-color: #4682b4;
+    transform: scale(1.05);
+}
+
+/* D-day 디스플레이 컨테이너 */
+#d-day-display {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+/* 각각의 D-day 박스 스타일 */
+.d-day-box {
+    width: 70px;
+    height: 100px;
+    background-color: #87cefa;
+    color: white;
+    font-size: 2.0em;
+    font-weight: bold;
+    text-align: center;
+    line-height: 100px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.d-day-box:hover {
+    background-color: #4682b4;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+/* Date navigation (이전/다음 버튼) 스타일 */
+.date-navigation button {
+    background-color: #87cefa;
+    border: none;
+    color: white;
+    padding: 5px 10px;
+    font-size: 1em;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.date-navigation button:hover {
+    background-color: #4682b4;
+    transform: scale(1.1);
+}

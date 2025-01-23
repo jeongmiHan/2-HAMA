@@ -21,7 +21,6 @@ public class Config {
 
     private final CustomOAuth2UserService customOAuth2UserService;
 
-    @Lazy
     public Config(CustomOAuth2UserService customOAuth2UserService) {
         this.customOAuth2UserService = customOAuth2UserService;
     }
@@ -40,41 +39,39 @@ public class Config {
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        log.info("Configuring Security Filter Chain");
-
         http
-            .csrf(csrf -> csrf.disable()) // CSRF 비활성화
+            .csrf(csrf -> csrf.disable()) // 필요에 따라 활성화 가능
             .authorizeHttpRequests(auth -> auth
-                // 정적 리소스 및 공개 URL 허용
-                .requestMatchers("/css/**", "/js/**", "/images/**", "/assets/**").permitAll()
-                .requestMatchers("/", "/user/register", "/user/login", "/user/social-login").permitAll()
-                // 인증된 사용자만 접근 허용
-                .requestMatchers("/user/mypage", "/user/logout", "/calendar", "/api/events/**").authenticated()
-                .anyRequest().permitAll()
+                .requestMatchers(
+                    "/", "/user/register", "/user/login", "/oauth2/**", // Google OAuth2 경로
+                    "/assets/**", "/images/**", "/webfonts/**", "/static/**",
+                    "/api/user/validate-password", "/api/user/check-id",
+                    "/api/user/check-name", "/api/email/verify-email", "/api/user/find-id",
+                    "/api/email/verify-code", "/user/find-id", "/user/reset-password", "/api/user/reset-password"
+                ).permitAll() // 공개 URL
+                .requestMatchers("/admin/**").hasRole("ADMIN") // 관리자 페이지
+                .anyRequest().authenticated() // 나머지 요청 인증 필요
             )
             .formLogin(form -> form
-                .loginPage("/user/login") // 기본 로그인 페이지
-                .defaultSuccessUrl("/calendar", true) // 로그인 성공 후 이동할 URL
-                .failureUrl("/user/login?error=true") // 로그인 실패 후 이동할 URL
-                .usernameParameter("userId") // 사용자 ID 파라미터
-                .passwordParameter("password") // 비밀번호 파라미터
+                .loginPage("/user/login") // 사용자 로그인 페이지
+                .defaultSuccessUrl("/calendar", true) // 로그인 성공 후 리다이렉트
+                .failureUrl("/user/login?error=true") // 로그인 실패
+                .usernameParameter("userId") // 사용자 ID
+                .passwordParameter("password") // 비밀번호
                 .permitAll()
             )
             .logout(logout -> logout
                 .logoutUrl("/user/logout") // 로그아웃 URL
-                .logoutSuccessUrl("/") // 로그아웃 성공 후 이동할 URL
+                .logoutSuccessUrl("/") // 로그아웃 성공 후 리다이렉트
                 .invalidateHttpSession(true) // 세션 무효화
                 .permitAll()
             )
             .oauth2Login(oauth2 -> oauth2
-                .loginPage("/user/login") // 소셜 로그인 페이지
-                .defaultSuccessUrl("/calendar", true) // 소셜 로그인 성공 후 이동할 URL
-                .userInfoEndpoint(userInfo -> userInfo
-                    .userService(customOAuth2UserService) // Custom OAuth2 User Service 설정
-                )
+                .loginPage("/user/login") // OAuth2 로그인 페이지
+                .defaultSuccessUrl("/calendar", true) // 성공 후 리다이렉트
+                .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
             );
 
-        log.info("Security Filter Chain configuration completed");
         return http.build();
     }
 

@@ -1,153 +1,141 @@
-/* === 전체 페이지 스타일 === */
 body {
     font-family: 'Arial', sans-serif;
-    background-color: #f4f4f4;
+    background: linear-gradient(135deg, #1d3557, #457b9d);
+    height: 100vh;
     margin: 0;
-    padding: 0;
     display: flex;
-    flex-direction: column; /* 수직 정렬 */
-    align-items: center; /* 수평 중앙 정렬 */
-    padding-top: 50px; /* 페이지 상단 여백 */
+    align-items: center;
+    justify-content: center;
 }
 
-/* === 제목 스타일 === */
-h2 {
+.container {
+    background: #f1faee;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     text-align: center;
-    color: #333;
-    margin-bottom: 20px;
-    font-size: 24px; /* 제목 크기 조정 */
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
 }
 
-/* === 폼 컨테이너 === */
-form {
+/* 로그인 폼 전용 스타일 */
+.login-form {
     background-color: #ffffff;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    width: 300px;
-    margin-top: 10px; /* 제목과 폼 간격 조정 */
-}
-
-/* === 입력 필드와 레이블 === */
-label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: bold;
-    color: #555;
-}
-
-input[type="text"],
-input[type="password"] {
     width: 100%;
-    padding: 10px;
+    max-width: 300px;
+    margin: 0 auto;
+}
+
+/* 헤더 스타일 */
+h1 {
     margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    color: #1d3557;
+    font-size: 24px;
+}
+
+/* 입력 필드 스타일 */
+input {
+    background-color: white;
+    border: 1px solid #457b9d;
+    padding: 10px;
+    margin-bottom: 12px;
+    border-radius: 5px;
+    width: 100%;
+    font-size: 14px;
     box-sizing: border-box;
 }
 
-input[type="text"]:focus,
-input[type="password"]:focus {
+input:focus {
     border-color: #007bff;
     outline: none;
 }
 
-/* === 에러 메시지 === */
-span {
-    color: red;
-    font-size: 0.9em;
-    display: block;
-    margin-bottom: 10px;
-}
-
-/* === 기본 버튼 스타일 === */
-button,
-.signup-social-container a {
-    display: inline-block;
-    padding: 12px 20px;
-    border-radius: 30px; /* 둥근 버튼 */
+/* 버튼 스타일 */
+.btn,
+.social-btn {
+    width: 100%;
+    padding: 12px;
+    border-radius: 5px;
     font-size: 16px;
     font-weight: bold;
-    transition: all 0.3s ease;
+    color: white;
     cursor: pointer;
-    width: 100%; /* 버튼 너비 */
-    box-sizing: border-box; /* 패딩 포함 */
+    transition: background 0.3s ease;
+    border: none;
     text-align: center;
 }
 
-/* === 로그인 버튼 스타일 === */
-button {
-    background-color: #007bff; /* 파란색 배경 */
-    color: white;
-    border: none;
+.btn {
+    background: #457b9d;
+    margin-top: 12px;
 }
 
-button:hover {
-    background-color: #0056b3;
+.btn:hover {
+    background: #1d3557;
 }
 
-button:focus {
-    outline: none;
+.btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
 }
 
-/* === 회원가입 및 소셜 로그인 컨테이너 === */
-.signup-social-container {
+/* 소셜 로그인 버튼 */
+.social-btn {
+    background-color: #db4437;
+    text-decoration: none;
+}
+
+.social-btn:hover {
+    background-color: #a93226;
+}
+
+/* 아이디/비밀번호 찾기 및 회원가입 링크 */
+.additional-links {
     margin-top: 20px;
-    display: flex;
-    flex-direction: column; /* 수직 정렬 */
-    gap: 10px; /* 버튼 간격 */
-    width: 300px; /* 폼과 동일한 너비 */
-    text-align: center;
 }
 
-/* === 회원가입 버튼 === */
-.signup-social-container .btn-signup {
-    background: linear-gradient(90deg, #28a745, #218838); /* 녹색 그라데이션 */
-    color: white;
+.additional-links a {
     text-decoration: none;
-    border: none;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 버튼 그림자 */
+    font-size: 14px;
+    color: #007bff;
+    margin-right: 15px;
+    transition: color 0.3s ease;
 }
 
-.signup-social-container .btn-signup:hover {
-    background: linear-gradient(90deg, #218838, #1c7430); /* Hover 시 진한 녹색 */
-    transform: translateY(-2px); /* 버튼 살짝 올라가기 */
-    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15); /* 그림자 증가 */
+.additional-links a:hover {
+    text-decoration: underline;
+    color: #0056b3;
 }
 
-/* === Google 로그인 버튼 === */
-.signup-social-container .btn-google {
-    display: flex; /* 아이콘과 텍스트를 나란히 */
-    align-items: center; /* 세로 정렬 */
-    justify-content: center; /* 텍스트와 아이콘 중앙 정렬 */
-    padding: 10px 20px;
-    background-color: #4285F4; /* Google 파란색 */
-    color: white;
-    text-decoration: none;
-    border-radius: 30px; /* 둥근 버튼 */
-    font-size: 16px;
-    font-weight: bold;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    border: none;
-    cursor: pointer;
+/* 에러 메시지 */
+.error-message {
+    color: red;
+    font-size: 12px;
+    margin-top: -10px;
+    margin-bottom: 10px;
+    text-align: left;
 }
 
-.signup-social-container .btn-google:hover {
-    background-color: #357ae8; /* Hover 시 더 진한 파란색 */
-    transform: translateY(-2px);
-    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+/* 소셜 로그인 버튼 위치 아래로 */
+.social-login {
+    margin-top: 20px;
 }
 
-/* Google 아이콘 스타일 */
-.signup-social-container .google-icon {
-    width: 20px; /* 아이콘 너비 */
-    height: 20px; /* 아이콘 높이 */
-    margin-right: 10px; /* 텍스트와 간격 */
+.social-login .social-btn {
+    margin-top: 10px;
 }
 
-/* === 버튼 포커스 효과 === */
-.signup-social-container a:focus {
-    outline: none;
-    box-shadow: 0 0 4px rgba(0, 0, 0, 0.2); /* 포커스 시 빛나는 효과 */
+/* 반응형 스타일 */
+@media (max-width: 600px) {
+    body {
+        padding: 20px;
+    }
+
+    .container {
+        width: 90%;
+    }
 }

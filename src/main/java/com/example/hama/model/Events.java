@@ -22,11 +22,11 @@ public class Events {
 
     private String cd_title; // 일정 제목
 
-    @Column(columnDefinition = "DATETIME")
-    private LocalDateTime cd_event_date_start; // 시작 시간
+    @Column(name = "cd_event_date_start", columnDefinition = "DATETIME")
+    private LocalDateTime eventDateStart; // 시작 시간
 
-    @Column(columnDefinition = "DATETIME")
-    private LocalDateTime cd_event_date_end; // 종료 시간
+    @Column(name = "cd_event_date_end", columnDefinition = "DATETIME")
+    private LocalDateTime eventDateEnd; // 종료 시간
 
     private String cd_color; // 이벤트 색상
 
@@ -38,12 +38,12 @@ public class Events {
     private User user; // 연결된 사용자
 
     // 전체 필드를 포함하는 생성자
-    public Events(String cd_title, String cd_description, LocalDateTime cd_event_date_start,
-                  LocalDateTime cd_event_date_end, String cd_color, User user) {
+    public Events(String cd_title, String cd_description, LocalDateTime eventDateStart,
+                  LocalDateTime eventDateEnd, String cd_color, User user) {
         this.cd_title = cd_title;
         this.cd_description = cd_description;
-        this.cd_event_date_start = cd_event_date_start;
-        this.cd_event_date_end = cd_event_date_end;
+        this.eventDateStart = eventDateStart;
+        this.eventDateEnd = eventDateEnd;
         this.cd_color = cd_color;
         this.user = user;
     }
