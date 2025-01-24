@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="/calendar/css/modal.css">
 <link rel="stylesheet" href="/calendar/css/memo.css">
 <link rel="stylesheet" href="/calendar/css/notifications.css">
-<link rel="stylesheet" href="/location/css/location-Read.css">
+<link rel="stylesheet" href="/location/css/location-read.css">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=278940b595d1bf12680c71409de85eda&libraries=services"></script>
 </head>
@@ -62,7 +62,7 @@
 <div class="white-background">			
 <div id="map">
 	<!-- 버튼 컨테이너 -->
-    <div id="mapControls" style="position:absolute; top:10px; left:10px; z-index:1000;">
+    <div id="mapControls" style="position:absolute; top:10px; left:10px; z-index:50;">
     <button onclick="setOverlayMapTypeId('traffic')" style="margin-bottom:5px; padding:8px 12px; font-size:12px; color:black; background:white; border:1px solid #ddd; border-radius:5px; cursor:pointer; box-shadow:0 2px 4px rgba(0,0,0,0.1);">
         교통정보
     </button>
@@ -301,8 +301,8 @@ function confirmAction(url, message) {
 }
 
 //카카오 맵 열기
-var locationLat = [[${location.locationLatitude}]]; // 장소의 위도
-var locationLng = [[${location.locationLongitude}]]; // 장소의 경도
+var locationLat = '[[${location.locationLatitude}]]'; // 장소의 위도
+var locationLng = '[[${location.locationLongitude}]]'; // 장소의 경도
 var locationName = '[[${location.locationName}]]'; // 장소 이름
 
 // 지도 초기화

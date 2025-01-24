@@ -1,0 +1,67 @@
+.star-rating {
+    display: inline-flex;
+    font-size: 2rem; /* 아이콘 크기 */
+    cursor: pointer;
+}
+.star {
+    color: lightgray; /* 기본 색상 */
+    margin-right: 5px; /* 아이콘 간 거리 조정 */
+    transition: color 0.2s ease-in-out;
+}
+.star:last-child {
+    margin-right: 0; /* 마지막 아이콘은 오른쪽 간격 제거 */
+}
+.star.selected {
+    color: #FF69B4; /* 클릭 시 핑크색 (#FF69B4) */
+}
+.modal-dialog {
+    max-width: 600px;
+    margin: 2rem auto;
+}
+
+.star-rating {
+    display: inline-flex;
+    font-size: 1.5rem; /* 아이콘 크기 */
+    cursor: pointer;
+}
+
+.star {
+    color: lightgray; /* 기본 색상 */
+    margin-right: 5px;
+    transition: color 0.2s ease-in-out;
+}
+
+.star.selected {
+    color: #FF69B4; /* 선택된 별의 색상 */
+}
+
+textarea {
+    resize: none;
+}
+
+.center {
+    text-align: center;
+}
+
+.file-upload-info {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+.modal-content {
+border-radius: 10px;
+box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+.form-control {
+    border-radius: 5px;
+}
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+.modal-header {
+	margin-bottom : 15px;
+}

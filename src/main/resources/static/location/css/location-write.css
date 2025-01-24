@@ -1,0 +1,40 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden; /* 스크롤 제거 */
+}
+/* 컨테이너를 화면 상단에 딱 붙임 */
+.container {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+.modal-content {
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+.form-control {
+    border-radius: 5px;
+}
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+.category-icons span {
+    margin-right: 8px;
+    font-size: 18px;
+}
+.modal-header {
+	margin-bottom : 15px;
+}
+#placeList li {
+    padding: 8px 12px;
+    border-bottom: 1px solid #ddd; /* 항목 구분선 */
+    font-size: 14px;
+    cursor: pointer;
+}
