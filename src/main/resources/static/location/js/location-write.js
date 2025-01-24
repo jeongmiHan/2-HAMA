@@ -56,7 +56,7 @@ function validateForm() {
   const locationName = document.getElementById('locationName').value.trim(); // 장소명
   const locationAddress = document.getElementById('locationAddress').value.trim(); // 주소
   const locationCategory = document.querySelector('input[name="locationCategory"]:checked'); // 카테고리
-
+  
   // 장소명 검증
   if (!locationName) {
     alert("장소명을 입력해주세요.");

@@ -1,5 +1,5 @@
 #map { width: 100%; height: 400px; }
-#search-bar { margin: 10px 0; text-align: right;}
+#search-bar-location { margin: 10px 0; text-align: right;}
 #places-list { margin-top: 20px; }
 .searchLocation {
 	display: flex;

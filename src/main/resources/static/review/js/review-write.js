@@ -21,7 +21,7 @@ function validateForm(){
 		alert("방문 일자를 선택해주세요.");
 		return false;
 	}
-	
+
 	//방문 일자가 미래인지 확인
 	const selectedDate = new Date(reviewDate);
 	const today = new Date();
