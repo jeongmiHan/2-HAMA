@@ -15,7 +15,6 @@
 		<div class="modal-content p-4">
 		<div class="modal-header">
 				<h3 class="modal-title">리뷰 수정</h3>
-				<button type="button" class="btn-close" onclick="window.close()"></button>
 		</div>
 		<div class="modal-body">
 			<form th:action="@{/review/reviewUpdate(reviewId=${reviewUpdate.reviewId})}" method="post" th:object="${reviewUpdate}" enctype="multipart/form-data" onsubmit="return validateForm()">

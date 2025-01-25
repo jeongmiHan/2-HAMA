@@ -18,7 +18,6 @@
 		<div class="modal-content p-4">
 			<div class="modal-header">
 				<h3 class="modal-title">장소 추천글 수정</h3>
-				<button type="button" class="btn-close" onclick="window.close()"></button>
 			</div>
 			<div class="modal-body">
 				<form id="locationForm" th:action="@{/location/locationUpdate(locationId=${locationUpdate.locationId})}" method="post" th:object="${locationUpdate}" onsubmit="return validateForm()">

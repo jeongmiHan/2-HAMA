@@ -84,6 +84,13 @@ public class ReviewController {
 		Location location = locationService.findLocation(locationId);
 		review.setLocation(location);
 		
+		// 파일 개수 제한 확인
+	    if (reviewImagePaths != null && reviewImagePaths.size() > 3) {
+	        model.addAttribute("errorMessage", "사진은 최대 3장까지만 첨부할 수 있습니다.");
+	        model.addAttribute("locationId", locationId);
+	        return "review/reviewwrite";
+	    }
+		
 		// 파일 저장 처리
 		List<String> filePaths = new ArrayList<>();
 		String uploadDir = System.getProperty("user.dir") + "/uploads/";
@@ -157,6 +164,14 @@ public class ReviewController {
 		//수정작업을 위한 엔티티 변환
 		Review updateReview = ReviewUpdate.toReview(reviewUpdate);
 		
+		
+		// 파일 개수 제한 확인
+	    if (reviewImagePaths != null && reviewImagePaths.size() > 3) {
+	        model.addAttribute("errorMessage", "사진은 최대 3장까지만 첨부할 수 있습니다.");
+	        model.addAttribute("locationId", locationId);
+	        return "review/reviewwrite";
+	    }
+	    
 		// 첨부파일 처리
 	    String uploadDir = System.getProperty("user.dir") + "/uploads/";
 	    Files.createDirectories(Paths.get(uploadDir)); // 업로드 폴더 생성

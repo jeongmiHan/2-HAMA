@@ -17,7 +17,6 @@
 		<div class="modal-content p-4">
 			<div class="modal-header">
 				<h3 class="modal-title">장소 추천글 작성</h3>
-				<button type="button" class="btn-close" onclick="window.close()"></button>
 			</div>
 			<div class="modal-body">
 				<form id="locationForm" action="/location/locationwrite" method="post" th:object="${locationWrite}" onsubmit="return validateForm()">

@@ -5,7 +5,7 @@
 <title>장소보기</title>
 <link rel="stylesheet" href="/calendar/css/style.css">
 <link rel="stylesheet" href="/calendar/css/default.css">
-<link rel="stylesheet" href="/calendar/css/modal.css">
+
 <link rel="stylesheet" href="/calendar/css/memo.css">
 <link rel="stylesheet" href="/calendar/css/notifications.css">
 <link rel="stylesheet" href="/location/css/location-read.css">
@@ -130,7 +130,6 @@
 <div class="seachReview">
 <div class="reviewbuttons">      
 	<input type="button" value="리뷰 쓰기" th:onclick="|window.open('/review/reviewwrite?locationId=' + [[${location.locationId}]], 'popup', 'width=500,height=650')|">
-	<input type="button" onclick="location.href='/location/locationList'" value="목록으로" id="listButton">
 </div>
 <!-- 검색 필터 선택 영역 -->
 <form method = "get" action = "/location/locationRead" style="text-align: right;">

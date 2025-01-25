@@ -157,19 +157,13 @@ function openPopup(place) {
 function closePopup() {
     document.getElementById('popup').classList.add('hidden');
 }
-// 팝업 길찾기 함수
-function openRoute(lat, lng, placeName) {
-    var routeUrl = `https://map.kakao.com/link/to/${encodeURIComponent(placeName)},${lat},${lng}`;
-    window.open(routeUrl, '_blank');
-}
 //지도, 위성, 확대바
 var mapContainer = document.getElementById('map'), // 지도를 표시할 div 
 mapOption = { 
-    center: new kakao.maps.LatLng(33.450701, 126.570667), // 지도의 중심좌표
+    center: new kakao.maps.LatLng(userLat, userLng), // 지도의 중심좌표
     level: 5 // 지도의 확대 레벨
 };
 
-var map = new kakao.maps.Map(mapContainer, mapOption); // 지도를 생성합니다
 
 //일반 지도와 스카이뷰로 지도 타입을 전환할 수 있는 지도타입 컨트롤을 생성합니다
 var mapTypeControl = new kakao.maps.MapTypeControl();
@@ -211,8 +205,8 @@ function setOverlayMapTypeId(maptype) {
 function resetMap() {
     if (currentTypeId) {
         map.removeOverlayMapTypeId(currentTypeId); // 지도 타입 제거
-        currentTypeId = null; // 상태 초기화
     }
+        currentTypeId = null; // 상태 초기화
 }
 // 수정 및 삭제
 function confirmAction(url, message) {
@@ -220,63 +214,80 @@ function confirmAction(url, message) {
         window.location.href = url;
     }
 }
-//페이지 로드 시 사용자 위치 가져오기
-window.onload = function () {
+
+//페이지 로드 시 사용자 위치를 가져와 장소추천 버튼에 쿼리 추가
+document.addEventListener('DOMContentLoaded', function () {
+    const userLatInput = document.getElementById('userLat');
+    const userLngInput = document.getElementById('userLng');
+    const recommendLink = document.querySelector('.navbar-menu li a[href="/location/locationList"]');
+
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
             function (position) {
-            	// 사용자의 실제 위치
                 const userLat = position.coords.latitude;
                 const userLng = position.coords.longitude;
 
-                // 숨겨진 input 요소에 사용자 위치 값을 설정하여 서버로 전송
-                document.getElementById('userLat').value = userLat;
-                document.getElementById('userLng').value = userLng;
-             	// 지도 중심을 사용자 위치로 이동
+                // 위치 정보를 숨겨진 input에 저장
+                if (userLatInput && userLngInput) {
+                    userLatInput.value = userLat;
+                    userLngInput.value = userLng;
+                }
+
+                // 장소추천 버튼 클릭 시 위치 정보 포함 URL로 이동
+                if (recommendLink) {
+                    recommendLink.onclick = function (event) {
+                        event.preventDefault();
+                        location.href = `/location/locationList?userLat=${userLat}&userLng=${userLng}&region=ALL&category=ALL&filter=default`;
+                    };
+                }
+
+                // 지도 중심을 사용자 위치로 설정
                 map.setCenter(new kakao.maps.LatLng(userLat, userLng));
-            
             },
             function (error) {
-                // 위치 가져오기 실패
-                console.error("위치 정보 불러오기 실패:", error);
-                alert("위치 정보를 불러올 수 없습니다.");
+                // 위치 정보를 가져오는 데 실패한 경우 처리
+                console.error("위치 정보를 가져올 수 없습니다:", error);
+
+                let errorMessage = "위치 정보를 가져올 수 없습니다.";
+                switch (error.code) {
+                    case error.PERMISSION_DENIED:
+                        errorMessage = "위치 정보 접근이 거부되었습니다. 브라우저 설정을 확인하세요.";
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        errorMessage = "위치 정보를 사용할 수 없습니다. 네트워크 상태를 확인하세요.";
+                        break;
+                    case error.TIMEOUT:
+                        errorMessage = "위치 정보를 가져오는 데 시간이 초과되었습니다.";
+                        break;
+                    default:
+                        errorMessage = "알 수 없는 에러가 발생했습니다.";
+                        break;
+                }
+
+                alert(errorMessage);
+
+                if (recommendLink) {
+                    recommendLink.onclick = function () {
+                        location.href = `/location/locationList`;
+                    };
+                }
+            },
+            {
+                enableHighAccuracy: true, // 높은 정확도 요청
+                timeout: 10000, // 최대 대기 시간 (ms)
+                maximumAge: 0 // 캐시된 위치를 사용하지 않음
             }
         );
     } else {
-        alert("이 브라우저에서는 위치 정보를 지원하지 않습니다.");
+        alert("이 브라우저는 위치 정보를 지원하지 않습니다.");
+
+        if (recommendLink) {
+            recommendLink.onclick = function () {
+                location.href = `/location/locationList`;
+            };
+        }
     }
-};
-//페이지 로드 시 사용자 위치를 가져와 장소추천 버튼에 쿼리 추가
-document.addEventListener('DOMContentLoaded', function () {
-            const recommendLink = document.querySelector('.navbar-menu li a[href="/location/locationList"]');
-
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    function (position) {
-                        const userLat = position.coords.latitude;
-                        const userLng = position.coords.longitude;
-
-                        // 장소추천 링크 클릭 시 좌표 포함 URL로 이동
-                        recommendLink.onclick = function (event) {
-                            event.preventDefault(); // 기본 동작 막기
-                            location.href = `/location/locationList?userLat=${userLat}&userLng=${userLng}&region=ALL&category=ALL&filter=default`;
-                        };
-                    },
-                    function (error) {
-                        console.error("위치 정보를 가져올 수 없습니다:", error);
-                        // 위치 정보를 가져오지 못하면 기본 URL로 이동
-                        recommendLink.onclick = function () {
-                            location.href = `/location/locationList`;
-                        };
-                    }
-                );
-            } else {
-                console.error("브라우저가 위치 정보를 지원하지 않습니다.");
-                recommendLink.onclick = function () {
-                    location.href = `/location/locationList`;
-                };
-            }
-        });
+});
 
 //도움말 말풍선
 function toggleHelpBalloon() {

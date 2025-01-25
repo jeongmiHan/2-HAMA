@@ -3,7 +3,7 @@
  	const reviewContent = document.querySelector('textarea[name="reviewContent"]').value.trim();
  	const reviewRating = document.getElementById("reviewRating").value;
  	const reviewDate = document.querySelector('input[name=reviewDate]').value.trim();
- 	
+	const reviewImages = document.getElementById("reviewImagePaths").files;
  	//리뷰 내용 검증
  	if(!reviewContent){
  		alert("리뷰 내용을 입력해주세요.");
@@ -30,6 +30,12 @@
  		alert("방문 날짜는 오늘 혹은 과거만 선택할 수 있습니다.")
  		return false;
  	}
+	
+	// 파일 개수 제한 확인
+		    if (files.length > 3) {
+		        alert("사진은 최대 3장까지만 선택 가능합니다.");
+		        event.target.value = ""; // 선택 초기화
+		    }
  	
  	return true;
  }
@@ -53,4 +59,14 @@
              }
          });
      });
+ });
+ // 사진 선택 시 검증
+ document.getElementById("reviewImagePaths").addEventListener("change", function (event) {
+     const files = event.target.files;
+
+     // 파일 개수 제한 확인
+     if (files.length > 3) {
+         alert("사진은 최대 3장까지만 첨부 가능합니다.");
+         event.target.value = ""; // 선택 초기화
+     }
  });

@@ -1,17 +1,8 @@
-body, html {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    overflow: hidden; /* 스크롤 제거 */
-}
 .container {
-    margin: 0;
-    padding: 0;
     width: 100%;
 }
 .modal-content {
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+   
 }
 .form-control {
     border-radius: 5px;
