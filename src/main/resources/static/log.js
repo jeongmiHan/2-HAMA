@@ -140,14 +140,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 	// 좋아요 증가 또는 취소
 	window.increaseLike = async (button) => {
 	    const postElement = button.closest(".logPost");
-	    const postId = postElement.querySelector(".logPostContent").dataset.id; // postId 가져오기
+	    const postId = postElement.querySelector(".logPostContent").dataset.id;
 
 	    try {
 	        const response = await fetch(`/log/${postId}/like`, {
 	            method: 'POST',
-	            headers: {
-	                'Content-Type': 'application/json',
-	            },
+	            headers: { 'Content-Type': 'application/json' },
 	        });
 
 	        if (!response.ok) {
@@ -163,17 +161,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 	        const likeCount = button.querySelector("span");
 	        likeCount.textContent = totalLikes;
 
-	        // 버튼 상태 업데이트
-	        if (isLiked) {
-	            button.classList.add("liked"); // 좋아요 활성화
-	        } else {
-	            button.classList.remove("liked"); // 좋아요 비활성화
-	        }
+	        button.classList.toggle("liked", isLiked);
 	    } catch (error) {
 	        console.error("Error toggling like:", error);
-	        alert("좋아요 처리 중 오류가 발생했습니다.");
 	    }
 	};
+
 
 	
 	// 세부 페이지 이동

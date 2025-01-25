@@ -2,6 +2,7 @@ package com.example.hama.model.log;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -18,7 +19,7 @@ public class LogUpdate {
 	private Long logId;	  
 	private User user;
 	private String logContent;
-	private Long logHit;
+	private List<LogLikes> logLikes;  
 	private LocalDateTime logCreatedDate;
 	
 	public static Log toLog(LogUpdate logUpdate) {
@@ -28,6 +29,7 @@ public class LogUpdate {
 		log.setUser(log.getUser());
 		log.setLogContent(log.getLogContent());
 		log.setLogCreatedDate(LocalDateTime.now());
+		log.setLogLikes(log.getLogLikes());
 		
 		return log;
 	}

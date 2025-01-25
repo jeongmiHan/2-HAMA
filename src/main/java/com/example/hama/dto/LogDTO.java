@@ -1,8 +1,10 @@
 package com.example.hama.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.example.hama.model.log.Log;
+import com.example.hama.model.log.LogLikes;
 import com.example.hama.util.SNSTime;
 
 import lombok.Data;
@@ -12,7 +14,7 @@ public class LogDTO {
     private Long id;           // logId에 매핑
     private String content;    // logContent에 매핑
     private String timeAgo;    // logCreatedDate를 SNS 스타일로 변환하여 매핑
-    private int likes;         // logLikes에 매핑
+    private List<LogLikes> likes;         // logLikes에 매핑
     private int comments;      // logComments에 매핑
 
     // Log 엔티티를 받아서 DTO로 변환하는 생성자

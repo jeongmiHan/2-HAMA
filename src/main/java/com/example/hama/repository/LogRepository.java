@@ -16,7 +16,7 @@ public interface LogRepository extends JpaRepository<Log, Long> {
 	//save(log);
 	
 	//일지 삭제
-	//deleteById(id);
+	//delete(id);
 	
 	//일지 전체 목록
 	//findAll();

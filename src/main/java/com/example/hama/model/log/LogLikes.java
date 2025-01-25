@@ -25,7 +25,7 @@ public class LogLikes {
        private Reply reply;  // 댓글에 좋아요를 연결
 
        @ManyToOne(fetch = FetchType.LAZY)
-       @JoinColumn(name = "user_id")
+       @JoinColumn(name = "user_id", nullable = false)
        private User user;  // 좋아요를 누른 회원
        
        @ManyToOne

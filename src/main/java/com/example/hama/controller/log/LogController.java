@@ -169,34 +169,43 @@ public class LogController {
 		    List<LogDTO> logs = logService.getLogTree();
 		    return ResponseEntity.ok(logs);
 		}
-		
 		@GetMapping("/list")
 		public ResponseEntity<?> getAllLogs() {
 		    try {
-			    User user = getAuthenticatedUser();
-			      if(user == null) {
-			    	  return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
-			      }
+		        User user = getAuthenticatedUser();
+		        if (user == null) {
+		            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+		        }
+
 		        List<Log> logs = logRepository.findAll();
 		        List<Map<String, Object>> response = logs.stream().map(log -> {
 		            Map<String, Object> logData = new HashMap<>();
 		            User logUser = log.getUser(); // 로그 작성자
 		            logData.put("author", logUser != null ? logUser.getName() : "익명");
-		            
+
 		            logData.put("id", log.getLogId());
 		            logData.put("content", log.getLogContent());
+
 		            // 절대 시간
 		            LocalDateTime createdDate = log.getLogCreatedDate();
-		            logData.put("time", createdDate); 
+		            logData.put("time", createdDate);
 
 		            // 상대 시간 추가
-		            String timeAgo = SNSTime.getTimeAgo(createdDate); // 상대 시간 계산
-		            logData.put("timeAgo", timeAgo); // timeAgo 필드 추가
-		            logData.put("likes", log.getLogLikes());
+		            String timeAgo = SNSTime.getTimeAgo(createdDate);
+		            logData.put("timeAgo", timeAgo);
+
+		            // 좋아요 수 계산
+		            int likeCount = log.getLogLikes().size();
+		            logData.put("likes", likeCount);
+
+		            // 댓글 수
 		            logData.put("comments", log.getLogComments());
+
+		            // 첨부된 이미지 목록
 		            logData.put("images", log.getLogAttachedFiles().stream()
-		            	    .map(LogAttachedFile::getLog_saved_filename) // 파일명만 반환
-		            	    .toList());
+		                    .map(LogAttachedFile::getLog_saved_filename)
+		                    .toList());
+
 		            return logData;
 		        }).toList();
 
@@ -207,64 +216,42 @@ public class LogController {
 		    }
 		}
 
-//		// 좋아요 처리
-//		@PostMapping("/{logId}/like")
-//		public ResponseEntity<?> addLike(@PathVariable("logId") Long logId) {
-//		    try {
-//		        // 로그를 조회
-//		        Log log = logRepository.findById(logId).orElseThrow(() -> new IllegalArgumentException("Log not found"));
-//
-//		        // 좋아요 수 증가
-//		        log.setLogLikes(log.getLogLikes() + 1);
-//		        logRepository.save(log);
-//
-//		        return ResponseEntity.ok("Like added successfully");
-//		    } catch (Exception e) {
-//		        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error adding like: " + e.getMessage());
-//		    }
-//		}
 		@PostMapping("/{logId}/like")
 		public ResponseEntity<?> toggleLike(@PathVariable("logId") Long logId) {
 		    try {
-		        // 로그 조회
 		        Log log = logRepository.findById(logId)
 		                .orElseThrow(() -> new IllegalArgumentException("Log not found"));
 
-		        // 사용자 조회
 		        User user = getAuthenticatedUser();
 		        if (user == null) {
 		            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
 		        }
 
-		        // 기존 좋아요 확인
-		        Optional<LogLikes> existingLike = logLikeRepository.findByUserAndLog(user, log);
-
+		        // 좋아요 상태 확인 및 토글
+		        Optional<LogLikes> existingLikeOpt = logLikeRepository.findByUserAndLog(user, log);
 		        boolean isLiked;
-		        if (existingLike.isPresent()) {
-		            // 좋아요 상태 변경
-		            LogLikes like = existingLike.get();
-		            isLiked = !like.isLiked(); // 상태 토글
-		            like.setLiked(isLiked);
-		            log.setLogLikes(log.getLogLikes() + (isLiked ? 1 : -1)); // 좋아요 수 증감
-		            logLikeRepository.save(like);
+
+		        if (existingLikeOpt.isPresent()) {
+		            logLikeRepository.delete(existingLikeOpt.get()); // 명시적 삭제
+		            isLiked = false;
 		        } else {
-		            // 처음 좋아요
-		            isLiked = true;
 		            LogLikes newLike = new LogLikes(user, log, true);
-		            logLikeRepository.save(newLike);
-		            log.setLogLikes(log.getLogLikes() + 1);
+		            logLikeRepository.save(newLike); // 새 좋아요 저장
+		            isLiked = true;
 		        }
 
-		        logRepository.save(log);
+		        int totalLikes = logLikeRepository.countByLog(log);
 
 		        return ResponseEntity.ok(Map.of(
 		            "isLiked", isLiked,
-		            "totalLikes", log.getLogLikes()
+		            "totalLikes", totalLikes
 		        ));
 		    } catch (Exception e) {
 		        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error toggling like: " + e.getMessage());
 		    }
 		}
+
+
 
 
 

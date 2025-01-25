@@ -104,9 +104,6 @@ public class LogService {
         log.getLogAttachedFiles().remove(fileToDelete);
         logRepository.save(log);
     }
-
-
-
 	    
 	// ID로 로그 조회
 	public Optional<Log> findById(Long id) {
@@ -135,7 +132,6 @@ public class LogService {
         Log log = logRepository.findById(logId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 일기입니다."));
         // 연관된 데이터 삭제
-        logLikeRepository.delete(log.getLogLikes());
         logRepository.delete(log);
     }
     

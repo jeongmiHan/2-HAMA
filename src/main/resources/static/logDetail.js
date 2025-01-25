@@ -436,24 +436,19 @@ document.addEventListener("DOMContentLoaded", async () => {
 	}
 	// 삭제 기능
 	window.deleteLog = async function() {
-	    const confirmation = confirm("정말로 삭제하시겠습니까?");
-	    if (!confirmation) return;
-	    try {
-	        const response = await fetch(`/log/${logId}/delete`, { method: "DELETE" });
-	        if (!response.ok) throw new Error("삭제 실패");
-	        // DOM에서 항목 제거
-		    // DOM에서 항목 제거
-		    const logElement = document.getElementById(`log-${logId}`);
-		    if (logElement) {
-		        logElement.remove();
-		        alert("일기가 삭제되었습니다.");
-		    } else {
-		        console.warn(`Element with ID "log-${logId}" not found.`);
-		    }
+		const confirmed = confirm("정말로 삭제하시겠습니까?");
+		if (!confirmed) return;
+
+		try {
+		    const response = await fetch(`/log/${logId}/delete`, { method: 'DELETE' });
+		    if (!response.ok) throw new Error('일기 삭제 실패');
+		    alert('일기가 삭제되었습니다.');
+		    window.location.href = `/log/indexLog`;
 		} catch (error) {
-		    console.error("삭제 중 오류:", error);
-		    alert("삭제에 실패했습니다.");
+		    console.error("일기 삭제 오류:", error);
+		    alert("일기 삭제 중 오류가 발생했습니다.");
 		}
+		
 	};
 	
 	function toggleEditMode(isEdit) {

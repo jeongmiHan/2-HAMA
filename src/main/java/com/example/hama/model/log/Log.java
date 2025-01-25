@@ -37,8 +37,8 @@ public class Log {
     @Column
     private LocalDateTime logCreatedDate; // 작성일
 
-    @Column
-    private int logLikes = 0;
+    @OneToMany(mappedBy = "log", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<LogLikes> logLikes = new ArrayList<>();
 
     @Column
     private int logComments = 0; // 댓글 수
@@ -65,6 +65,7 @@ public class Log {
         logUpdate.setUser(log.getUser());
         logUpdate.setLogContent(log.getLogContent());
         logUpdate.setLogCreatedDate(log.getLogCreatedDate());
+        logUpdate.setLogLikes(log.getLogLikes()); 
         return logUpdate;
     }
 
