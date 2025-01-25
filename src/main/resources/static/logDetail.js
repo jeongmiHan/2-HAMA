@@ -564,5 +564,47 @@ document.addEventListener("DOMContentLoaded", async () => {
 		        alert("좋아요 처리 중 오류가 발생했습니다.");
 		    }
 		};
+		window.toggleBookmark = async function(button) {
+		    const postElement = button.closest(".logPost"); // 게시물 요소 찾기
+
+		    try {
+		        // 즐겨찾기 API 호출
+		        const response = await fetch(`/log/${logId}/bookmark`, {
+		            method: 'POST',
+		            headers: { 'Content-Type': 'application/json' },
+		        });
+
+		        if (!response.ok) {
+		            const errorMessage = await response.text();
+		            console.error("Server Error:", errorMessage);
+		            throw new Error('즐겨찾기 토글 실패');
+		        }
+
+		        const { isBookmarked, totalBookmarks } = await response.json(); // 서버 응답 데이터
+		        console.log(`isBookmarked: ${isBookmarked}, totalBookmarks: ${totalBookmarks}`);
+
+		        // UI 업데이트
+		        const bookmarkCount = button.querySelector("span");
+		        bookmarkCount.textContent = totalBookmarks;
+
+		        // 버튼 상태 업데이트
+		        if (isBookmarked) {
+		            button.classList.add("bookmarked"); // 즐겨찾기 활성화
+		        } else {
+		            button.classList.remove("bookmarked"); // 즐겨찾기 비활성화
+		        }
+		    } catch (error) {
+		        console.error("즐겨찾기 오류:", error);
+		        alert("즐겨찾기 처리 중 오류가 발생했습니다.");
+		    }
+		};
+		window.navigateToLogDetail = function(commentButton) {
+		    if (logId) {
+		        // logDetail로 이동하면서 해시 추가
+		        window.location.href = `/detail/${logId}#commentList`;
+		    } else {
+		        console.error("postId가 유효하지 않습니다.");
+		    }
+		};
 	
 });

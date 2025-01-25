@@ -250,6 +250,39 @@ public class LogController {
 		        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error toggling like: " + e.getMessage());
 		    }
 		}
+		@PostMapping("/{logId}/bookmark")
+		public ResponseEntity<?> toggleBookmark(@PathVariable("logId") Long logId) {
+		    try {
+		        Log log = logRepository.findById(logId)
+		                .orElseThrow(() -> new IllegalArgumentException("Log not found"));
+
+		        User user = getAuthenticatedUser();
+		        if (user == null) {
+		            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+		        }
+
+		        boolean isBookmarked;
+		        if (log.getBookmarkedUsers().contains(user)) {
+		            log.getBookmarkedUsers().remove(user); // 즐겨찾기 취소
+		            isBookmarked = false;
+		        } else {
+		            log.getBookmarkedUsers().add(user); // 즐겨찾기 추가
+		            isBookmarked = true;
+		        }
+
+		        logRepository.save(log);
+
+		        int totalBookmarks = log.getBookmarkedUsers().size();
+
+		        return ResponseEntity.ok(Map.of(
+		            "isBookmarked", isBookmarked,
+		            "totalBookmarks", totalBookmarks
+		        ));
+		    } catch (Exception e) {
+		        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error toggling bookmark: " + e.getMessage());
+		    }
+		}
+
 
 
 

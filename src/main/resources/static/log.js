@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 			<div class="logPostFooter">
 			    <div class="logPostComment" onclick="navigateToLogDetail(this)">💬<span id="comment-count-${post.id}">${post.comments || 0}</span></div>
 			    <div class="logPostLike" onclick="increaseLike(this)">❤️ <span>${post.likes|| 0}</span></div>
-			    <div>🔖 <span>${post.saves}</span></div>
+			    <div class="logPostBookmark" onclick="toggleBookmark(this)">🔖 <span>${post.bookmarks || 0}</span></div>
 			</div>
 			<div class="logReplyContentSection" style="display: none;">
 			    <div class="logReplyContentInput">
@@ -116,6 +116,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 	            content: data.content,
 	            images: data.images || [],
 	            likes: data.likes || 0,
+				bookmarks: post.bookmarks || 0,
 	            comments: data.comments || 0,
 	        }, true);
 
@@ -166,6 +167,42 @@ document.addEventListener("DOMContentLoaded", async () => {
 	        console.error("Error toggling like:", error);
 	    }
 	};
+	window.toggleBookmark = async function(button) {
+	    const postElement = button.closest(".logPost"); // 게시물 요소 찾기
+	    const postId = postElement.querySelector(".logPostContent").dataset.id; // postId 가져오기
+
+	    try {
+	        // 즐겨찾기 API 호출
+	        const response = await fetch(`/log/${postId}/bookmark`, {
+	            method: 'POST',
+	            headers: { 'Content-Type': 'application/json' },
+	        });
+
+	        if (!response.ok) {
+	            const errorMessage = await response.text();
+	            console.error("Server Error:", errorMessage);
+	            throw new Error('즐겨찾기 토글 실패');
+	        }
+
+	        const { isBookmarked, totalBookmarks } = await response.json(); // 서버 응답 데이터
+	        console.log(`isBookmarked: ${isBookmarked}, totalBookmarks: ${totalBookmarks}`);
+
+	        // UI 업데이트
+	        const bookmarkCount = button.querySelector("span");
+	        bookmarkCount.textContent = totalBookmarks;
+
+	        // 버튼 상태 업데이트
+	        if (isBookmarked) {
+	            button.classList.add("bookmarked"); // 즐겨찾기 활성화
+	        } else {
+	            button.classList.remove("bookmarked"); // 즐겨찾기 비활성화
+	        }
+	    } catch (error) {
+	        console.error("즐겨찾기 오류:", error);
+	        alert("즐겨찾기 처리 중 오류가 발생했습니다.");
+	    }
+	};
+
 
 
 	

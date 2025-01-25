@@ -2,7 +2,9 @@ package com.example.hama.model.log;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.example.hama.model.user.User;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -15,6 +17,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.Data;
@@ -39,6 +43,14 @@ public class Log {
 
     @OneToMany(mappedBy = "log", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<LogLikes> logLikes = new ArrayList<>();
+    
+    @ManyToMany
+    @JoinTable(
+        name = "log_bookmarks",
+        joinColumns = @JoinColumn(name = "log_id"),
+        inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private Set<User> bookmarkedUsers = new HashSet<>();
 
     @Column
     private int logComments = 0; // 댓글 수
