@@ -9,6 +9,11 @@
  		alert("리뷰 내용을 입력해주세요.");
  		return false;
  	}
+	
+	if (reviewContent.length < 12 || reviewContent.length > 72) {
+		        alert("리뷰 내용은 12자 이상 72자 이하로 작성해주세요.");
+		        return false;
+		    }
  	
  	//리뷰 평점 검증
  	if(reviewRating === "0"){

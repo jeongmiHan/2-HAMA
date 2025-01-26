@@ -152,7 +152,17 @@
 
 <div class="review-list">
     <div th:each="review, iterStat : ${listR}" class="review-item" th:classappend="${iterStat.index >= 5} ? 'hidden' : ''">
-        <!-- 이미지 영역 -->
+    	<div class="review-header">
+	    	<div class="review-author">
+	        	<i class="fa fa-user author-icon"></i>
+	            <span th:text="${review.user.name}">작성자</span>
+	        </div>
+	        <!-- 날짜 영역 -->
+	        <span class="review-date" th:text="${review.reviewDate}">작성일</span>
+    	</div>
+    <div class="review-body">
+    
+    <!-- 이미지 영역 -->
     <div class="review-image" style="position: relative;">
     <!-- 이미지 조건 처리 추가 -->
     <th:block th:if="${review.reviewImagePath != null and review.reviewImagePath != ''}">   
@@ -165,32 +175,31 @@
         <span>첨부이미지 없음</span>
     </th:block>
 	</div>
-        <!-- 내용 영역 -->
-        <div class="review-content-box">
-            <div class="review-text">
-                <p th:text="${review.reviewContent}">리뷰 내용</p>
-            </div>
-            <div class="review-rating">
-                <i class="fa fa-paw rating-icon"></i>
-                <span th:text="${review.reviewRating}">평점</span>
-            </div>
-            <div class="review-author">
-            	<i class="fa fa-user author-icon"></i>
-                <span th:text="${review.user.name}">작성자</span>
-            </div>
+     <!-- 내용 영역 -->
+     <div class="review-content-box">
+         <div class="review-text">
+             <p th:text="${review.reviewContent}">리뷰 내용</p>
+         </div>
+     </div>	
+    </div>
+        
+        <div class="review-bottom">
+	        <!-- 수정, 삭제 버튼 (책갈피 형태)-->
+	        <div class="bookmark-buttons" th:if="${sessionUser.userId == review.user.userId}">
+	            <button class="review-edit-btn" th:onclick="window.open('/review/reviewUpdate?reviewId= + [[${review.reviewId}]]', 'popup', 'width=500,height=650')">
+	                <i class="fa fa-edit"></i>
+	            </button>
+	            <button class="review-delete-btn" th:onclick="|confirmAction('@{/review/reviewDelete(reviewId=${review.reviewId}, locationId=${location.locationId})}', '리뷰를 삭제하시겠습니까?')|">
+	    			<i class="fa fa-trash"></i>
+				</button>
+	        </div>
+	        <div class="review-rating">
+		    <span th:each="i : ${#numbers.sequence(1, review.reviewRating)}">
+		        <i class="fa fa-paw rating-icon"></i>
+		    </span>
+			</div>
         </div>
-        <!-- 날짜 영역 -->
-        <span class="review-date" th:text="${review.reviewDate}">작성일</span>
-    	
-    	<!-- 수정, 삭제 버튼 (책갈피 형태)-->
-        <div class="bookmark-buttons" th:if="${sessionUser.userId == review.user.userId}">
-            <button class="edit-btn" th:onclick="window.open('/review/reviewUpdate?reviewId= + [[${review.reviewId}]]', 'popup', 'width=500,height=650')">
-                <i class="fa fa-edit"></i>
-            </button>
-            <button class="delete-btn" th:onclick="|confirmAction('@{/review/reviewDelete(reviewId=${review.reviewId}, locationId=${location.locationId})}', '리뷰를 삭제하시겠습니까?')|">
-    			<i class="fa fa-trash"></i>
-			</button>
-        </div> 
+    	 
     </div>
 </div>
 
@@ -576,9 +585,9 @@ function toggleHelpBalloon() {
 document.addEventListener('DOMContentLoaded', function () {
     const reviews = document.querySelectorAll('.review-item'); // 리뷰 항목
     const loadMoreBtn = document.getElementById('loadMoreReviewsBtn'); // "더보기" 버튼
-    let currentIndex = 5; // 초기 표시할 리뷰 개수
+    let currentIndex = 3; // 초기 표시할 리뷰 개수
 
-    // 초기 상태: 첫 5개만 표시
+    // 초기 상태: 첫 3개만 표시
     reviews.forEach((review, index) => {
         if (index >= currentIndex) {
             review.classList.add('hidden');
@@ -590,7 +599,7 @@ document.addEventListener('DOMContentLoaded', function () {
         let hiddenCount = 0;
 
         // 다음 5개 항목을 표시
-        for (let i = currentIndex; i < currentIndex + 5 && i < reviews.length; i++) {
+        for (let i = currentIndex; i < currentIndex + 3 && i < reviews.length; i++) {
             reviews[i].classList.remove('hidden');
             hiddenCount++;
         }
@@ -604,6 +613,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 });
+
 </script>
 <script src="/calendar/js/notifications.js"></script>            
 </body>

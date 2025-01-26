@@ -21,7 +21,6 @@
          max-width: 600px;
          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
-
 .location-header {
     display: flex;
     justify-content: center;
@@ -87,37 +86,50 @@
 }
  
 .review-list {
-     margin: 0;
-     padding: 0;
-     list-style-type: none;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 한 줄에 3개씩 */
+    gap: 20px; /* 카드 간 간격 */
+    list-style-type: none;
+    padding: 0;
+    margin: 0 auto;
+    width: 90%;
  }
- .review-item {
-     display: flex; /* 가로 정렬 */
-     align-items: center; /* 세로 중앙 정렬 */
-     border: 1px solid #ddd;
-     border-radius: 5px;
-     padding: 15px;
-     margin-bottom: 10px;
-     background-color: #f9f9f9;
-     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-     position: relative; /* 날짜 위치를 위한 기준 */
-     width: 90%;
- 	 height: 120px; /* 세로 크기 조절 */
-     margin-left: auto;
-     margin-right: auto;
- }
-  
+.review-header{
+	margin-bottom:25px;
+}
+ 
+.review-item {
+   display: flex;
+   flex-direction: column; /* 세로 정렬 */
+   align-items: center;
+   border: 1px solid #ddd;
+   border-radius: 10px;
+   padding: 10px;
+   background-color: #f9f9f9;
+   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+   text-align: left;
+   position: relative;
+}
+.review-body {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px; /* 이미지와 내용 간 간격 */
+  margin-bottom:10px;
+  margin-top:10px;
+}
 .review-image {
-    flex: 0 0 100px; /* 고정된 크기 */
-    height: 100px;
-    margin-right: 15px;
-    background-color: #ffebcd;
-    border-radius: 5px;
+	flex-shrink: 0; /* 사진 크기 고정 */
+    width: 120px; /* 고정 너비 */
+    height: 120px; /* 고정 높이 */
+    margin-bottom: 10px;
+    border-radius: 10px;
+    background-color: #e9ecef;
+    overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: hidden;
-    position: relative; /* 상대 위치 설정 */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+   
 }
 .review-image img {
     width: 100%;
@@ -128,17 +140,45 @@
     flex: 1; /* 남은 공간 차지 */
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: flex-start;
+    height: 130px; /* 고정 높이 */
+    overflow-y: auto; /* 세로 스크롤 활성화 */
+    padding-right: 5px; /* 스크롤바와 텍스트 간 여백 */
+    scrollbar-width: thin; /* 스크롤바 두께 설정 (Firefox) */
+    scrollbar-color: #ccc transparent; /* 스크롤바 색상 설정 (Firefox) */
+}
+/* Webkit 기반 브라우저용 스크롤바 스타일 */
+.review-content-box::-webkit-scrollbar {
+    width: 8px; /* 스크롤바 너비 */
+}
+
+.review-content-box::-webkit-scrollbar-thumb {
+    background-color: #ccc; /* 스크롤바 색상 */
+    border-radius: 4px; /* 스크롤바 모서리 둥글게 */
+}
+
+.review-content-box::-webkit-scrollbar-thumb:hover {
+    background-color: #999; /* 스크롤바 호버 색상 */
+}
+
+.review-content-box::-webkit-scrollbar-track {
+    background-color: transparent; /* 스크롤바 트랙 색상 */
 }
 .review-text {
-    margin-bottom: 5px; /* 간격 줄임 */
-	color: #444;
-	font-size: 0.9em; /* 글씨 크기 줄임 */
+    font-size: 0.85em;
+    color: #444;
+    margin-bottom: 10px;
+    line-height: 1.4;
+    max-height: 130px; /* 텍스트 높이 제한 */
+    overflow: hidden; /* 내용이 길 경우 숨김 */
+    text-overflow: ellipsis; /* 말줄임표 처리 */
 }
 .review-author {
-    text-align: right;
-    font-size: 0.9em;
-    color: #555;
+  	position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 0.8em;
+    color: #888;
 }
 .review-date {
     position: absolute;
@@ -148,14 +188,18 @@
     color: #888;
 }
 .review-rating {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    font-size: 1em;
-    margin-bottom: 5px;
+    position: absolute;
+    bottom: 5px; /* 카드 하단 여백 */
+    right: 10px; /* 카드 좌측 여백 */
+    display: flex; /* 가로 정렬 */
+    align-items: center; /* 아이콘 수직 중앙 정렬 */
+    gap: 1.5px; /* 아이콘 간 간격 */
+    font-size: 1em; /* 아이콘 크기 */
+    color: #FF69B4; /* 핑크색 */
+    
 }
     
- .rating-icon {
+.rating-icon {
      color: #FF69B4; /* 핑크색으로 설정 */
      font-size: 1em; /* 아이콘 크기 */
      margin-right: 5px; /* 숫자 평점과의 간격 */
@@ -163,6 +207,9 @@
 .no-rating{
 	color: gray;
 	font-style: italic;
+}
+.review-bottom{
+	margin-top:10px;
 }
 /* 이미지 개수 표시 배지 */
 .image-count {
@@ -218,45 +265,39 @@
     margin: 0 10px;
 }
 /* 버튼 영역 (세로 배치 및 카드와 같은 색상) */
-.bookmark-buttons {
-    position: absolute; /* 리스트 카드와 밀착 */
-    top: 0;
-    right: -45px; 
-    display: flex;
-    flex-direction: column; /* 세로 정렬 */
-    gap: 5px; /* 버튼 간격 설정 */
-    background-color: #f9f9f9; /* 부드러운 베이지 톤 */
-    border: 1px solid #ddd; /* 테두리 추가 */
-    border-radius: 5px; /* 둥근 모서리 */
-    padding: 5px; /* 안쪽 여백 */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+.bookmark-buttons {  
+    position: absolute;
+    bottom: 5px;
+    left: 10px;
+    font-size: 0.8em;
+    
 }
 /* 버튼 기본 스타일 */
 .bookmark-buttons button {
     background: none;
     border: none;
     cursor: pointer;
-    font-size: 14px; /* 크기 축소 */
+    font-size: 12px; /* 크기 축소 */
     padding: 5px;
     border-radius: 0;
     transition: all 0.3s ease;
 }
 /* 수정 버튼 */
-.edit-btn {
+.review-edit-btn {
     color: #007bff; /* 파란색 */
 }
 
-.edit-btn:hover {
+.review-edit-btn:hover {
     color: #0056b3;
     transform: scale(1.1); /* 호버 시 확대 */
 }
 
 /* 삭제 버튼 */
-.delete-btn {
+.review-delete-btn {
     color: #dc3545; /* 빨간색 */
 }
 
-.delete-btn:hover {
+.review-delete-btn:hover {
     color: #c82333;
     transform: scale(1.1);
 }
@@ -326,7 +367,7 @@
     position: fixed;
     top: 20%;
     right: 20px;
-    z-index: 1000;
+    z-index: 2;
 }
 
 .help-icon {
