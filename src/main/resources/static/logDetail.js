@@ -143,6 +143,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 	        document.getElementById("logTime").innerText = log.timeAgo || "시간 정보 없음";
 	        document.getElementById("logContent").innerText = log.content || "내용 없음";
 
+			// 프로필 이미지 처리
+			const profileImageElement = document.querySelector(".profile-image");
+			if (log.photoUrl) {
+			    profileImageElement.src = log.photoUrl;
+			} else {
+			    profileImageElement.src = "/static/default-profile.jpg"; // 기본 이미지 경로
+			}
+			
 	        // 이미지 리스트 표시
 	        imageList = log.images.map(img => `/log/images/${img}`); // 이미지 URL 수정
 	        imageList.forEach((src, index) => {

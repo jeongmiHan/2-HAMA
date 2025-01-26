@@ -211,6 +211,8 @@ public class LogController {
 		            logData.put("images", log.getLogAttachedFiles().stream()
 		                    .map(LogAttachedFile::getLog_saved_filename)
 		                    .toList());
+		            // 본인 여부 확인
+		            logData.put("isAuthor", log.getUser().equals(user)); 
 
 		            return logData;
 		        }).toList();

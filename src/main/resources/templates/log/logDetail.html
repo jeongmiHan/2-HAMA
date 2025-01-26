@@ -6,6 +6,7 @@
   <title>もふもふ</title>
   <link rel="stylesheet" href="/log.css">
   <link rel="stylesheet" href="/logDetail.css">
+  <link rel="stylesheet" href="/assets/profile.css">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
   <style></style>
   <script type="module" src="/logDetail.js"></script>
@@ -21,14 +22,7 @@
 <body>
   <div class="wrapper"> <!--wrapper : 전체 페이지를 감싸는 컨테이너-->
     <!-- Sidebar -->
-    <nav class="sidebar"> <!--sidebar :  왼쪽 메뉴를 담당하는 사이드 바-->
-      <div class="sidebar-header">
-        <h2>프로필</h2>
-      </div>
-      <ul class="sidebar-menu">
-        <li><a href="#">Dashboard</a></li>
-      </ul>
-    </nav>
+    <nav class="sidebar" th:replace="~{profile}"></nav>
 
     <!-- Content Wrapper --> <!--Content Wrapper : 메인 콘텐츠와 상단 네비게이션 바를 감싸는 컨테이너 -->
     <div class="content-wrapper">
@@ -86,7 +80,7 @@
         <!-- 일기 내용 -->
 		<div id="logDetailContainer">
 	        <div id="logAuthor" class="logAuthor">
-	          <img src="/path/to/profile.jpg" alt="프로필 사진" class="profile-image">
+	       	  <img src="/static/default-profile.jpg" alt="프로필 사진" class="profile-image" />
 	          <div class="author-info">
 			    <span class="author-name" id="nickname"></span>
 			    <div class="profile-group"></div>
@@ -133,7 +127,6 @@
 		    <div class="logPostLike" onclick="increaseLike(this)">❤️ <span></span></div>
 		    <div class="logPostBookmark" onclick="toggleBookmark(this)">🔖 <span></span></div>
 		</div>
-
 		
 		<!-- 댓글 템플릿 -->
 		<template id="comment-template">
@@ -163,8 +156,6 @@
 		        </div>
 		    </div>
 		</template>
-
-
 
         <!-- 댓글 목록 -->
         <div id="commentList"></div>

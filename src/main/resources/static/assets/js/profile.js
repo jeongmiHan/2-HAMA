@@ -76,75 +76,81 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // 저장 버튼
-    saveButton.addEventListener('click', () => {
-        const name = document.getElementById('name').value.trim();
-        const breed = document.getElementById('breed').value.trim();
-        const age = document.getElementById('age').value.trim();
-        const birthdate = document.getElementById('birthdate').value.trim();
-        const mode = saveButton.dataset.mode;
-        const petId = saveButton.dataset.petId;
+   saveButton.addEventListener('click', () => {
+       const name = document.getElementById('name').value.trim();
+       const breed = document.getElementById('breed').value.trim();
+       const age = document.getElementById('age').value.trim();
+       const birthdate = document.getElementById('birthdate').value.trim();
+       const mode = saveButton.dataset.mode;
+       const petId = saveButton.dataset.petId;
 
-        if (!name || !breed || isNaN(age) || age <= 0 || !birthdate) {
-            alert("모든 항목을 올바르게 입력해주세요.");
-            return;
-        }
+       if (!name || !breed || isNaN(age) || age <= 0 || !birthdate) {
+           alert("모든 항목을 올바르게 입력해주세요.");
+           return;
+       }
 
-        const formData = new FormData();
-        formData.append('name', name);
-        formData.append('breed', breed);
-        formData.append('age', parseInt(age, 10));
-        formData.append('birthdate', birthdate);
+       const formData = new FormData();
+       formData.append('name', name);
+       formData.append('breed', breed);
+       formData.append('age', parseInt(age, 10));
+       formData.append('birthdate', birthdate);
 
-        if (croppedImageBlob) {
-            formData.append('photo', croppedImageBlob);
-        }
+       // 이미지가 수정된 경우에만 Blob 추가
+       if (croppedImageBlob) {
+           formData.append('photo', croppedImageBlob);
+       }
 
-        const url = mode === 'add' ? '/pets' : `/pets/${petId}`;
-        const method = mode === 'add' ? 'POST' : 'PUT';
+       const url = mode === 'add' ? '/pets' : `/pets/${petId}`;
+       const method = mode === 'add' ? 'POST' : 'PUT';
 
-        fetch(url, {
-            method: method,
-            body: formData,
-        })
-            .then(response => {
-                if (!response.ok) {
-                    return response.json().then(err => {
-                        throw new Error(err.message || '서버에서 오류가 발생했습니다.');
-                    });
-                }
-                return response.json();
-            })
-            .then(data => {
-                const imageUrl = croppedImageBlob
-                    ? URL.createObjectURL(croppedImageBlob)
-                    : `${data.photoUrl}?t=${Date.now()}`;
-                if (mode === 'add') {
-                    addProfileToUI(
-                        imageUrl,
-                        data.petName,
-                        data.petBreed,
-                        data.petAge,
-                        data.petBirthdate,
-                        data.petId
-                    );
-                } else if (mode === 'edit') {
-                    updateProfileInUI(
-                        {
-                            ...data,
-                            photoUrl: imageUrl,
-                        },
-                        petId
-                    );
-                }
-                updateSessionStorage();
-                popup.style.display = 'none';
-                croppedImageBlob = null;
-            })
-            .catch(error => {
-                console.error('에러 발생:', error);
-                alert(`작업 중 오류가 발생했습니다: ${error.message}`);
-            });
-    });
+       fetch(url, {
+           method: method,
+           body: formData,
+       })
+           .then(response => {
+               if (!response.ok) {
+                   return response.json().then(err => {
+                       throw new Error(err.message || '서버에서 오류가 발생했습니다.');
+                   });
+               }
+               return response.json();
+           })
+           .then(data => {
+               // 이미지를 수정하지 않았을 경우 기존의 이미지 URL 유지
+               const imageUrl = croppedImageBlob
+                   ? URL.createObjectURL(croppedImageBlob) // 새로 업로드한 이미지 Blob
+                   : data.photoUrl
+                   ? `${data.photoUrl}?t=${Date.now()}` // 서버에서 반환된 photoUrl
+                   : document.querySelector(`[data-id="${petId}"] img`).src; // 기존 이미지 URL 유지
+
+               if (mode === 'add') {
+                   addProfileToUI(
+                       imageUrl,
+                       data.petName,
+                       data.petBreed,
+                       data.petAge,
+                       data.petBirthdate,
+                       data.petId
+                   );
+               } else if (mode === 'edit') {
+                   updateProfileInUI(
+                       {
+                           ...data,
+                           photoUrl: imageUrl,
+                       },
+                       petId
+                   );
+               }
+               updateSessionStorage();
+               popup.style.display = 'none';
+               croppedImageBlob = null; // Blob 초기화
+           })
+           .catch(error => {
+               console.error('에러 발생:', error);
+               alert(`작업 중 오류가 발생했습니다: ${error.message}`);
+           });
+   });
+
 
     // 프로필 추가
     function addProfileToUI(imageSrc, name, breed, age, birthdate, petId) {
