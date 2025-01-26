@@ -112,11 +112,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 	        renderPost({
 	            id: data.id,
 	            author: data.author,
-	            timeAgo: data.timeAgo,
+	            timeAgo: data.timeAgo || "방금 전",
 	            content: data.content,
 	            images: data.images || [],
 	            likes: data.likes || 0,
-				bookmarks: post.bookmarks || 0,
+				bookmarks: data.bookmarks || 0,
 	            comments: data.comments || 0,
 	        }, true);
 

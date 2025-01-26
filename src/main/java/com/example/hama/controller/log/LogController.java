@@ -137,6 +137,8 @@ public class LogController {
 		    response.put("id", log.getLogId());
 		    response.put("author", user.getName());
 		    response.put("content", log.getLogContent());
+		    response.put("likes", log.getLogLikes().size());
+		    response.put("bookmarks", log.getBookmarkedUsers().size());
 		    response.put("images", attachedFiles.stream()
 		            .map(LogAttachedFile::getLog_saved_filename)
 		            .toList());
@@ -200,7 +202,11 @@ public class LogController {
 
 		            // 댓글 수
 		            logData.put("comments", log.getLogComments());
-
+		            
+		            // 즐겨찾기 수
+		            int bookmarkCount = log.getBookmarkedUsers().size(); // Lazy 로딩 발생
+		            logData.put("bookmarks", bookmarkCount);
+		            
 		            // 첨부된 이미지 목록
 		            logData.put("images", log.getLogAttachedFiles().stream()
 		                    .map(LogAttachedFile::getLog_saved_filename)

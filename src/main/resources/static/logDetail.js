@@ -368,7 +368,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             const replies = result.replies || [];
             commentList.innerHTML = ""; // 초기화
 			
-			
 			if (result.replies.length === 0) {
 			    // 댓글이 없을 경우 메시지 추가
 			    const noCommentsMessage = document.createElement("p");
