@@ -228,7 +228,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 	    const isDeleted = reply.logReplyContent === "댓글이 삭제되었습니다.";
 
 	    if (isDeleted) {
-	      // 삭제된 댓글의 경우
+	      // 삭제된 댓글 처리
 	      replyElement.innerHTML = ""; // 기존 내용 초기화
 	      replyElement.textContent = "댓글이 삭제되었습니다."; // 삭제 메시지
 	      replyElement.style.color = "#888";
@@ -242,32 +242,45 @@ document.addEventListener("DOMContentLoaded", async () => {
 	        renderReplies(reply.childReplies, childContainer); // 자식 댓글 재귀 렌더링
 	      }
 	    } else {
-	      replyElement.querySelector("[data-nickname]").textContent = reply.author || nickname;
+	      // 댓글 정보 설정
+	      replyElement.querySelector("[data-nickname]").textContent = reply.author || "익명";
 	      replyElement.querySelector(".comment-time").textContent = reply.timeAgo || "방금 전";
 	      replyElement.querySelector(".comment-content p").textContent = reply.logReplyContent;
-	      replyElement.querySelector(".like-count").textContent = reply.likes || 0;
 
-	      // 수정 버튼 이벤트
-	      replyElement.querySelector(".edit-button").addEventListener("click", () => {
-	        prepareEditReply(reply.id, reply.logReplyContent);
-	      });
+	      // 수정/삭제 버튼 표시 여부
+	      const editButton = replyElement.querySelector(".edit-button");
+	      const deleteButton = replyElement.querySelector(".delete-button");
+		  const commentActions = replyElement.querySelector(".comment-actions");
+		  
+	      if (reply.isAuthor) {
+			commentActions.style.display = "block"; // 작성자만 버튼 보이기
 
-	      // 삭제 버튼 이벤트
-	      replyElement.querySelector(".delete-button").addEventListener("click", () => {
-	        deleteReply(null, reply.id);
-	        reply.logReplyContent = "댓글이 삭제되었습니다.";
-	        replyElement.innerHTML = "";
-	        replyElement.textContent = "댓글이 삭제되었습니다.";
-	        replyElement.style.color = "#888";
-	        replyElement.style.fontStyle = "italic";
-	        // 자식 댓글 유지
-	        if (reply.childReplies && reply.childReplies.length > 0) {
-	          const childContainer = document.createElement("div");
-	          childContainer.classList.add("logReplyContentList");
-	          replyElement.appendChild(childContainer);
-	          renderReplies(reply.childReplies, childContainer);
-	        }
-	      });
+	        // 수정 버튼 이벤트
+	        editButton.addEventListener("click", () => {
+	          prepareEditReply(reply.id, reply.logReplyContent);
+	        });
+
+	        // 삭제 버튼 이벤트
+	        deleteButton.addEventListener("click", () => {
+	          deleteReply(null, reply.id);
+	          reply.logReplyContent = "댓글이 삭제되었습니다.";
+	          replyElement.innerHTML = "";
+	          replyElement.textContent = "댓글이 삭제되었습니다.";
+	          replyElement.style.color = "#888";
+	          replyElement.style.fontStyle = "italic";
+
+	          // 자식 댓글 유지
+	          if (reply.childReplies && reply.childReplies.length > 0) {
+	            const childContainer = document.createElement("div");
+	            childContainer.classList.add("logReplyContentList");
+	            replyElement.appendChild(childContainer);
+	            renderReplies(reply.childReplies, childContainer);
+	          }
+	        });
+	      } else {
+	        // 작성자가 아닌 경우 버튼 숨김
+	        commentActions.style.display = "none";
+	      }
 
 	      // 답글 버튼 이벤트
 	      replyElement.querySelector(".reply-button").addEventListener("click", () => {
@@ -286,6 +299,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 	    parentElement.appendChild(clone);
 	  });
 	}
+
   
 	let isEditMode = false; // 수정 모드 여부
 	let editReplyId = null; // 수정할 댓글 ID
@@ -311,6 +325,42 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 	// 댓글 추가/수정 함수
 	window.addReply = async () => {
+		try {
+		    const replyText = commentInput.value.trim();
+		    if (!replyText) {
+		        alert("댓글 내용을 입력하세요!");
+		        return;
+		    }
+
+		    const response = await fetch(`/reply/log/${logId}/reply`, {
+		        method: "POST",
+		        headers: { "Content-Type": "application/json" },
+		        body: JSON.stringify({
+		            logReplyContent: replyText,
+		            parentReplyId: parentReplyId,
+		        }),
+		    });
+
+		    if (!response.ok) throw new Error("댓글 추가 실패");
+		    const responseData = await response.json();
+
+		    if (responseData.status !== "success") {
+		        throw new Error(responseData.message || "댓글 추가 실패");
+		    }
+
+		    alert("댓글이 추가되었습니다.");
+		    location.reload();
+		} catch (error) {
+		    console.error("댓글 추가 오류:", error);
+		    alert("댓글 추가 중 오류가 발생했습니다.");
+		} finally {
+		    commentInput.value = "";
+		    parentReplyId = null;
+		    commentInput.placeholder = "댓글을 작성해보세요.";
+		}
+	};
+	// 댓글 수정 함수
+	window.editReply = async () => {
 	    try {
 	        const replyText = commentInput.value.trim();
 	        if (!replyText) {
@@ -318,41 +368,30 @@ document.addEventListener("DOMContentLoaded", async () => {
 	            return;
 	        }
 
-	        // 요청 설정
-	        const url = isEditMode 
-	            ? `/reply/log/${editReplyId}/edit` // 수정 모드 API
-	            : `/reply/log/${logId}/reply`;    // 추가 모드 API
-	        const method = isEditMode ? 'PUT' : 'POST';
-
-	        // 댓글 전송 또는 수정 요청
-			const response = await fetch(url, {
-			    method: method,
-			    headers: { 'Content-Type': 'application/json' },
-			    body: JSON.stringify({
-			        logReplyContent: replyText,
-			        parentReplyId: isEditMode ? null : parentReplyId
-			    })
+	        const response = await fetch(`/reply/log/${editReplyId}/edit`, {
+	            method: "PUT",
+	            headers: { "Content-Type": "application/json" },
+	            body: JSON.stringify({
+	                logReplyContent: replyText,
+	            }),
 	        });
 
-	        if (!response.ok) throw new Error(isEditMode ? "댓글 수정 실패" : "댓글 추가 실패");
+	        if (!response.ok) throw new Error("댓글 수정 실패");
 	        const responseData = await response.json();
 
 	        if (responseData.status !== "success") {
-	            throw new Error(responseData.message || (isEditMode ? "댓글 수정 실패" : "댓글 추가 실패"));
+	            throw new Error(responseData.message || "댓글 수정 실패");
 	        }
 
-	        alert(isEditMode ? "댓글이 수정되었습니다." : "댓글이 추가되었습니다.");
-	        location.reload(); // 새로고침
+	        alert("댓글이 수정되었습니다.");
+	        location.reload();
 	    } catch (error) {
-	        console.error(isEditMode ? "댓글 수정 오류:" : "댓글 추가 오류:", error);
-	        alert(isEditMode ? "댓글 수정 중 오류가 발생했습니다." : "댓글 추가 중 오류가 발생했습니다.");
+	        console.error("댓글 수정 오류:", error);
+	        alert("댓글 수정 중 오류가 발생했습니다.");
 	    } finally {
-			// 댓글 저장 후 목록 새로고침
-			commentInput.value = "";
-			isEditMode = false;
-			editReplyId = null;
-			parentReplyId = null;
-			fetchReplies();
+	        commentInput.value = "";
+	        isEditMode = false;
+	        editReplyId = null;
 	        commentInput.placeholder = "댓글을 작성해보세요.";
 	    }
 	};
@@ -408,22 +447,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     // 댓글 초기 로딩
     fetchReplies();
 
-    // 댓글 추가 버튼 이벤트 등록
-    submitComment.addEventListener("click", addReply);
-    commentInput.addEventListener("keydown", (event) => {
-        if (event.key === "Enter" && !event.shiftKey) {
-            event.preventDefault();
-            addReply();
-        }
-    });
+	// 이벤트 핸들러 분리
+	submitComment.addEventListener("click", () => {
+	    if (isEditMode) {
+	        editReply();
+	    } else {
+	        addReply();
+	    }
+	});
+	
 	// 댓글 수정 버튼 이벤트 등록
 	commentInput.addEventListener("keydown", (event) => {
 	    if (event.key === "Enter" && !event.shiftKey) {
 	        event.preventDefault();
-	        if (parentReplyId) {
-	            editReply(); // 수정 모드
+	        if (isEditMode) {
+	            editReply();
 	        } else {
-	            addReply(); // 추가 모드
+	            addReply();
 	        }
 	    }
 	});

@@ -40,7 +40,7 @@ public class Reply {
 	@JoinColumn(name="user_id", nullable = false)
 	private User user;	   //사용자
 	
-	@Column
+	@Column(nullable = false)
 	private String logReplyContent;
 	
 	private LocalDateTime logCreatedTime;
@@ -58,8 +58,11 @@ public class Reply {
 	@Transient
 	private boolean writer;
 	
-	private boolean isDeleted = false;
+	@Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
+	private boolean isAuthor = false; // 기본값 false로 설정
 	
+	private boolean isDeleted = false;
+
 }
 
 

@@ -80,14 +80,18 @@ public class LogDetailController {
     }
     @DeleteMapping("/log/{logId}/delete")
     public ResponseEntity<?> deleteLog(@PathVariable("logId") Long logId) {
-        try {
-            logService.deleteLog(logId); // 삭제 서비스 호출
-            return ResponseEntity.ok("일기가 삭제되었습니다.");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                 .body("일기 삭제 중 오류 발생: " + e.getMessage());
+    	User currentUser = getAuthenticatedUser();
+        Log log = logRepository.findById(logId)
+                .orElseThrow(() -> new IllegalArgumentException("Log not found"));
+
+        if (!log.getUser().getUserId().equals(currentUser.getUserId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("삭제 권한이 없습니다.");
         }
+
+        logService.deleteLog(logId);
+        return ResponseEntity.ok("일기가 삭제되었습니다.");
     }
+    
     @DeleteMapping("/log/{logId}/file/delete")
     public ResponseEntity<?> deleteLogFile(@PathVariable("logId") Long logId
     									 , @RequestBody Map<String, String> request) {

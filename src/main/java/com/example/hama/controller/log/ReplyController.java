@@ -57,8 +57,8 @@ public class ReplyController {
     }
 	@PostMapping("/log/{logId}/reply")
 	public ResponseEntity<?> addReply(@PathVariable("logId") Long logId
-													, @RequestBody Map<String, Object> request
-													, @RequestParam(name = "name", required = false) String nickname) {
+									, @RequestBody Map<String, Object> request
+									, @RequestParam(name = "name", required = false) String nickname) {
 	    try {
 	        // 댓글 내용 및 부모 ID 추출
 	        String logReplyContent = (String) request.get("logReplyContent");
@@ -68,8 +68,8 @@ public class ReplyController {
 	        if (logReplyContent == null || logReplyContent.trim().isEmpty()) {
 	            throw new IllegalArgumentException("댓글 내용이 비어있습니다.");
 	        }
-		    User user = getAuthenticatedUser();
-		      if(user == null) {
+		    User currentUser = getAuthenticatedUser();
+		      if(currentUser == null) {
 		    	  return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
 		      }
 	        Log log = logRepository.findById(logId)
@@ -77,10 +77,11 @@ public class ReplyController {
 
 	        // 댓글 객체 생성
 	        Reply reply = new Reply();
-	        reply.setUser(user);
+	        reply.setUser(currentUser);
 	        reply.setLog(log);
 	        reply.setLogReplyContent(logReplyContent);
 	        reply.setLogCreatedTime(LocalDateTime.now());
+	        reply.setAuthor(currentUser.getUserId().equals(log.getUser().getUserId())); // 작성자인지 여부 설정
 
 	        // 부모 댓글 검증 및 설정
 	        if (parentReplyId != null) {
@@ -145,35 +146,29 @@ public class ReplyController {
 	}
 	// 댓글 목록 조회
 	@GetMapping("/log/{logId}/replies")
-	public ResponseEntity<?> getReplies(@PathVariable("logId") Long logId
-									  , @RequestParam(name = "name", required = false) String nickname) {
+	public ResponseEntity<?> getReplies(@PathVariable("logId") Long logId) {
 	    try {
 	        Log log = logRepository.findById(logId)
 	                .orElseThrow(() -> new IllegalArgumentException("Invalid log ID"));
-		    User user = getAuthenticatedUser();
-	        if(user == null) {
+		    User currentUser = getAuthenticatedUser();
+	        if(currentUser == null) {
 	    	    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
 	        }
 	        List<Reply> replies = logReplyRepository.findByLog(log);
-		    log.setUser(user);
-	        return ResponseEntity.ok(Map.of(
-	            "status", "success",
-	            "replies", buildReplyHierarchy(replies)
-	        ));
+	        List<ReplyDTO> replyHierarchy = buildReplyHierarchy(replies, currentUser);
+	        return ResponseEntity.ok(Map.of("status", "success", "replies", replyHierarchy));
 	    } catch (Exception e) {
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-	                .body(Map.of("status", "error", "message", "댓글 조회 실패"));
+	                .body(Map.of("status", "error", "message", "댓글 조회 실패" + e.getMessage()));
 	    }
 	}
     // 댓글 ID를 기준으로 매핑
-	private List<ReplyDTO> buildReplyHierarchy(List<Reply> replies) {
+	private List<ReplyDTO> buildReplyHierarchy(List<Reply> replies, User currentUser) {
 	    Map<Long, ReplyDTO> replyMap = new HashMap<>();
 	    List<ReplyDTO> roots = new ArrayList<>();
 
 	    for (Reply reply : replies) {
-	        ReplyDTO dto = new ReplyDTO(reply);
-	        // 댓글 작성자 정보 추가
-	        
+	        ReplyDTO dto = new ReplyDTO(reply, currentUser); // 현재 사용자 정보 전달
 	        replyMap.put(dto.getId(), dto);
 	    }
 
@@ -185,14 +180,13 @@ public class ReplyController {
 	            if (parent != null) {
 	                parent.getChildReplies().add(dto);
 	            } else {
-	                System.err.println("부모 댓글 누락: " + dto.getParentReplyId());
 	                roots.add(dto);
 	            }
 	        }
 	    }
-
 	    return roots;
 	}
+
 
 	@PutMapping("/log/{replyId}/edit")
 	public ResponseEntity<?> editReply(@PathVariable("replyId") Long replyId, @RequestBody Map<String, String> request) {
