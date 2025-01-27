@@ -89,9 +89,8 @@ public class LogDetailController {
         }
     }
     @DeleteMapping("/log/{logId}/file/delete")
-    public ResponseEntity<?> deleteLogFile(
-        @PathVariable("logId") Long logId,
-        @RequestBody Map<String, String> request) {
+    public ResponseEntity<?> deleteLogFile(@PathVariable("logId") Long logId
+    									 , @RequestBody Map<String, String> request) {
         String filename = request.get("filename");
 
         try {
@@ -104,7 +103,8 @@ public class LogDetailController {
     }
     
     @GetMapping("/edit/{logId}")
-    public String editLog(@PathVariable("logId") Long logId, Model model) {
+    public String editLog(@PathVariable("logId") Long logId
+    					, Model model) {
         // ID를 통해 기존 일기 조회
         Log log = logService.findById(logId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 일기입니다."));
@@ -117,11 +117,10 @@ public class LogDetailController {
     }
     
     @PutMapping("/log/{logId}/update")
-    public ResponseEntity<?> updateLog(
-        @PathVariable("logId") Long logId,
-        @RequestParam("content") String content,
-        @RequestParam(value = "logFiles", required = false) List<MultipartFile> logFiles,
-        @RequestParam(value = "deletedFiles", required = false) String deletedFilesJson) {
+    public ResponseEntity<?> updateLog(@PathVariable("logId") Long logId
+								     , @RequestParam("content") String content
+								     , @RequestParam(value = "logFiles", required = false) List<MultipartFile> logFiles
+								     , @RequestParam(value = "deletedFiles", required = false) String deletedFilesJson) {
         try {
             // JSON 문자열을 List<String>으로 변환
             List<String> deletedFiles = new ObjectMapper().readValue(deletedFilesJson, new TypeReference<List<String>>() {});
@@ -136,22 +135,23 @@ public class LogDetailController {
     }
 	@GetMapping("/log/{logId}")
 	public ResponseEntity<?> getLogById(@PathVariable("logId") Long logId
-									   , @RequestParam(name = "name", required = false) String nickname) {
+							     	  , @RequestParam(name = "name", required = false) String nickname) {
 	    try {
 	        Log log = logRepository.findById(logId)
 	            .orElseThrow(() -> new IllegalArgumentException("Log not found"));
-	    	User user = getAuthenticatedUser();
-	        if(user == null) {
+	    	User currentUser = getAuthenticatedUser();
+	        if(currentUser == null) {
 	        	return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
 	        }
-
+	        boolean isAuthor = log.getUser().getUserId().equals(currentUser.getUserId());
 	        // 상대 시간 계산 추가
 	        String timeAgo = SNSTime.getTimeAgo(log.getLogCreatedDate());
 
 	        Map<String, Object> logData = new HashMap<>();
             User logUser = log.getUser(); // 로그 작성자
             logData.put("author", logUser != null ? logUser.getName() : "익명");
-	        logData.put("id", log.getLogId());
+            logData.put("isAuthor", isAuthor);
+            logData.put("id", log.getLogId());
 	        logData.put("content", log.getLogContent());
 	        logData.put("time", log.getLogCreatedDate());
 	        logData.put("timeAgo", timeAgo); // 상대 시간 추가

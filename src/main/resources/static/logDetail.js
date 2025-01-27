@@ -137,6 +137,17 @@ document.addEventListener("DOMContentLoaded", async () => {
 	    try {
 	        const response = await fetch(`/log/${logId}`); // ID로 데이터 요청
 	        const log = await response.json();
+			
+			if (!response.ok || !log) {
+			            throw new Error("로그 데이터를 불러올 수 없습니다.");
+			}
+			
+			// 작성자 여부에 따라 드롭다운 표시
+	        if (log.isAuthor) {
+	            document.getElementById("menuButton").style.display = "block"; // 버튼 표시
+	        } else {
+	            document.getElementById("menuButton").style.display = "none"; // 버튼 숨기기
+	        }
 
 	        // 화면에 데이터 적용
 	        document.getElementById("nickname").innerText = log.author || "익명";
