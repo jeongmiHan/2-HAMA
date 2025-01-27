@@ -598,7 +598,7 @@ document.addEventListener('DOMContentLoaded', function () {
     loadMoreBtn.addEventListener('click', function () {
         let hiddenCount = 0;
 
-        // 다음 5개 항목을 표시
+        // 다음 3개 항목을 표시
         for (let i = currentIndex; i < currentIndex + 3 && i < reviews.length; i++) {
             reviews[i].classList.remove('hidden');
             hiddenCount++;
