@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,9 +26,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.hama.config.CustomUserDetails;
 import com.example.hama.dto.ReplyDTO;
 import com.example.hama.model.log.Log;
+import com.example.hama.model.log.LogLikes;
 import com.example.hama.model.log.Reply;
 import com.example.hama.model.user.User;
 import com.example.hama.repository.LogRepository;
+import com.example.hama.repository.LogLikeRepository;
 import com.example.hama.repository.LogReplyRepository;
 import com.example.hama.service.UserService;
 
@@ -39,6 +42,7 @@ import lombok.RequiredArgsConstructor;
 public class ReplyController {
 	
 	private final LogRepository logRepository;
+	private final LogLikeRepository logLikeRepository;
  	private final LogReplyRepository logReplyRepository;
  	private final UserService userService;
 	
@@ -127,6 +131,43 @@ public class ReplyController {
 	    } catch (Exception e) {
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 	                .body("댓글 삭제 실패: " + e.getMessage());
+	    }
+	}
+	// 댓글 좋아요
+	@PostMapping("/log/{replyId}/like")
+	public ResponseEntity<?> toggleReplyLike(@PathVariable("replyId") Long replyId) {
+	    try {
+	        Reply reply = logReplyRepository.findById(replyId)
+	                .orElseThrow(() -> new IllegalArgumentException("댓글이 존재하지 않습니다."));
+
+	        User user = getAuthenticatedUser();
+	        if (user == null) {
+	            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+	        }
+
+	        // 댓글에 대한 좋아요 상태 확인 및 토글
+	        Optional<LogLikes> existingLikeOpt = logLikeRepository.findByUserAndReply(user, reply);
+	        boolean isLiked;
+
+	        if (existingLikeOpt.isPresent()) {
+	            logLikeRepository.delete(existingLikeOpt.get());
+	            isLiked = false;
+	        } else {
+	        	LogLikes newLike = new LogLikes(user, reply);
+	        	logLikeRepository.save(newLike);
+	            isLiked = true;
+	        }
+
+	        // 댓글의 총 좋아요 수 계산
+	        int totalLikes = logLikeRepository.countByReply(reply);
+
+	        return ResponseEntity.ok(Map.of(
+	            "isLiked", isLiked,
+	            "totalLikes", totalLikes
+	        ));
+	    } catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+	                .body("댓글 좋아요 처리 중 오류 발생: " + e.getMessage());
 	    }
 	}
 

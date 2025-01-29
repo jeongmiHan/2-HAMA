@@ -243,7 +243,7 @@ public class LogController {
 		            logLikeRepository.delete(existingLikeOpt.get()); // 명시적 삭제
 		            isLiked = false;
 		        } else {
-		            LogLikes newLike = new LogLikes(user, log, true);
+		            LogLikes newLike = new LogLikes(user, log);
 		            logLikeRepository.save(newLike); // 새 좋아요 저장
 		            isLiked = true;
 		        }

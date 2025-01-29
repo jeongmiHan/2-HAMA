@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import com.example.hama.model.log.Log;
 import com.example.hama.model.log.LogLikes;
+import com.example.hama.model.log.Reply;
 import com.example.hama.model.user.User;
 
 @Repository
@@ -16,5 +17,10 @@ public interface LogLikeRepository extends JpaRepository<LogLikes, Long> {
     
     // 특정 로그의 좋아요 개수 계산
     int countByLog(Log log);
+    
+    // 댓글에 대한 좋아요 조회
+    Optional<LogLikes> findByUserAndReply(User user, Reply reply); 
 
+    // 댓글에 대한 좋아요 수 계산
+    int countByReply(Reply reply); 
 }

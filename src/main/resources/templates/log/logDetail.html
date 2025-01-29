@@ -124,7 +124,10 @@
 		</div>
 		<div id="logPostFooter">
 		    <div class="logPostComment" onclick="navigateToLogDetail(this)">💬<span id="comment-count-${post.id}"></span></div>
-		    <div class="logPostLike" onclick="increaseLike(this)">❤️ <span></span></div>
+		    <div class="logPostLike" onclick="increaseLike(this)">
+		       <i class="fas fa-heart"></i>
+		       <span></span>
+		    </div>
 		    <div class="logPostBookmark" onclick="toggleBookmark(this)">🔖 <span></span></div>
 		</div>
 		
@@ -150,8 +153,8 @@
 		        </div>
 		        <div class="comment-footer">
 		            <button class="reply-button">답글</button>
-		            <span class="like">
-		                <i class="fas fa-heart"></i> <span class="like-count"></span>
+		            <span class="like" onclick="toggleReplyLike(this)">
+		                <i class="fas fa-heart"></i> <span class="like-count">0</span>
 		            </span>
 		        </div>
 		    </div>

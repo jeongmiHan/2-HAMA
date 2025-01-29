@@ -20,8 +20,8 @@ public class LogLikes {
        @GeneratedValue(strategy = GenerationType.IDENTITY)
        private Long likeId;
 
-       @ManyToOne(fetch = FetchType.LAZY)
-       @JoinColumn(name = "reply_id")
+       @ManyToOne
+       @JoinColumn(name = "reply_id", nullable = true)
        private Reply reply;  // 댓글에 좋아요를 연결
 
        @ManyToOne(fetch = FetchType.LAZY)
@@ -29,7 +29,7 @@ public class LogLikes {
        private User user;  // 좋아요를 누른 회원
        
        @ManyToOne
-       @JoinColumn(name = "log_id", nullable = false)
+       @JoinColumn(name = "log_id", nullable = true)
        private Log log; // 좋아요가 눌린 로그
        
        private boolean liked;
@@ -38,9 +38,15 @@ public class LogLikes {
        public LogLikes() {
        }
        
-       public LogLikes(User user, Log log, boolean liked) {
-           this.user = user;
-           this.log = log;
-           this.liked = liked;
+       public LogLikes(User user, Log log) {
+    	    this.user = user;
+    	    this.log = log;
+    	    this.liked = true;
+       }
+
+       public LogLikes(User user, Reply reply) {
+    	    this.user = user;
+    	    this.reply = reply;
+    	    this.liked = true;
        }
 }

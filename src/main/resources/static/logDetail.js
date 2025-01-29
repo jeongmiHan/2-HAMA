@@ -246,12 +246,27 @@ document.addEventListener("DOMContentLoaded", async () => {
 	      replyElement.querySelector("[data-nickname]").textContent = reply.author || "익명";
 	      replyElement.querySelector(".comment-time").textContent = reply.timeAgo || "방금 전";
 	      replyElement.querySelector(".comment-content p").textContent = reply.logReplyContent;
+		  
+		  // 좋아요 버튼 설정
+		  const likeButton = replyElement.querySelector(".like");
+		  const likeCount = replyElement.querySelector(".like-count");
+		  
+		  if (reply.isLiked) {
+		      likeButton.classList.add("liked");
+		  }
+		  likeCount.textContent = reply.likeCount || 0;
 
+		  // 좋아요 버튼 클릭 이벤트 추가
+		  likeButton.addEventListener("click", () => {
+		      toggleReplyLike(likeButton, reply.id); // 좋아요 처리 함수 호출
+		  });
+		  
 	      // 수정/삭제 버튼 표시 여부
 	      const editButton = replyElement.querySelector(".edit-button");
 	      const deleteButton = replyElement.querySelector(".delete-button");
 		  const commentActions = replyElement.querySelector(".comment-actions");
 		  
+		  replyElement.querySelector(".like-count").textContent = reply.likeCount || 0;
 	      if (reply.isAuthor) {
 			commentActions.style.display = "block"; // 작성자만 버튼 보이기
 
@@ -588,8 +603,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 	// 좋아요 증가 또는 취소
 	window.increaseLike = async (button) => {
-		    const postElement = button.closest(".logPost");
-
 		    try {
 		        const response = await fetch(`/log/${logId}/like`, {
 		            method: 'POST',
@@ -622,6 +635,47 @@ document.addEventListener("DOMContentLoaded", async () => {
 		        alert("좋아요 처리 중 오류가 발생했습니다.");
 		    }
 		};
+		
+		// 댓글 좋아요 기능
+		window.toggleReplyLike = async (button) => {
+			console.log(`💡 댓글 좋아요 요청 - replyId: ${replyId}`); // 로그 출력
+
+			// replyId가 유효한지 확인
+			if (!replyId || isNaN(replyId)) {
+			    console.error("❌ 오류: 잘못된 replyId 값이 전달되었습니다.", replyId);
+			    alert("댓글 정보가 올바르지 않습니다.");
+			    return;
+			}
+			
+		    try {
+		        const response = await fetch(`/reply/log/${replyId}/like`, {
+		            method: 'POST',
+		            headers: { 'Content-Type': 'application/json' },
+		        });
+
+		        if (!response.ok) {
+		            const errorMessage = await response.text();
+		            console.error("Server Error:", errorMessage);
+		            throw new Error('댓글 좋아요 처리 실패');
+		        }
+
+		        const { isLiked, totalLikes } = await response.json();
+
+		        // 좋아요 상태 업데이트
+		        const likeCount = button.querySelector("span.like-count");
+		        likeCount.textContent = totalLikes;
+
+		        if (isLiked) {
+		            button.classList.add("liked");
+		        } else {
+		            button.classList.remove("liked");
+		        }
+		    } catch (error) {
+		        console.error("댓글 좋아요 오류:", error);
+		        alert("댓글 좋아요 처리 중 오류가 발생했습니다.");
+		    }
+		};
+
 		window.toggleBookmark = async function(button) {
 		    const postElement = button.closest(".logPost"); // 게시물 요소 찾기
 
