@@ -152,6 +152,7 @@
 .comment-actions {
   display: flex;
   gap: 12px; /* 버튼 간격 */
+  
 }
 
 .comment-actions button {
@@ -210,7 +211,7 @@
   max-width: 500px; /* logDetailContainer와 동일한 너비 */
   margin: 0 auto;
   background: #fff;
-  z-index: 1000; /* 다른 요소 위로 올리기 */
+  z-index: 999; /* 다른 요소 위로 올리기 */
 }
 
 /* 댓글 입력창 스타일 */
@@ -264,11 +265,6 @@
 #logPostFooter > div i {
   margin-right: 8px;
 }
-
-#logPostFooter .logPostLike.liked i {
-  color: red;
-}
-
 
 /* 상단 버튼과 메뉴 */
 #logDetailHeader {
@@ -352,8 +348,6 @@
   transition: all 0.3s ease; /* 부드러운 전환 효과 */
 }
 
-
-
 /* 드롭다운 메뉴 화살표 */
 #menuDropdown::before {
   content: '';
@@ -363,5 +357,15 @@
   border-width: 8px;
   border-style: solid;
   border-color: transparent transparent #fff transparent; /* 하단 흰색 삼각형 */
+}
+
+/* 좋아요 활성화된 경우 */
+.logPostLike.liked i {
+    color: red;
+}
+
+/* 즐겨찾기(북마크) 활성화된 경우 */
+.logPostBookmark.bookmarked i {
+    color: gold;
 }
 

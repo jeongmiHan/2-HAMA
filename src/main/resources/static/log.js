@@ -33,7 +33,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 		// 이미지 경로를 그대로 출력
 		const imagesHtml = post.images
 		    ? post.images.map((image) => `<img src="/log/images/${image}" alt="게시물 이미지" class="logPostImage">`).join("")
-		    : "";	
+		    : "";
+		const commentCount = post.comments > 0 ? post.comments : "";	
         postElement.innerHTML = `
 			<div class="logPostHeader">
 				<div class="logPostAuthorSection">
@@ -47,15 +48,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 			<div class="logPostFooter">
 			    <div class="logPostComment" onclick="navigateToLogDetail(this)">
 					<i class="fas fa-comment"></i>
-					<span id="comment-count-${post.id}">${post.comments || 0}</span>
+					<span id="comment-count-${post.id}">${commentCount}</span>
 				</div>
-			    <div class="logPostLike" onclick="increaseLike(this)">
+			    <div class="logPostLike ${post.isLiked ? 'liked' : ''}" onclick="increaseLike(this)">
 					<i class="fas fa-heart"></i> 
-					<span>${post.likes|| 0}</span>
+					<span>${post.likes|| ""}</span>
 				</div>
-			    <div class="logPostBookmark" onclick="toggleBookmark(this)">
+			    <div class="logPostBookmark ${post.isBookmarked ? 'bookmarked' : ''}" onclick="toggleBookmark(this)">
 					<i class="fas fa-bookmark"></i> 
-					<span>${post.bookmarks || 0}</span>
+					<span>${post.bookmarks || ""}</span>
 				</div>
 			</div>
 			<div class="logReplyContentSection" style="display: none;">
@@ -141,6 +142,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 	        alert("로그 저장에 실패했습니다.");
 	    }
 	});	
+	// 이미지 업로드 개수 제한 (최대 5개)
+	 imageInput.addEventListener("change", (event) => {
+	     if (imageInput.files.length > 5) {
+	         alert("최대 5개까지만 업로드할 수 있습니다.");
+	         imageInput.value = ""; // 선택한 파일 초기화
+	     }
+	 });
 	
 	// 더보기 링크 클릭 이벤트
 	window.showMore = (element) => {
@@ -216,9 +224,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 	        alert("즐겨찾기 처리 중 오류가 발생했습니다.");
 	    }
 	};
-
-
-
 	
 	// 세부 페이지 이동
 	postContainer.addEventListener("click", (event) => {
@@ -244,6 +249,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 	        console.error("postId가 유효하지 않습니다.");
 	    }
 	};
+	
 	// DB 댓글 갯수 동기화
 	window.updateReplyCount = async (postId) => {
 	   try {
@@ -254,7 +260,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 	       const countElement = document.getElementById(`comment-count-${postId}`); // ID로 찾기
 	      countElement.textContent = data.count;
 	      if (countElement) {
-	          countElement.textContent = data.count; // 댓글 수 동기화
+	          countElement.textContent = data.count > 0 ? data.count : "";; // 댓글 수 동기화
 	      }
 	   } catch (error) {
 	       console.error("댓글 수 조회 오류:", error);

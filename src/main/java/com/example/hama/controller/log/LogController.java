@@ -127,6 +127,10 @@ public class LogController {
 
 		    // 여러 파일 저장 처리
 		    List<LogAttachedFile> attachedFiles = logFileService.logSaveFiles(logFiles);
+		    if (logFiles != null && logFiles.size() > 5) {
+		        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+		                .body("이미지는 최대 5개까지만 업로드할 수 있습니다.");
+		    }
 		    for (LogAttachedFile file : attachedFiles) {
 		        file.setLog(log); // Log와 연결
 		        logFileRepository.save(file); // 명시적으로 데이터베이스에 저장
@@ -203,7 +207,9 @@ public class LogController {
 		            logData.put("likes", likeCount);
 
 		            // 댓글 수
-		            logData.put("comments", log.getLogComments());
+		            // 댓글 수가 0이면 빈 문자열을 저장
+		            int commentCount = log.getLogComments();
+		            logData.put("comments", commentCount > 0 ? commentCount : "");
 		            
 		            // 즐겨찾기 수
 		            int bookmarkCount = log.getBookmarkedUsers().size(); // Lazy 로딩 발생
@@ -213,6 +219,15 @@ public class LogController {
 		            logData.put("images", log.getLogAttachedFiles().stream()
 		                    .map(LogAttachedFile::getLog_saved_filename)
 		                    .toList());
+		            
+		            // 좋아요 여부
+		            boolean isLiked = logLikeRepository.findByUserAndLog(user, log).isPresent();
+		            logData.put("isLiked", isLiked);
+		            
+		            // 즐겨찾기 여부
+		            boolean isBookmarked = log.getBookmarkedUsers().contains(user);
+		            logData.put("isBookmarked", isBookmarked);
+		            
 		            // 본인 여부 확인
 		            logData.put("isAuthor", log.getUser().equals(user)); 
 

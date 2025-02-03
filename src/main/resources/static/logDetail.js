@@ -148,6 +148,32 @@ document.addEventListener("DOMContentLoaded", async () => {
 	        } else {
 	            document.getElementById("menuButton").style.display = "none"; // 버튼 숨기기
 	        }
+			// 댓글 개수 업데이트
+			const commentCountElement = document.querySelector(".logPostComment span");
+			if (log.comments > 0) {
+			    commentCountElement.textContent = log.comments;
+			} else {
+			    commentCountElement.textContent = "";
+			}
+			// 좋아요 상태 반영
+			const likeButton = document.querySelector(".logPostLike");
+			const likeCount = likeButton.querySelector("span");
+			likeCount.textContent = log.likes || 0;
+			if (log.isLiked) {
+			    likeButton.classList.add("liked");
+			} else {
+			    likeButton.classList.remove("liked");
+			}
+
+			// 즐겨찾기 상태 반영
+			const bookmarkButton = document.querySelector(".logPostBookmark");
+			const bookmarkCount = bookmarkButton.querySelector("span");
+			bookmarkCount.textContent = log.bookmarks || 0;
+			if (log.isBookmarked) {
+			    bookmarkButton.classList.add("bookmarked");
+			} else {
+			    bookmarkButton.classList.remove("bookmarked");
+			}
 
 	        // 화면에 데이터 적용
 	        document.getElementById("nickname").innerText = log.author || "익명";
@@ -705,6 +731,22 @@ document.addEventListener("DOMContentLoaded", async () => {
 		        console.error("즐겨찾기 오류:", error);
 		        alert("즐겨찾기 처리 중 오류가 발생했습니다.");
 		    }
+		};
+		// DB 댓글 갯수 동기화
+		window.updateReplyCount = async (postId) => {
+		   try {
+		       const response = await fetch(`/reply/log/${postId}/count`);
+		       if (!response.ok) throw new Error("댓글 수 조회 실패");
+
+		      const data = await response.json();
+		       const countElement = document.getElementById(`comment-count-${postId}`); // ID로 찾기
+		      countElement.textContent = data.count;
+		      if (countElement) {
+		          countElement.textContent = data.count > 0 ? data.count : "";; // 댓글 수 동기화
+		      }
+		   } catch (error) {
+		       console.error("댓글 수 조회 오류:", error);
+		   }
 		};
 		window.navigateToLogDetail = function(commentButton) {
 		    if (logId) {

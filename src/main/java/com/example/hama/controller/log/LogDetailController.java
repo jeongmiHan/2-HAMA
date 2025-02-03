@@ -26,6 +26,7 @@ import com.example.hama.model.log.Log;
 import com.example.hama.model.log.LogAttachedFile;
 import com.example.hama.model.user.User;
 import com.example.hama.repository.LogFileRepository;
+import com.example.hama.repository.LogLikeRepository;
 import com.example.hama.repository.LogRepository;
 import com.example.hama.service.LogService;
 import com.example.hama.service.UserService;
@@ -43,6 +44,7 @@ public class LogDetailController {
     private final UserService userService;
     private final LogFileRepository logFileRepository;
     private final LogRepository logRepository;
+    private final LogLikeRepository logLikeRepository;
     
     @GetMapping("/detail/{logId}")
     public String getLogDetail(
@@ -147,6 +149,8 @@ public class LogDetailController {
 	        if(currentUser == null) {
 	        	return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
 	        }
+	        boolean isLiked = logLikeRepository.findByUserAndLog(currentUser, log).isPresent();
+	        boolean isBookmarked = log.getBookmarkedUsers().contains(currentUser);
 	        boolean isAuthor = log.getUser().getUserId().equals(currentUser.getUserId());
 	        // 상대 시간 계산 추가
 	        String timeAgo = SNSTime.getTimeAgo(log.getLogCreatedDate());
@@ -162,6 +166,15 @@ public class LogDetailController {
 	        logData.put("images", log.getLogAttachedFiles().stream()
 	            .map(LogAttachedFile::getLog_saved_filename)
 	            .toList());
+            
+	        // 댓글 개수가 0이면 빈 문자열 반환
+	        int commentCount = log.getLogComments();
+	        logData.put("comments", commentCount > 0 ? commentCount : "");
+	        
+	        logData.put("likes", log.getLogLikes().size());
+	        logData.put("bookmarks", log.getBookmarkedUsers().size());
+	        logData.put("isLiked", isLiked);
+	        logData.put("isBookmarked", isBookmarked);
 
 	        return ResponseEntity.ok(logData);
 	    } catch (Exception e) {
