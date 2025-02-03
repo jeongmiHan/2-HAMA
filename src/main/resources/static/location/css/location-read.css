@@ -11,7 +11,39 @@
 }
 .seachReview .reviewbuttons {
     margin-right: auto; /* 버튼들을 오른쪽 정렬 */
-} 
+}
+.reviewbutton {
+	font-size: 16px;
+	background-color: #007bff;
+	color: white;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+	text-align: center;
+	padding: 5px 10px;
+	transition: transform 0.2s ease-in-out; /* 부드러운 전환 효과 */
+}
+.reviewbutton:hover {
+    transform: scale(1.05);
+}
+#loadMoreReviewsBtn{
+	transition: transform 0.2s ease-in-out; /* 부드러운 전환 효과 */
+}
+#loadMoreReviewsBtn:hover {
+    transform: scale(1.05);
+}
+.reviewsearch{
+	background-color: #007bff;
+	color: white;
+	border:none;
+	border-radius: 5px;
+	font-size:10px;
+	padding: 5px 10px;
+	transition: transform 0.2s ease-in-out; /* 부드러운 전환 효과 */
+}
+.reviewsearch:hover {
+    transform: scale(1.2);
+}
 .location-item {
          border: 1px solid #ddd;
          padding: 10px;
@@ -198,7 +230,7 @@
     color: #FF69B4; /* 핑크색 */
     
 }
-    
+ 
 .rating-icon {
      color: #FF69B4; /* 핑크색으로 설정 */
      font-size: 1em; /* 아이콘 크기 */

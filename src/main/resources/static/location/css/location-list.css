@@ -11,6 +11,38 @@
 .searchLocation .locationbuttons {
     margin-right: auto; /* 버튼들을 오른쪽 정렬 */
 }
+.locationbutton{
+	font-size: 16px;
+	background-color: #007bff;
+	color: white;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+	text-align: center;
+	padding: 5px 10px;
+	transition: transform 0.2s ease-in-out; /* 부드러운 전환 효과 */
+}
+.locationbutton:hover {
+    transform: scale(1.05);
+}
+#loadMoreBtn{
+	transition: transform 0.2s ease-in-out; /* 부드러운 전환 효과 */
+}
+#loadMoreBtn:hover {
+    transform: scale(1.05);
+}
+.locationsearch{
+	background-color: #007bff;
+	color: white;
+	border:none;
+	border-radius: 5px;
+	font-size:10px;
+	padding: 5px 10px;
+	transition: transform 0.2s ease-in-out; /* 부드러운 전환 효과 */
+}
+.locationsearch:hover {
+    transform: scale(1.2);
+}
 .place-item {
     border: 1px solid #ddd;
     padding: 10px;

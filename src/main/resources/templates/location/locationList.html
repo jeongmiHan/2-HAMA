@@ -64,7 +64,7 @@
 <h1>장소 추천</h1>
 <div id="search-bar-location">
     <input type="text" id="keyword" placeholder="검색어를 입력하세요" />
-    <button onclick="searchPlaces()"><i class="fas fa-search"></i></button>
+    <button onclick="searchPlaces()" class="locationsearch"><i class="fas fa-search"></i></button>
 </div>
 <div id="map">
 	<!-- 버튼 컨테이너 -->
@@ -92,8 +92,8 @@
 
 <div class="searchLocation"> 
 <div class="locationbuttons">
-    <input type="button" value="장소쓰기" onclick="window.open('/location/locationwrite', 'popup', 'width=890,height=400')">
-    <input type="button" onclick="location.href='/calendar'" value="메인으로">
+    <input type="button" class="locationbutton" value="게시글 작성" onclick="window.open('/location/locationwrite', 'popup', 'width=890,height=400')">
+    <input type="button" class="locationbutton" onclick="location.href='/calendar'" value="메인으로">
 </div>
 <!-- 지역 필터 추가 -->
 <label for="region">지역:</label>
@@ -138,7 +138,7 @@
 	<option value="myLocations" th:selected="${selectedFilter == 'myLocations'}">내가 쓴 추천글</option>
 </select>
 <input type="text" id="search" name="search" placeholder="장소 이름 검색" th:value="${search}">
-<button type="submit"><i class="fas fa-search"></i></button>
+<button type="submit" class="locationsearch"><i class="fas fa-search"></i></button>
 </form>
 </div>
 

@@ -124,12 +124,16 @@
     <div class="visitor-photo-list" id="visitor-photo-list">
         <!-- 방문자 사진들이 동적으로 추가됨 -->
     </div>
+<!-- 방문자 사진이 없는 경우 메시지 -->
+<div th:if="${#lists.isEmpty(listR)}" style="text-align:center; color:#555; margin:20px 0;">
+    <p>방문자 사진이 존재하지 않습니다.</p>
+</div>
 </div>
 
-<h3>리뷰 목록</h3>
+<h2>리뷰 목록</h2>
 <div class="seachReview">
 <div class="reviewbuttons">      
-	<input type="button" value="리뷰 쓰기" th:onclick="|window.open('/review/reviewwrite?locationId=' + [[${location.locationId}]], 'popup', 'width=500,height=650')|">
+	<input type="button" class="reviewbutton" value="리뷰 작성" th:onclick="|window.open('/review/reviewwrite?locationId=' + [[${location.locationId}]], 'popup', 'width=500,height=650')|">
 </div>
 <!-- 검색 필터 선택 영역 -->
 <form method = "get" action = "/location/locationRead" style="text-align: right;">
@@ -141,7 +145,7 @@
 		<option value = "reviewDate" th:selected="${selectedFilter == 'reviewDate'}">최신순</option>
 		<option value = "myReviews" th:selected="${selectedFilter == 'myReviews'}">내가 쓴 리뷰</option>
 	</select>
-	<button type="submit"><i class="fas fa-search"></i></button>
+	<button type="submit" class="reviewsearch"><i class="fas fa-search"></i></button>
 </form>
 </div>
 
@@ -416,7 +420,7 @@ function resetMap() {
 //방문자 사진
 document.addEventListener("DOMContentLoaded", () => {
     const visitorPhotoList = document.getElementById("visitor-photo-list");
-
+    
     let currentIndex = 0; // 현재 인덱스
     let itemWidth = 0; // 슬라이더 아이템의 너비
     let totalItems = 0; // 슬라이더 전체 아이템 개수
