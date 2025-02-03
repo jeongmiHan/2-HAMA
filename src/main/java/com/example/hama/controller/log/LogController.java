@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,6 +58,7 @@ import com.example.hama.service.LogService;
 import com.example.hama.service.UserService;
 import com.example.hama.util.SNSTime;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -258,6 +260,7 @@ public class LogController {
 		        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error toggling like: " + e.getMessage());
 		    }
 		}
+		@Transactional
 		@PostMapping("/{logId}/bookmark")
 		public ResponseEntity<?> toggleBookmark(@PathVariable("logId") Long logId) {
 		    try {
@@ -269,8 +272,10 @@ public class LogController {
 		            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
 		        }
 
+		        List<User> bookmarkedUsers = new ArrayList<>(log.getBookmarkedUsers());
 		        boolean isBookmarked;
-		        if (log.getBookmarkedUsers().contains(user)) {
+
+		        if (bookmarkedUsers.contains(user)) {
 		            log.getBookmarkedUsers().remove(user); // 즐겨찾기 취소
 		            isBookmarked = false;
 		        } else {

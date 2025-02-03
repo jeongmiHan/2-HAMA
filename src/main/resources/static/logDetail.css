@@ -1,7 +1,7 @@
 /* 전체 컨테이너 */
 #logDetailContainer {
   width: 100%;
-  max-width: 600px;
+  max-width: 550px;
   margin: 0 auto;
   padding: 16px;
   padding-bottom: 100px; /* 댓글 입력란의 높이만큼 여백 추가 */
@@ -55,7 +55,7 @@
 }
 
 /* 이미지 섹션 */
-#logImages img {
+.content-image {
   width: 80%;
   height: auto;
   max-height: 80vh;
@@ -64,7 +64,6 @@
   object-fit: contain;
   border-radius: 8px;
   margin-bottom: 16px;
-  cursor: pointer;
 }
 
 /* 댓글 목록 */
@@ -77,13 +76,14 @@
 
 /* 댓글 아이템 */
 .comment-item {
-  margin-bottom: 16px;
   padding-left: 16px;
   position: relative; /* 수정/삭제 버튼 위치를 위해 추가 */
 }
+.reply-item {
+  margin-bottom: 24px; /* 대댓글도 동일한 간격 적용 */
+}
 
 .comment-header {
-  display: flex;
   justify-content: space-between; /* 작성자 정보와 버튼 양쪽 정렬 */
   align-items: center; /* 세로 가운데 정렬 */
   margin-bottom: 8px;
@@ -91,21 +91,44 @@
 
 /* 작성자 정보 및 프로필 */
 .comment-author {
-  display: flex;
   align-items: center; /* 프로필 사진과 텍스트 세로 정렬 */
 }
 
-.profile-image {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin-right: 8px;
+.author-info {
+    display: flex; /* 내부 요소를 가로로 정렬 */
+    align-items: center; /* 수직 중앙 정렬 */
 }
 
-.author-info {
-  display: flex;
-  flex-direction: column;
+/* 기본적으로 모든 user-icon 스타일 유지 */
+.user-icon {
+    font-size: 20px;
+    color: #555;
+}
+
+/* author-info 내부에 있는 경우에만 가로 정렬 적용 */
+.author-info, .user-icon {
+    display: inline-flex; /* 아이콘을 인라인 요소로 유지하면서 flex 적용 */
+    align-items: center; /* 수직 중앙 정렬 */
+    margin-right: 6px; /* 아이콘과 닉네임 사이 간격 */
+}
+/* 이모티콘과 닉네임 간격 조정 */
+.author-info .user-icon,
+.comment-author .user-icon {
+    margin-right: 10px; /* 이모티콘과 닉네임 사이 간격 */
+}
+/* 댓글의 시간 위치 및 간격 조정 */
+.author-info #logTime,
+.author-info .comment-time {
+  display: block; /* 새 줄에 배치 */
+  margin-top: 4px; /* 닉네임과 시간 사이의 간격 */
+  color: #888; /* 시간의 색상 */
+  font-size: 12px; /* 시간의 크기 */
+  line-height: 1.4; /* 가독성을 위한 줄 간격 */
+}
+.comment-time {
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 16px;
 }
 
 .author-name {
@@ -113,12 +136,6 @@
   font-size: 14px;
   margin: 0;
   color: #333;
-}
-
-.comment-time {
-  font-size: 12px;
-  color: #888;
-  margin: 0;
 }
 
 /* 댓글 내용 */
@@ -156,6 +173,7 @@
   align-items: center;
   gap: 16px;
   margin-top: 8px;
+  margin-bottom: 16px;
 }
 
 .comment-footer .like {
@@ -184,35 +202,42 @@
   color: #007bff;
 }
 
-/* 댓글 입력창 */
-#commentSectionFixed {
+/* 공통 컨테이너 스타일 */
+#logFooterContainer {
   position: fixed;
-  bottom: 45px; /* logPostFooter 높이만큼 위로 올림 */
-  right: 0;
-  width: calc(100% - 380px);
+  bottom: 0;
+  width: 100%; /* 화면 전체 너비 */
+  max-width: 500px; /* logDetailContainer와 동일한 너비 */
+  margin: 0 auto;
   background: #fff;
-  padding: 15px 20px;
-  border-top: 1px solid #ddd;
+  z-index: 1000; /* 다른 요소 위로 올리기 */
+}
+
+/* 댓글 입력창 스타일 */
+#commentSectionFixed {
   display: flex;
-  align-items: center;
-  z-index: 10;
+  margin-bottom: 16px;
+  background: #fff;
 }
 
 #commentSectionFixed textarea {
   flex-grow: 1;
   height: 40px;
-  padding: 10px;
+  padding: 8px;
   border: 1px solid #ddd;
   border-radius: 5px;
+  font-size: 14px;
+  resize: none;
   margin-right: 10px;
 }
 
 #commentSectionFixed button {
-  padding: 10px 20px;
+  padding: 8px 16px;
   background-color: #007bff;
   color: white;
   border: none;
   border-radius: 5px;
+  font-size: 14px;
   cursor: pointer;
 }
 
@@ -221,42 +246,27 @@
   cursor: not-allowed;
 }
 
-#submitComment:hover {
-  background-color: #0056b3;
-}
-/* 좋아요 및 즐겨찾기 */
+/* 좋아요 및 기타 액션 스타일 */
 #logPostFooter {
-    position: fixed;
-    bottom: 0;
-    right: 0;
-    width: calc(100% - 380px);
-    background: #f9f9f9;
-    border-top: 1px solid #ddd;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    padding: 10px 0;
-    z-index: 9; /* 댓글창보다 아래 */
+  display: flex;
+  justify-content: space-around;
 }
 
 #logPostFooter > div {
-    cursor: pointer;
-    font-size: 16px;
-    display: flex;
-    align-items: center;
-    gap: 5px; /* 아이콘과 텍스트 간격 */
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 16px;
 }
-/* 댓글창과 푸터 연결 자연스럽게 처리 */
-#logPostFooter::before {
-    content: '';
-    display: block;
-    width: 100%;
-    height: 1px;
-    background: #ddd;
-    position: absolute;
-    top: 0;
-    left: 0;
+
+#logPostFooter > div i {
+  margin-right: 8px;
 }
+
+#logPostFooter .logPostLike.liked i {
+  color: red;
+}
+
 
 /* 상단 버튼과 메뉴 */
 #logDetailHeader {

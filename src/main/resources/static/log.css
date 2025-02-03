@@ -217,9 +217,30 @@ body {
 
 /* 글쓰기 버튼 */
 #writeButton {
-  position: absolute;
-  left: 50%;
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background-color: #4e73df;
+  color: white;
+  border: none;
+  border-radius: 50%; /* 완벽한 원형 */
   cursor: pointer;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center; /* 세로 중앙 정렬 */
+  justify-content: center; /* 가로 중앙 정렬 */
+  width: 60px; /* 버튼 크기 */
+  height: 60px;
+  padding: 0;
+  overflow: hidden;
+  z-index: 999;
+}
+
+/* 아이콘 */
+#writeButton i {
+  font-size: 24px; /* 아이콘 크기 */
+  line-height: 1; /* 아이콘 높이 맞추기 */
+  display: block; /* 블록 요소로 정렬 안정화 */
 }
 
 /* 일기 쓰기 팝업창 */
@@ -299,21 +320,22 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 14px;
   color: #555;
+  padding : 10px;
+}
+.logPostAuthorSection {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.user-icon {
+    font-size: 16px;
+    color: #6c757d;
 }
 
 .logPostAuthor {
   font-weight: bold;
-}
-
-.logPostFollow {
-  color: #1e90ff;
-  cursor: pointer;
-}
-
-.logPostFollow:hover {
-  text-decoration: underline;
 }
 
 .logPostTime {
@@ -321,10 +343,9 @@ body {
   color: #aaa;
 }
 
-
 /* 일기 본문 */
 .logPostContent {
-  margin: 10px 0;
+  margin: 15px 0;
   padding: 10px;
   font-size: 16px;
   line-height: 1.5;
@@ -434,7 +455,7 @@ body {
   object-fit: cover;
   border-radius: 5px;
   position: absolute;
-  top: 35px;
+  top: 40px;
   right: 10px;
 }
 

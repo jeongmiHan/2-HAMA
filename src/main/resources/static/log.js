@@ -24,10 +24,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         const contentLines = post.content.split("\n");
         let displayContent = post.content;
-        if (contentLines.length > 3) {
+        if (contentLines.length > 2) {
             displayContent =
-                contentLines.slice(0, 3).join("\n") +
-                '...<span class="show-more" onclick="showMore(this)">더보기</span>';
+                contentLines.slice(0, 2).join("\n") +
+                '<span class="show-more" onclick="showMore(this)">더보기</span>';
             postElement.dataset.fullContent = post.content;
         }
 		// 이미지 경로를 그대로 출력
@@ -36,7 +36,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 		    : "";	
         postElement.innerHTML = `
 			<div class="logPostHeader">
-			    <div class="logPostAuthor">${post.author}</div>
+				<div class="logPostAuthorSection">
+				    <i class="fas fa-user user-icon"></i>
+				    <div class="logPostAuthor">${post.author}</div>
+				</div>
 			    <div class="logPostTime">${post.timeAgo}</div>
 			</div>
 			<div class="logPostContent" data-id="${post.id}">${displayContent}</div>
@@ -167,38 +170,40 @@ document.addEventListener("DOMContentLoaded", async () => {
 	        console.error("Error toggling like:", error);
 	    }
 	};
-	window.toggleBookmark = async function(button) {
-	    const postElement = button.closest(".logPost"); // 게시물 요소 찾기
-	    const postId = postElement.querySelector(".logPostContent").dataset.id; // postId 가져오기
+	
+	window.toggleBookmark = async function (button) {
+	    const postElement = button.closest(".logPost");
+	    const postId = postElement.querySelector(".logPostContent").dataset.id;
 
 	    try {
-	        // 즐겨찾기 API 호출
+	        // 서버로 API 요청
 	        const response = await fetch(`/log/${postId}/bookmark`, {
-	            method: 'POST',
-	            headers: { 'Content-Type': 'application/json' },
+	            method: "POST",
+	            headers: { "Content-Type": "application/json" },
 	        });
 
 	        if (!response.ok) {
 	            const errorMessage = await response.text();
 	            console.error("Server Error:", errorMessage);
-	            throw new Error('즐겨찾기 토글 실패');
+	            throw new Error("즐겨찾기 토글 실패");
 	        }
 
-	        const { isBookmarked, totalBookmarks } = await response.json(); // 서버 응답 데이터
+	        const { isBookmarked, totalBookmarks } = await response.json();
 	        console.log(`isBookmarked: ${isBookmarked}, totalBookmarks: ${totalBookmarks}`);
 
 	        // UI 업데이트
 	        const bookmarkCount = button.querySelector("span");
 	        bookmarkCount.textContent = totalBookmarks;
 
-	        // 버튼 상태 업데이트
 	        if (isBookmarked) {
-	            button.classList.add("bookmarked"); // 즐겨찾기 활성화
+	            button.classList.add("bookmarked");
 	        } else {
-	            button.classList.remove("bookmarked"); // 즐겨찾기 비활성화
+	            button.classList.remove("bookmarked");
 	        }
+
+	        console.log("Bookmark toggle completed successfully");
 	    } catch (error) {
-	        console.error("즐겨찾기 오류:", error);
+	        console.error("즐겨찾기 처리 중 오류:", error);
 	        alert("즐겨찾기 처리 중 오류가 발생했습니다.");
 	    }
 	};

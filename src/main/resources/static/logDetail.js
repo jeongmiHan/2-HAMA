@@ -153,14 +153,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 	        document.getElementById("nickname").innerText = log.author || "익명";
 	        document.getElementById("logTime").innerText = log.timeAgo || "시간 정보 없음";
 	        document.getElementById("logContent").innerText = log.content || "내용 없음";
-
-			// 프로필 이미지 처리
-			const profileImageElement = document.querySelector(".profile-image");
-			if (log.photoUrl) {
-			    profileImageElement.src = log.photoUrl;
-			} else {
-			    profileImageElement.src = "/static/default-profile.jpg"; // 기본 이미지 경로
-			}
 			
 	        // 이미지 리스트 표시
 	        imageList = log.images.map(img => `/log/images/${img}`); // 이미지 URL 수정
@@ -698,13 +690,17 @@ document.addEventListener("DOMContentLoaded", async () => {
 		        // UI 업데이트
 		        const bookmarkCount = button.querySelector("span");
 		        bookmarkCount.textContent = totalBookmarks;
-
+				
+				// 상태 변경 전과 후를 비교하기 위해 console.log 추가
+				console.log("Before toggle:", button.classList.contains("bookmarked"));
+				
 		        // 버튼 상태 업데이트
 		        if (isBookmarked) {
 		            button.classList.add("bookmarked"); // 즐겨찾기 활성화
 		        } else {
 		            button.classList.remove("bookmarked"); // 즐겨찾기 비활성화
 		        }
+				console.log("After toggle:", button.classList.contains("bookmarked"));
 		    } catch (error) {
 		        console.error("즐겨찾기 오류:", error);
 		        alert("즐겨찾기 처리 중 오류가 발생했습니다.");

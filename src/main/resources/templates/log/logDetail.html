@@ -80,8 +80,8 @@
         <!-- 일기 내용 -->
 		<div id="logDetailContainer">
 	        <div id="logAuthor" class="logAuthor">
-	       	  <img src="/static/default-profile.jpg" alt="프로필 사진" class="profile-image" />
 	          <div class="author-info">
+	        	<i class="fas fa-user user-icon"></i>
 			    <span class="author-name" id="nickname"></span>
 			    <div class="profile-group"></div>
 	          </div>
@@ -97,7 +97,7 @@
 			    </div>
 			    <button id="saveLogButton" style="display: none;" onclick="saveLog()">저장</button>
 			</div>
-		    <div id="logImages"></div>
+		    <div id="logImages" class="content-image"></div>
 		</div>
 		
 		<!-- 글쓰기 팝업 (수정용으로 재활용) -->
@@ -117,18 +117,20 @@
 		        <button id="logCloseButton">닫기</button>
 		    </div>
 		</div>
-        <!-- 댓글 입력 -->
-        <div id="commentSectionFixed">
-		    <textarea id="commentInput" placeholder="댓글을 작성해보세요."></textarea>
-		    <button id="submitComment">완료</button>
-		</div>
-		<div id="logPostFooter">
-		    <div class="logPostComment" onclick="navigateToLogDetail(this)">💬<span id="comment-count-${post.id}"></span></div>
-		    <div class="logPostLike" onclick="increaseLike(this)">
-		       <i class="fas fa-heart"></i>
-		       <span></span>
-		    </div>
-		    <div class="logPostBookmark" onclick="toggleBookmark(this)">🔖 <span></span></div>
+		<div id="logFooterContainer">
+	        <!-- 댓글 입력 -->
+	        <div id="commentSectionFixed">
+			    <textarea id="commentInput" placeholder="댓글을 작성해보세요."></textarea>
+			    <button id="submitComment">완료</button>
+			</div>
+			<div id="logPostFooter">
+			    <div class="logPostComment" onclick="navigateToLogDetail(this)">💬<span id="comment-count-${post.id}"></span></div>
+			    <div class="logPostLike" onclick="increaseLike(this)">
+			       <i class="fas fa-heart"></i>
+			       <span></span>
+			    </div>
+			    <div class="logPostBookmark" onclick="toggleBookmark(this)">🔖 <span></span></div>
+			</div>
 		</div>
 		
 		<!-- 댓글 템플릿 -->
@@ -136,12 +138,11 @@
 		    <div class="reply-item">
 		        <div class="comment-header">
 		            <div class="comment-author">
-		                <img src="/path/to/profile.jpg" alt="프로필 사진" class="profile-image">
 		                <div class="author-info">
+		                	<i class="fas fa-user user-icon"></i>
 		                    <span class="author-name" data-nickname></span>
-		                    <div class="profile-group"></div>
-		                    <p class="comment-time"></p>
 		                </div>
+                   		<p class="comment-time"></p>
 		            </div>
 		            <div class="comment-actions" style="display: none;">
 		                <button class="edit-button">수정</button>
