@@ -15,7 +15,22 @@ document.addEventListener("DOMContentLoaded", async () => {
         popupContainer.style.display = "none";
         uploadedImages = []; // 업로드된 이미지 초기화
     });	
-	
+	// DB 댓글 갯수 동기화
+	window.updateReplyCount = async (postId) => {
+	   try {
+	       const response = await fetch(`/reply/log/${postId}/count`);
+	       if (!response.ok) throw new Error("댓글 수 조회 실패");
+
+	      const data = await response.json();
+	       const countElement = document.getElementById(`comment-count-${postId}`); // ID로 찾기
+	      countElement.textContent = data.count;
+	      if (countElement) {
+	          countElement.textContent = data.count > 0 ? data.count : "";; // 댓글 수 동기화
+	      }
+	   } catch (error) {
+	       console.error("댓글 수 조회 오류:", error);
+	   }
+	};
 	// 게시글
     // 게시물 렌더링 함수
     const renderPost = (post, prepend = false) => {
@@ -82,21 +97,53 @@ document.addEventListener("DOMContentLoaded", async () => {
 	};
 	
 	//프론트엔드 데이터 렌더링 유지
-	window.onload = async () => {
-		try {
-		    const response = await fetch("/log/list");
-		    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    // 필터 버튼 추가
+    const filterButton = document.createElement("button");
+    filterButton.textContent = "즐겨찾기한 게시글 보기"; // 기본 상태
+    filterButton.id = "filterBookmarkButton";
+	filterButton.innerHTML = '<i class="fas fa-bookmark"></i>'; // 아이콘 추가
+	document.body.appendChild(filterButton);
+	
+	// 즐겨찾기 버튼을 글쓰기 버튼 위로 배치
+	const writeButtonRect = writeButton.getBoundingClientRect();
+	filterButton.style.position = "fixed";
+	filterButton.style.right = "30px";
 
-		    const text = await response.text(); // 응답 데이터 원본 확인
+    let showBookmarked = false; // 필터 활성화 여부
 
-		    const logs = JSON.parse(text); // JSON 파싱
-
-		    if (!Array.isArray(logs)) throw new Error("Logs is not an array");
-		    logs.reverse().forEach((log) => renderPost(log, false));
-		} catch (error) {
-		    console.error("Error fetching logs:", error);
+    filterButton.addEventListener("click", async () => {
+        showBookmarked = !showBookmarked; // 상태 변경
+		// 버튼 색상 변경 (활성화 여부에 따라)
+		if (showBookmarked) {
+		    filterButton.classList.remove("active"); // 즐겨찾기 필터 ON (노란색)
+		} else {
+		    filterButton.classList.add("active"); // 전체 게시글 보기 (회색)
 		}
-	};
+        const url = showBookmarked ? "/log/bookmarked" : "/log/list";
+        try {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+            const logs = await response.json();
+            postContainer.innerHTML = ""; // 기존 게시글 초기화
+            logs.reverse().forEach((log) => renderPost(log, false));
+        } catch (error) {
+            console.error("Error fetching logs:", error);
+        }
+		
+    });
+
+    // 기본적으로 전체 게시글 불러오기
+    try {
+        const response = await fetch("/log/list");
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+        const logs = await response.json();
+        logs.reverse().forEach((log) => renderPost(log, false));
+    } catch (error) {
+        console.error("Error fetching logs:", error);
+    }
+	filterButton.classList.add("active"); // 시작할 때 회색 배경 (전체 게시글 보기)
 
     // 게시물 추가 이벤트
 	submitButton.addEventListener("click", async () => {
@@ -249,25 +296,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 	        console.error("postId가 유효하지 않습니다.");
 	    }
 	};
-	
-	// DB 댓글 갯수 동기화
-	window.updateReplyCount = async (postId) => {
-	   try {
-	       const response = await fetch(`/reply/log/${postId}/count`);
-	       if (!response.ok) throw new Error("댓글 수 조회 실패");
-
-	      const data = await response.json();
-	       const countElement = document.getElementById(`comment-count-${postId}`); // ID로 찾기
-	      countElement.textContent = data.count;
-	      if (countElement) {
-	          countElement.textContent = data.count > 0 ? data.count : "";; // 댓글 수 동기화
-	      }
-	   } catch (error) {
-	       console.error("댓글 수 조회 오류:", error);
-	   }
-	};
-
-
 	
 });
 

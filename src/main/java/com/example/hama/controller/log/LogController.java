@@ -169,7 +169,41 @@ public class LogController {
 		        return ResponseEntity.ok().build();
 		    }
 		}
+		// 북마크 불러오기
+		@GetMapping("/bookmarked")
+		public ResponseEntity<?> getBookmarkedLogs() {
+		    try {
+		        User user = getAuthenticatedUser();
+		        if (user == null) {
+		            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+		        }
 
+		        List<Log> logs = logRepository.findAll(); // 모든 게시글 가져오기
+		        List<Map<String, Object>> response = logs.stream()
+		            .filter(log -> log.getBookmarkedUsers().contains(user)) // 즐겨찾기한 게시글 필터링
+		            .map(log -> {
+		                Map<String, Object> logData = new HashMap<>();
+		                logData.put("author", log.getUser() != null ? log.getUser().getName() : "익명");
+		                logData.put("id", log.getLogId());
+		                logData.put("content", log.getLogContent());
+		                logData.put("timeAgo", SNSTime.getTimeAgo(log.getLogCreatedDate()));
+		                logData.put("likes", log.getLogLikes().size());
+		                logData.put("comments", log.getLogComments() > 0 ? log.getLogComments() : "");
+		                logData.put("bookmarks", log.getBookmarkedUsers().size());
+		                logData.put("images", log.getLogAttachedFiles().stream()
+		                        .map(LogAttachedFile::getLog_saved_filename)
+		                        .toList());
+		                logData.put("isBookmarked", log.getBookmarkedUsers().contains(user));
+		                return logData;
+		            })
+		            .toList();
+
+		        return ResponseEntity.ok(response);
+		    } catch (Exception e) {
+		        e.printStackTrace();
+		        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error retrieving bookmarked logs");
+		    }
+		}
 
 		
 		@GetMapping("/list/tree")
