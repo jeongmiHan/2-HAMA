@@ -45,9 +45,18 @@ document.addEventListener("DOMContentLoaded", async () => {
 			<div class="logPostContent" data-id="${post.id}">${displayContent}</div>
 			${imagesHtml}
 			<div class="logPostFooter">
-			    <div class="logPostComment" onclick="navigateToLogDetail(this)">💬<span id="comment-count-${post.id}">${post.comments || 0}</span></div>
-			    <div class="logPostLike" onclick="increaseLike(this)">❤️ <span>${post.likes|| 0}</span></div>
-			    <div class="logPostBookmark" onclick="toggleBookmark(this)">🔖 <span>${post.bookmarks || 0}</span></div>
+			    <div class="logPostComment" onclick="navigateToLogDetail(this)">
+					<i class="fas fa-comment"></i>
+					<span id="comment-count-${post.id}">${post.comments || 0}</span>
+				</div>
+			    <div class="logPostLike" onclick="increaseLike(this)">
+					<i class="fas fa-heart"></i> 
+					<span>${post.likes|| 0}</span>
+				</div>
+			    <div class="logPostBookmark" onclick="toggleBookmark(this)">
+					<i class="fas fa-bookmark"></i> 
+					<span>${post.bookmarks || 0}</span>
+				</div>
 			</div>
 			<div class="logReplyContentSection" style="display: none;">
 			    <div class="logReplyContentInput">

@@ -124,12 +124,18 @@
 			    <button id="submitComment">완료</button>
 			</div>
 			<div id="logPostFooter">
-			    <div class="logPostComment" onclick="navigateToLogDetail(this)">💬<span id="comment-count-${post.id}"></span></div>
+			    <div class="logPostComment" onclick="navigateToLogDetail(this)">
+			    	<i class="fas fa-comment"></i>
+			    	<span id="comment-count-${post.id}"></span>
+			    </div>
 			    <div class="logPostLike" onclick="increaseLike(this)">
 			       <i class="fas fa-heart"></i>
 			       <span></span>
 			    </div>
-			    <div class="logPostBookmark" onclick="toggleBookmark(this)">🔖 <span></span></div>
+			    <div class="logPostBookmark" onclick="toggleBookmark(this)">
+			    	<i class="fas fa-bookmark"></i> 
+			    	<span></span>
+			    </div>
 			</div>
 		</div>
 		
