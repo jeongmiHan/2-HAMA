@@ -2,8 +2,10 @@ package com.example.hama.controller.calendar;
 
 import com.example.hama.config.CustomUserDetails;
 import com.example.hama.model.Events;
+import com.example.hama.model.Notification;
 import com.example.hama.model.user.User;
 import com.example.hama.repository.EventRepository;
+import com.example.hama.repository.NotificationRepository;
 import com.example.hama.service.UserService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +34,10 @@ public class EventController {
 
     @Autowired
     private UserService userService; // 사용자 서비스 주입
+    
+    @Autowired
+    private NotificationRepository notificationRepository; // 알림 저장소 추가
+
 
     // 현재 인증된 사용자 정보를 가져오는 메서드
     private User getAuthenticatedUser() {
@@ -139,6 +145,10 @@ public class EventController {
             log.warn("User {} attempted to delete event they do not own. Event ID: {}", loggedInUser.getUserId(), calendar_id);
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
+
+        // 알림 삭제 로직 추가
+        List<Notification> notifications = notificationRepository.findByEvent(existingEvent);
+        notificationRepository.deleteAll(notifications);
 
         try {
             eventRepository.delete(existingEvent);

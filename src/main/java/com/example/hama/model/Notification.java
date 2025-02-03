@@ -35,7 +35,7 @@ public class Notification {
     @JoinColumn(name = "user_id", nullable = false) // FK 컬럼 이름
     private User user; // 연결된 사용자
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "event_id", nullable = false)
     private Events event; // 연결된 이벤트
 
