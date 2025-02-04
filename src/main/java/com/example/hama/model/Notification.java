@@ -1,4 +1,4 @@
-package com.example.hama.model;
+	package com.example.hama.model;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -37,7 +37,7 @@ public class Notification {
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "event_id", nullable = false)
-    private Events event; // 연결된 이벤트
+    private Events event;
 
     public Notification() {
         this.createdAt = LocalDateTime.now();
