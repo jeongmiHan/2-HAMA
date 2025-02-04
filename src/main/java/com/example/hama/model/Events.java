@@ -37,7 +37,6 @@ public class Events {
     @JoinColumn(name = "user_id", nullable = false) // FK 컬럼 이름
     private User user; // 연결된 사용자
     
-    
     @ManyToOne(fetch = FetchType.EAGER) // 이벤트와 반려동물 연결
     @JoinColumn(name = "pet_id", nullable = true) // FK 컬럼 (null 가능)
     private Pet pet; // 연결된 반려동물
