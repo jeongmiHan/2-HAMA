@@ -22,7 +22,7 @@ public class CalendarNotificationScheduler {
         this.notificationService = notificationService;
     }
 
-    @Scheduled(cron = "0 * * * * *") // 매 분 0초에 실행
+    @Scheduled(cron = "*/10 * * * * *") // 매 분 0초에 실행
     public void generateNotificationsFromCalendar() {
         System.out.println("스케줄러 실행 중: " + LocalDateTime.now());
         LocalDateTime now = LocalDateTime.now();
@@ -36,18 +36,16 @@ public class CalendarNotificationScheduler {
                 User user = event.getUser(); // 이벤트와 연결된 사용자
                 String content = "다가오는 일정: " + event.getCd_title() + " (" + event.getEventDateStart() + ")";
 
-                // 중복 알림 확인
-                if (!notificationService.isNotificationExists(content)) {
-                    notificationService.createNotificationForUser(content, user, event);
-                    System.out.println("알림 생성: " + content + " for user: " + user.getUserId());
-                } else {
-                    System.out.println("중복 알림 발견: " + content);
-                }
+                // 기존 알림이 있다면 수정, 없으면 새로 생성
+                notificationService.createOrUpdateNotificationForUser(content, user, event);
+
+                System.out.println("알림 업데이트 또는 생성: " + content + " for user: " + user.getUserId());
             }
         } else {
             System.out.println("알림 생성할 이벤트가 없습니다.");
         }
     }
+
 
     @Scheduled(cron = "0 * * * * *") // 매 분마다 만료된 알림 처리
     public void expireOldNotifications() {
