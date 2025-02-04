@@ -28,6 +28,7 @@ import com.example.hama.model.user.User;
 import com.example.hama.repository.LogFileRepository;
 import com.example.hama.repository.LogLikeRepository;
 import com.example.hama.repository.LogRepository;
+import com.example.hama.repository.UserRepository;
 import com.example.hama.service.LogService;
 import com.example.hama.service.UserService;
 import com.example.hama.util.SNSTime;
@@ -44,6 +45,7 @@ public class LogDetailController {
     private final UserService userService;
     private final LogFileRepository logFileRepository;
     private final LogRepository logRepository;
+    private final UserRepository userRepository;
     private final LogLikeRepository logLikeRepository;
     
     @GetMapping("/detail/{logId}")
@@ -139,49 +141,57 @@ public class LogDetailController {
                                  .body("일기 수정 중 오류 발생: " + e.getMessage());
         }
     }
-	@GetMapping("/log/{logId}")
-	public ResponseEntity<?> getLogById(@PathVariable("logId") Long logId
-							     	  , @RequestParam(name = "name", required = false) String nickname) {
-	    try {
-	        Log log = logRepository.findById(logId)
-	            .orElseThrow(() -> new IllegalArgumentException("Log not found"));
-	    	User currentUser = getAuthenticatedUser();
-	        if(currentUser == null) {
-	        	return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
-	        }
-	        boolean isLiked = logLikeRepository.findByUserAndLog(currentUser, log).isPresent();
-	        boolean isBookmarked = log.getBookmarkedUsers().contains(currentUser);
-	        boolean isAuthor = log.getUser().getUserId().equals(currentUser.getUserId());
-	        // 상대 시간 계산 추가
-	        String timeAgo = SNSTime.getTimeAgo(log.getLogCreatedDate());
+    @GetMapping("/log/{logId}")
+    public ResponseEntity<?> getLogById(@PathVariable("logId") Long logId,
+                                        @RequestParam(name = "name", required = false) String nickname) {
+        try {
+            Log log = logRepository.findById(logId)
+                    .orElseThrow(() -> new IllegalArgumentException("Log not found"));
 
-	        Map<String, Object> logData = new HashMap<>();
+            User authenticatedUser = getAuthenticatedUser();
+            if (authenticatedUser == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+            }
+
+            // 인증된 사용자를 명시적으로 로드
+            User currentUser = userRepository.findById(authenticatedUser.getUserId())
+                    .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+            boolean isLiked = logLikeRepository.findByUserAndLog(currentUser, log).isPresent();
+            boolean isBookmarked = log.getBookmarkedUsers().contains(currentUser);
+            boolean isAuthor = log.getUser().getUserId().equals(currentUser.getUserId());
+
+            // 상대 시간 계산 추가
+            String timeAgo = SNSTime.getTimeAgo(log.getLogCreatedDate());
+
+            Map<String, Object> logData = new HashMap<>();
             User logUser = log.getUser(); // 로그 작성자
             logData.put("author", logUser != null ? logUser.getName() : "익명");
             logData.put("isAuthor", isAuthor);
             logData.put("id", log.getLogId());
-	        logData.put("content", log.getLogContent());
-	        logData.put("time", log.getLogCreatedDate());
-	        logData.put("timeAgo", timeAgo); // 상대 시간 추가
-	        logData.put("images", log.getLogAttachedFiles().stream()
-	            .map(LogAttachedFile::getLog_saved_filename)
-	            .toList());
-            
-	        // 댓글 개수가 0이면 빈 문자열 반환
-	        int commentCount = log.getLogComments();
-	        logData.put("comments", commentCount > 0 ? commentCount : "");
-	        
-	        logData.put("likes", log.getLogLikes().size());
-	        logData.put("bookmarks", log.getBookmarkedUsers().size());
-	        logData.put("isLiked", isLiked);
-	        logData.put("isBookmarked", isBookmarked);
+            logData.put("content", log.getLogContent());
+            logData.put("time", log.getLogCreatedDate());
+            logData.put("timeAgo", timeAgo); // 상대 시간 추가
+            logData.put("images", log.getLogAttachedFiles().stream()
+                    .map(LogAttachedFile::getLog_saved_filename)
+                    .toList());
 
-	        return ResponseEntity.ok(logData);
-	    } catch (Exception e) {
-	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-	                             .body("Error retrieving log details: " + e.getMessage());
-	    }
-	}
+            // 댓글 개수가 0이면 빈 문자열 반환
+            int commentCount = log.getLogComments();
+            logData.put("comments", commentCount > 0 ? commentCount : "");
+
+            logData.put("likes", log.getLogLikes().size());
+            logData.put("bookmarks", log.getBookmarkedUsers().size());
+            logData.put("isLiked", isLiked);
+            logData.put("isBookmarked", isBookmarked);
+
+            return ResponseEntity.ok(logData);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                 .body("Error retrieving log details: " + e.getMessage());
+        }
+    }
+
 
     
 

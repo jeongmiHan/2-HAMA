@@ -50,6 +50,6 @@ public class ReplyDTO {
         this.author = reply.getUser() != null ? reply.getUser().getName() : "익명"; // 작성자 이름 설정
         this.parentReplyId = (reply.getParentReply() != null) ? reply.getParentReply().getLogReplyId() : null;
         this.timeAgo = SNSTime.getTimeAgo(reply.getLogCreatedTime());
-        this.isAuthor = currentUser != null && reply.getUser() != null && reply.getUser().equals(currentUser); // 작성자인지 확인
+        this.isAuthor = currentUser != null && reply.getUser().getUserId().equals(currentUser.getUserId()); // 현재 로그인한 사용자와 댓글 작성자 비교
     }
 }

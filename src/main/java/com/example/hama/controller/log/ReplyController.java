@@ -85,7 +85,7 @@ public class ReplyController {
 	        reply.setLog(log);
 	        reply.setLogReplyContent(logReplyContent);
 	        reply.setLogCreatedTime(LocalDateTime.now());
-	        reply.setAuthor(currentUser.getUserId().equals(log.getUser().getUserId())); // 작성자인지 여부 설정
+	        reply.setAuthor(currentUser.getUserId().equals(reply.getUser().getUserId())); // 댓글 작성자 여부 체크
 
 	        // 부모 댓글 검증 및 설정
 	        if (parentReplyId != null) {
