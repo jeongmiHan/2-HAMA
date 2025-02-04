@@ -394,4 +394,3 @@ async function loadEvents() {
 window.selectColor = function(color) {
 	document.getElementById('eventColor').value = color;
 };
-
