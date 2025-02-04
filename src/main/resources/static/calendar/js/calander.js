@@ -1,5 +1,6 @@
 let calendar, currentEvent = null;
 let allEvents = []; // 모든 이벤트를 저장하는 배열
+let petImages = {};
 
 document.addEventListener('DOMContentLoaded', function() {
    var calendarEl = document.getElementById('calendar');  // 캘린더가 표시될 요소
@@ -37,11 +38,30 @@ document.addEventListener('DOMContentLoaded', function() {
       },
       displayEventTime: false, // 캘린더에 이벤트 시간 숨기고 제목만 보여주는 기능
       // 이벤트 렌더링 후 실행 (필터링 기능을 위해 모든 이벤트 저장)
-      eventDidMount: function(info) {
-         if (!allEvents.some(event => event.id === info.event.id)) {
-            allEvents.push(info.event); // 이벤트를 allEvents 배열에 저장
-         }
-      },
+	  eventDidMount: function(info) {
+	      if (!allEvents.some(event => event.id === info.event.id)) {
+	          allEvents.push(info.event);
+	      }
+
+	      const eventEl = info.el;
+	      const petImage = info.event.extendedProps.petImage;
+	      const eventColor = info.event.extendedProps.cd_color || "#000"; // 기본 검은색
+
+	      // ✅ 기존의 중복 요소 삭제
+	      let existingContainer = eventEl.querySelector('.event-title-container');
+	      if (existingContainer) {
+	          existingContainer.remove();
+	      }
+
+	      // 🟢 새로운 UI 적용 (이벤트 색상 + 반려동물 사진 + 타이틀)
+	      const titleContainer = document.createElement('div');
+	      titleContainer.classList.add('event-title-container');
+	      titleContainer.innerHTML = `
+	          ${petImage ? `<img src="${petImage}" class="event-pet-icon">` : ''}
+	      `;
+
+	      eventEl.appendChild(titleContainer);
+	  },
       // 캘린더 날짜 변경 시 필터 드롭다운을 툴바에 추가
       datesSet: function() {
          const toolbarLeft = document.querySelector('.fc-toolbar.fc-header-toolbar .fc-toolbar-chunk:first-child');
@@ -267,7 +287,7 @@ function resetEventModal() {
 /* ---------------- 이벤트 관리 함수 ---------------- */
 /* ---------------- 이벤트 관리 함수 ---------------- */
 // ✅ 이벤트 추가 함수 (반려동물 ID 정상 저장)
- function addEvent() {
+async function addEvent() {
     const title = document.getElementById('eventTitle').value;
     const startDate = document.getElementById('startDate').value;
     const startTime = document.getElementById('startTime').value;
@@ -278,101 +298,125 @@ function resetEventModal() {
     const petId = document.getElementById('petSelect').value || null;
 
     if (!title || !startDate || !startTime || !endDate || !endTime) {
-       alert('모든 필드를 채워주세요.');
-       return;
+        alert('모든 필드를 채워주세요.');
+        return;
     }
 
     const start = `${startDate}T${startTime}`;
     const end = `${endDate}T${endTime}`;
 
     if (new Date(end) <= new Date(start)) {
-       alert('종료 시간은 시작 시간보다 이후여야 합니다.');
-       return;
+        alert('종료 시간은 시작 시간보다 이후여야 합니다.');
+        return;
     }
 
+    // ✅ 반려동물 정보가 먼저 로딩되도록 보장
+    await loadPets();
+
+    const petImage = petId ? petImages[petId] : null;
+
     const eventData = {
-       cd_title: title,
-       eventDateStart: start,
-       eventDateEnd: end,
-       cd_description: description,
-       cd_color: color,
-       petId: petId ? Number(petId) : null // 🚀 petId를 숫자로 변환
+        cd_title: title,
+        eventDateStart: start,
+        eventDateEnd: end,
+        cd_description: description,
+        cd_color: color,
+        petId: petId ? Number(petId) : null
     };
 
-	console.log("📤 서버로 전송할 데이터:", JSON.stringify(eventData));
-	
+    console.log("📤 서버로 전송할 데이터:", JSON.stringify(eventData));
+
     fetch('/api/events', {
-       method: 'POST',
-       headers: { 'Content-Type': 'application/json' },
-       body: JSON.stringify(eventData)
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(eventData)
     })
-    .then(response => response.json())  // 🚀 JSON 응답 변환 추가
+    .then(response => response.json())  
     .then(data => {
-       console.log('✅ 이벤트 추가 성공:', data);
-       calendar.addEvent({
-          id: data.calendar_id,
-          title,
-          start,
-          end,
-          backgroundColor: color,
-          extendedProps: { description, petId }
-       });
-       closeEventModal();
+        console.log('✅ 이벤트 추가 성공:', data);
+
+        // 🔥 반려동물 사진을 즉시 반영
+        calendar.addEvent({
+            id: data.calendar_id,
+            title,
+            start,
+            end,
+            backgroundColor: color,
+            extendedProps: { description, petId, petImage }
+        });
+
+        closeEventModal();
     })
     .catch(error => console.error('❌ 이벤트 추가 실패:', error));
+}
+
+ async function updateEvent(event) {
+     const title = document.getElementById('eventTitle').value;
+     const startDate = document.getElementById('startDate').value;
+     const startTime = document.getElementById('startTime').value;
+     const endDate = document.getElementById('endDate').value;
+     const endTime = document.getElementById('endTime').value;
+     const description = document.getElementById('eventDescription').value;
+     const color = document.getElementById('eventColor').value;
+     const petId = document.getElementById('petSelect').value || null;
+
+     if (!title || !startDate || !startTime || !endDate || !endTime) {
+         alert('모든 필드를 채워주세요.');
+         return;
+     }
+
+     const start = `${startDate}T${startTime}`;
+     const end = `${endDate}T${endTime}`;
+
+     if (new Date(end) <= new Date(start)) {
+         alert('종료 시간은 시작 시간보다 이후여야 합니다.');
+         return;
+     }
+
+     const eventData = {
+         cd_title: title,
+         eventDateStart: start,
+         eventDateEnd: end,
+         cd_description: description,
+         cd_color: color,
+         petId: petId ? Number(petId) : null
+     };
+
+     fetch(`/api/events/${event.id}`, {
+         method: 'PUT',
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify(eventData)
+     })
+     .then(response => response.json())
+     .then(async data => {
+         console.log('✅ 이벤트 수정 성공:', data);
+
+         // ✅ 새로운 반려동물 사진 적용
+         let newPetImage = petId ? `http://localhost:9000/pets/${petId}/photo` : null;
+         petImages[petId] = newPetImage;
+
+         // ✅ 기존 이벤트 삭제 후 다시 추가 (즉시 반영)
+         event.remove();
+         calendar.addEvent({
+             id: data.calendar_id,
+             title: title,
+             start: start,
+             end: end,
+             backgroundColor: color,
+             extendedProps: {
+                 description: description,
+                 petId: petId,
+                 petImage: newPetImage
+             }
+         });
+
+         closeEventModal();
+     })
+     .catch(error => console.error('❌ 이벤트 수정 실패:', error));
  }
 
- // ✅ 이벤트 수정 함수 (반려동물 ID 저장 문제 해결)
- function updateEvent(event) {
-    const title = document.getElementById('eventTitle').value;
-    const startDate = document.getElementById('startDate').value;
-    const startTime = document.getElementById('startTime').value;
-    const endDate = document.getElementById('endDate').value;
-    const endTime = document.getElementById('endTime').value;
-    const description = document.getElementById('eventDescription').value;
-    const color = document.getElementById('eventColor').value;
-    const petId = document.getElementById('petSelect').value || null;
 
-    if (!title || !startDate || !startTime || !endDate || !endTime) {
-       alert('모든 필드를 채워주세요.');
-       return;
-    }
 
-    const start = `${startDate}T${startTime}`;
-    const end = `${endDate}T${endTime}`;
-
-    if (new Date(end) <= new Date(start)) {
-       alert('종료 시간은 시작 시간보다 이후여야 합니다.');
-       return;
-    }
-
-    const eventData = {
-       cd_title: title,
-       eventDateStart: start,
-       eventDateEnd: end,
-       cd_description: description,
-       cd_color: color,
-       petId: petId ? Number(petId) : null // 🚀 petId를 숫자로 변환하여 전달
-    };
-
-    fetch(`/api/events/${event.id}`, {
-       method: 'PUT',
-       headers: { 'Content-Type': 'application/json' },
-       body: JSON.stringify(eventData)
-    })
-    .then(response => response.json())  // 🚀 JSON 응답 변환 추가
-    .then(data => {
-       console.log('✅ 이벤트 수정 성공:', data);
-       event.setProp('title', title);
-       event.setStart(start);
-       event.setEnd(end);
-       event.setProp('backgroundColor', color);
-       event.setExtendedProp('description', description);
-       event.setExtendedProp('petId', petId);
-       closeEventModal();
-    })
-    .catch(error => console.error('❌ 이벤트 수정 실패:', error));
- }
 
  // ✅ 이벤트 삭제 함수 (삭제 오류 해결)
  function deleteEvent() {
@@ -421,6 +465,9 @@ async function loadPets() {
             option.value = pet.petId;
             option.textContent = pet.petName;
             petSelect.appendChild(option);
+
+            // 🔥 반려동물 ID - 사진 URL 매핑 저장 (DB 저장 없이 사용)
+            petImages[pet.petId] = `http://localhost:9000/pets/${pet.petId}/photo`;  
         });
 
         console.log("✅ 반려동물 목록 로드 완료:", pets);
@@ -429,29 +476,67 @@ async function loadPets() {
     }
 }
 
+function updateEventUI(event) {
+    const eventEl = document.querySelector(`.fc-event[data-event-id="${event.id}"]`);
+    if (!eventEl) return;
+
+    const petImage = event.extendedProps.petImage;
+    const eventColor = event.extendedProps.cd_color || "#000"; // 기본 검은색
+
+    // ✅ 기존의 중복 요소 삭제
+    let existingContainer = eventEl.querySelector('.event-title-container');
+    if (existingContainer) {
+        existingContainer.remove();
+    }
+
+    // 🟢 UI 업데이트 (이벤트 색상 + 반려동물 사진 + 타이틀)
+    const titleContainer = document.createElement('div');
+    titleContainer.classList.add('event-title-container');
+    titleContainer.innerHTML = `
+        ${petImage ? `<img src="${petImage}" class="event-pet-icon">` : ''}
+    `;
+
+    eventEl.appendChild(titleContainer);
+}
+
+
+
 
 /* ------------------- 서버 데이터 로드 ------------------- */
-// 서버에서 이벤트 데이터 로드
 async function loadEvents() {
-   const response = await fetch('/api/events');
-   if (response.ok) {
-      const events = await response.json();
-      events.forEach(event => {
-         calendar.addEvent({
-            id: event.calendar_id, // 서버에서 반환된 이벤트 ID
-            title: event.cd_title, // 일정 제목
-            start: event.eventDateStart, // 시작 날짜/시간
-            end: event.eventDateEnd, // 종료 날짜/시간
-            backgroundColor: event.cd_color, // 이벤트 색상
-            extendedProps: {
-                description: event.cd_description, petId: event.pet?.petId }
-         });
-      });
-   }
+    try {
+        const response = await fetch('/api/events');
+        if (!response.ok) throw new Error('이벤트 데이터를 불러올 수 없음');
+        
+        const events = await response.json();
+        events.forEach(event => {
+            const petId = event.pet?.petId;  // 이벤트에 연결된 반려동물 ID
+            const petImage = petId ? petImages[petId] : null; // 🔥 ID 기반 프로필 이미지 찾기
+
+            // 🔥 FullCalendar에 이벤트 추가
+            calendar.addEvent({
+                id: event.calendar_id, 
+                title: event.cd_title, // 🔥 `title`을 단순 텍스트로만 사용
+                start: event.eventDateStart,
+                end: event.eventDateEnd,
+                backgroundColor: event.cd_color,
+                extendedProps: {
+                    description: event.cd_description, 
+                    petId: petId,
+                    petImage: petImage // 🔥 이미지 URL을 `extendedProps`에 저장
+                }
+            });
+        });
+
+        console.log("✅ 이벤트 목록 로드 완료:", events);
+    } catch (error) {
+        console.error('❌ 이벤트 목록 로드 실패:', error);
+    }
 }
+
+
 /* ------------------- 유틸리티 함수 ------------------- */
 // 색상 선택 시 숨겨진 입력값 업데이트
 window.selectColor = function(color) {
    document.getElementById('eventColor').value = color;
 };
-

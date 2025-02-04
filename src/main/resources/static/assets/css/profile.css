@@ -272,3 +272,25 @@ h1.profile-title {
     margin: 10px;
 }
 
+/* 🟢 선택된 반려동물 카드 스타일 (더 강조) */
+.profile-card.selected {
+ background-color: #fff6e5;}
+
+.select-button:hover {
+    background-color: #0056b3;
+}
+
+
+
+.event-title-container {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.event-pet-icon {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    object-fit: cover;
+}

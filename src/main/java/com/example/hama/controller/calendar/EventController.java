@@ -125,43 +125,51 @@ public class EventController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
-        // 기존 이벤트 시작 시간 저장
-        LocalDateTime oldEventStart = existingEvent.getEventDateStart();
-
-        // JSON에서 새로운 데이터 가져오기
+        // 기존 이벤트 데이터 수정
         String title = (String) eventData.get("cd_title");
         String description = (String) eventData.get("cd_description");
         String color = (String) eventData.get("cd_color");
         LocalDateTime newEventStart = LocalDateTime.parse((String) eventData.get("eventDateStart"));
         LocalDateTime eventEnd = LocalDateTime.parse((String) eventData.get("eventDateEnd"));
-
+        
         existingEvent.setCd_title(title);
         existingEvent.setCd_description(description);
         existingEvent.setCd_color(color);
         existingEvent.setEventDateStart(newEventStart);
         existingEvent.setEventDateEnd(eventEnd);
 
-        Events savedEvent = eventRepository.save(existingEvent);
-
-        // 📌 5시간 이내인지 확인
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime fiveHoursLater = now.plusHours(5);
-
-        List<Notification> notifications = notificationRepository.findByEvent(existingEvent);
-
-        for (Notification notification : notifications) {
-            if (newEventStart.isAfter(fiveHoursLater)) {
-                // 📌 5시간 이후라면 알림만 삭제 (이벤트는 유지됨)
-                notificationRepository.delete(notification);
-                log.info("이벤트 {}의 알림이 삭제됨 (새로운 일정이 5시간 이후)", calendar_id);
+        // ✅ 반려동물 ID 추가 (이전 코드에서 빠져있었음)
+        Long petId = eventData.get("petId") != null ? ((Number) eventData.get("petId")).longValue() : null;
+        if (petId != null) {
+            Pet pet = petService.getPetById(petId);
+            if (pet != null) {
+                existingEvent.setPet(pet);
+                log.info("✅ 이벤트 {}에 반려동물 {} 적용됨", calendar_id, pet.getPetName());
             } else {
-                // 📌 5시간 이내면 알림 내용 업데이트
-                String newContent = "수정된 일정: " + title + " (" + newEventStart + ")";
-                notification.setContent(newContent);
-                notificationRepository.save(notification);
-                log.info("이벤트 {}의 알림 내용이 수정됨", calendar_id);
+                log.warn("⚠️ petId {}에 해당하는 반려동물이 존재하지 않음", petId);
             }
+        } else {
+            existingEvent.setPet(null); // 반려동물 선택 안 하면 기존 반려동물 제거
         }
+
+        Events savedEvent = eventRepository.save(existingEvent);
+        
+		/*
+		 * // 📌 5시간 이내인지 확인 LocalDateTime now = LocalDateTime.now(); LocalDateTime
+		 * fiveHoursLater = now.plusHours(5);
+		 * 
+		 * List<Notification> notifications =
+		 * notificationRepository.findByEvent(existingEvent);
+		 * 
+		 * for (Notification notification : notifications) { if
+		 * (newEventStart.isAfter(fiveHoursLater)) { // 📌 5시간 이후라면 알림만 삭제 (이벤트는 유지됨)
+		 * notificationRepository.delete(notification);
+		 * log.info("이벤트 {}의 알림이 삭제됨 (새로운 일정이 5시간 이후)", calendar_id); } else { // 📌 5시간
+		 * 이내면 알림 내용 업데이트 String newContent = "수정된 일정: " + title + " (" + newEventStart
+		 * + ")"; notification.setContent(newContent);
+		 * notificationRepository.save(notification); log.info("이벤트 {}의 알림 내용이 수정됨",
+		 * calendar_id); } }
+		 */
 
         return ResponseEntity.ok(savedEvent);
     }
