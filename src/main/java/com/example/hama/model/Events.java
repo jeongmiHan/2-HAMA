@@ -36,15 +36,21 @@ public class Events {
     @ManyToOne(fetch = FetchType.EAGER) // 다대일 관계 설정
     @JoinColumn(name = "user_id", nullable = false) // FK 컬럼 이름
     private User user; // 연결된 사용자
+    
+    
+    @ManyToOne(fetch = FetchType.EAGER) // 이벤트와 반려동물 연결
+    @JoinColumn(name = "pet_id", nullable = true) // FK 컬럼 (null 가능)
+    private Pet pet; // 연결된 반려동물
 
     // 전체 필드를 포함하는 생성자
     public Events(String cd_title, String cd_description, LocalDateTime eventDateStart,
-                  LocalDateTime eventDateEnd, String cd_color, User user) {
+                  LocalDateTime eventDateEnd, String cd_color, User user, Pet pet) {
         this.cd_title = cd_title;
         this.cd_description = cd_description;
         this.eventDateStart = eventDateStart;
         this.eventDateEnd = eventDateEnd;
         this.cd_color = cd_color;
         this.user = user;
+        this.pet = pet; // 반려동물 추가
     }
 }
