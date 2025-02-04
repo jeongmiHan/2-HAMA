@@ -1,3 +1,8 @@
+// 🟢 선택한 반려동물을 저장하는 변수
+	let selectedPetId = null;
+	let selectedPetName = null;
+
+
 document.addEventListener('DOMContentLoaded', () => {
     const addButton = document.getElementById('add-button');
     const popup = document.getElementById('popup');
@@ -157,16 +162,37 @@ document.addEventListener('DOMContentLoaded', () => {
             <p>품종: ${breed}</p>
             <p>나이: ${age}세</p>
             <p>생일: ${birthdate}</p>
+			<button class="select-button">선택</button>
             <button class="edit-button">수정</button>
             <button class="delete-button">삭제</button>
         `;
-
+		// 🟢 "선택" 버튼 클릭 시 반려동물 선택
+		   card.querySelector('.select-button').addEventListener('click', () => selectPet(petId, name));
+		   
         card.querySelector('.edit-button').addEventListener('click', () => editProfile(petId, card));
         card.querySelector('.delete-button').addEventListener('click', () => deleteProfile(petId, card));
 
         profileList.appendChild(card);
     }
 
+	// 🟢 반려동물 선택 함수
+	function selectPet(petId, name) {
+	    selectedPetId = petId;
+	    selectedPetName = name;
+	    console.log(`✅ 선택된 반려동물: ${name} (ID: ${petId})`);
+
+	    // 선택된 반려동물 스타일 강조 (선택된 카드 강조)
+	    document.querySelectorAll('.profile-card').forEach(card => {
+	        if (card.getAttribute('data-id') === String(petId)) {
+	            card.classList.add('selected'); // CSS로 강조 효과 추가 가능
+	        } else {
+	            card.classList.remove('selected');
+	        }
+	    });
+
+	    alert(`"${name}"을(를) 선택했습니다.`);
+	}
+	
     // 프로필 수정
     function editProfile(petId, card) {
         document.getElementById('name').value = card.querySelector('h3').innerText;

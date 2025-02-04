@@ -159,28 +159,38 @@ modalBackdrop.onclick = function() {
 };
 
 // 일정 추가 모달 창 표시
-function showEventModal(date) {
-   resetEventModal(); // 모달 상태 초기화
-   currentEvent = null; // 클릭한 이벤트를 현재 이벤트로 설정
-   loadPets();
-   document.getElementById('eventModal').style.display = 'block';
-   document.getElementById('modalBackdrop').style.display = 'block';
-   document.getElementById('startDate').value = date.start;
-   document.getElementById('endDate').value = date.end;
-   document.getElementById('eventTitle').value = '';
-   document.getElementById('eventDescription').value = '';
-   document.getElementById('eventColor').value = '#F08080'; // 기본 색상
-   document.getElementById('updateEventButton').style.display = 'none'; // 수정 버튼 숨기기
-   document.getElementById('deleteEventButton').style.display = 'none'; // 삭제 버튼 숨기기
-   document.getElementById('addEventButton').onclick = function() {
-      addEvent();
-   };
-   document.getElementById('closeModal').onclick = function() {
-      closeEventModal();
-   };
-   document.getElementById('modalBackdrop').onclick = function() {
-      closeEventModal();
-   };
+// ✅ 이벤트 추가 모달 표시 시 선택된 반려동물 자동 적용 (수정 버전)
+async function showEventModal(date) {
+    resetEventModal();
+    currentEvent = null;
+
+    document.getElementById('eventModal').style.display = 'block';
+    document.getElementById('modalBackdrop').style.display = 'block';
+    document.getElementById('startDate').value = date.start;
+    document.getElementById('endDate').value = date.end;
+    document.getElementById('eventTitle').value = '';
+    document.getElementById('eventDescription').value = '';
+    document.getElementById('eventColor').value = '#F08080';
+
+    // 🟢 반려동물 목록이 로드된 후 선택 값을 적용하기 위해 `await` 사용
+    await loadPets();
+
+    if (selectedPetId) {
+        document.getElementById('petSelect').value = selectedPetId;
+        console.log(`📌 반려동물 자동 선택: ${selectedPetName} (ID: ${selectedPetId})`);
+    }
+
+    document.getElementById('updateEventButton').style.display = 'none';
+    document.getElementById('deleteEventButton').style.display = 'none';
+    document.getElementById('addEventButton').onclick = function () {
+        addEvent();
+    };
+    document.getElementById('closeModal').onclick = function () {
+        closeEventModal();
+    };
+    document.getElementById('modalBackdrop').onclick = function () {
+        closeEventModal();
+    };
 }
 
 // 하루종일 버튼 동작 추가

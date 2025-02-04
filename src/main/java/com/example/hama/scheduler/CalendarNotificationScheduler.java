@@ -22,7 +22,7 @@ public class CalendarNotificationScheduler {
         this.notificationService = notificationService;
     }
 
-    @Scheduled(cron = "*/10 * * * * *") // 매 분 0초에 실행
+    @Scheduled(cron = "*/10 * * * * *") // 매 분 10초에 실행
     public void generateNotificationsFromCalendar() {
         System.out.println("스케줄러 실행 중: " + LocalDateTime.now());
         LocalDateTime now = LocalDateTime.now();
