@@ -3,9 +3,11 @@ package com.example.hama.controller.calendar;
 import com.example.hama.config.CustomUserDetails;
 import com.example.hama.model.Events;
 import com.example.hama.model.Notification;
+import com.example.hama.model.Pet;
 import com.example.hama.model.user.User;
 import com.example.hama.repository.EventRepository;
 import com.example.hama.repository.NotificationRepository;
+import com.example.hama.service.PetService;
 import com.example.hama.service.UserService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +39,9 @@ public class EventController {
     
     @Autowired
     private NotificationRepository notificationRepository; // 알림 저장소 추가
+    
+    @Autowired
+    private PetService petService;
 
 
     // 현재 인증된 사용자 정보를 가져오는 메서드
@@ -71,42 +76,39 @@ public class EventController {
 
 
     @PostMapping // POST 요청을 처리하여 새로운 이벤트를 생성
-    public ResponseEntity<Events> createEvent(@RequestBody Events events) {
+    public ResponseEntity<Events> createEvent(@RequestBody Events events, @RequestParam(name = "petId", required = false) Long petId) {
         User loggedInUser = getAuthenticatedUser();  // 인증된 사용자 가져오기
         if (loggedInUser == null) {
-            log.warn("Unauthorized attempt to create event. No authenticated user.");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // 인증되지 않은 경우 401 반환
         }
         events.setUser(loggedInUser);  // 이벤트의 소유자를 설정
-        log.info("Creating new event for user: {}. Event details: {}", loggedInUser.getUserId(), events);
 
-        try {
-            Events savedEvent = eventRepository.save(events);  // 이벤트 저장
-            log.info("Event created successfully. Event ID: {}", savedEvent.getCalendar_id());
-            return ResponseEntity.status(HttpStatus.CREATED).body(savedEvent);  // 저장된 이벤트 반환
-        } catch (Exception e) {
-            log.error("Error saving event to database", e); // 에러 로그 출력
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // 500 반환
+        // 반려동물 선택 시 petId 설정
+        if (petId != null) {
+            Pet pet = petService.getPetById(petId);
+            if (pet != null) {
+                events.setPet(pet);
+            }
         }
+
+        Events savedEvent = eventRepository.save(events);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedEvent);
     }
 
     // 특정 이벤트 수정
     @PutMapping("/{calendar_id}")
-    public ResponseEntity<Events> updateEvent(@PathVariable("calendar_id") Long calendar_id, @RequestBody Events updatedEvent) {
+    public ResponseEntity<Events> updateEvent(@PathVariable("calendar_id") Long calendar_id, @RequestBody Events updatedEvent, @RequestParam(name = "petId", required = false) Long petId) {
         User loggedInUser = getAuthenticatedUser();
         if (loggedInUser == null) {
-            log.warn("Unauthorized attempt to update event. No authenticated user.");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         Events existingEvent = eventRepository.findById(calendar_id).orElse(null);
         if (existingEvent == null) {
-            log.warn("Event not found. Event ID: {}", calendar_id);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
         if (!existingEvent.getUser().getUserId().equals(loggedInUser.getUserId())) {
-            log.warn("User {} attempted to update event they do not own. Event ID: {}", loggedInUser.getUserId(), calendar_id);
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
@@ -116,15 +118,20 @@ public class EventController {
         existingEvent.setCd_description(updatedEvent.getCd_description());
         existingEvent.setCd_color(updatedEvent.getCd_color());
 
-        try {
-            Events savedEvent = eventRepository.save(existingEvent);
-            log.info("Event updated successfully. Event ID: {}", calendar_id);
-            return ResponseEntity.ok(savedEvent);
-        } catch (Exception e) {
-            log.error("Error updating event in database", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        // 반려동물 업데이트
+        if (petId != null) {
+            Pet pet = petService.getPetById(petId);
+            if (pet != null) {
+                existingEvent.setPet(pet);
+            }
+        } else {
+            existingEvent.setPet(null); // 반려동물을 선택하지 않으면 null로 설정
         }
+
+        Events savedEvent = eventRepository.save(existingEvent);
+        return ResponseEntity.ok(savedEvent);
     }
+
 
     // 특정 이벤트 삭제
     @DeleteMapping("/{calendar_id}")

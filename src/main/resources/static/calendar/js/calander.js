@@ -157,29 +157,54 @@ modalBackdrop.onclick = function() {
    modalBackdrop.style.display = 'none';
 };
 
-// 일정 추가 모달 창 표시
+// 반려동물 목록 불러오기 함수
+async function loadPetList() {
+   try {
+      const response = await fetch('/pets'); // 반려동물 목록 가져오기
+      if (!response.ok) throw new Error('반려동물 목록 로드 실패');
+      const pets = await response.json();
+
+      const petSelect = document.getElementById('petSelect');
+      petSelect.innerHTML = '<option value="">반려동물 없음</option>'; // 기본값 추가
+
+      pets.forEach(pet => {
+         const option = document.createElement('option');
+         option.value = pet.petId;
+         option.textContent = pet.petName;
+         petSelect.appendChild(option);
+      });
+   } catch (error) {
+      console.error('반려동물 목록 불러오기 실패:', error);
+   }
+}
+
+// 일정 추가 모달 창 표시 (반려동물 목록 로드 추가)
 function showEventModal(date) {
-   resetEventModal(); // 모달 상태 초기화
-   currentEvent = null; // 클릭한 이벤트를 현재 이벤트로 설정
+   resetEventModal();
+   currentEvent = null;
    document.getElementById('eventModal').style.display = 'block';
    document.getElementById('modalBackdrop').style.display = 'block';
    document.getElementById('startDate').value = date.start;
    document.getElementById('endDate').value = date.end;
    document.getElementById('eventTitle').value = '';
    document.getElementById('eventDescription').value = '';
-   document.getElementById('eventColor').value = '#F08080'; // 기본 색상
-   document.getElementById('updateEventButton').style.display = 'none'; // 수정 버튼 숨기기
-   document.getElementById('deleteEventButton').style.display = 'none'; // 삭제 버튼 숨기기
-   document.getElementById('addEventButton').onclick = function() {
+   document.getElementById('eventColor').value = '#F08080';
+   document.getElementById('petSelect').value = ''; // 반려동물 선택 초기화
+   loadPetList(); // 반려동물 목록 불러오기 추가
+
+   document.getElementById('updateEventButton').style.display = 'none';
+   document.getElementById('deleteEventButton').style.display = 'none';
+   document.getElementById('addEventButton').onclick = function () {
       addEvent();
    };
-   document.getElementById('closeModal').onclick = function() {
+   document.getElementById('closeModal').onclick = function () {
       closeEventModal();
    };
-   document.getElementById('modalBackdrop').onclick = function() {
+   document.getElementById('modalBackdrop').onclick = function () {
       closeEventModal();
    };
 }
+
 
 // 하루종일 버튼 동작 추가
 document.getElementById('allDayButton').onclick = function() {
@@ -195,39 +220,42 @@ document.getElementById('allDayButton').onclick = function() {
 };
 
 // 일정 수정 모달 창 표시
+// 일정 수정 모달 창 표시 (반려동물 선택 반영)
 function showEventModalForEdit(event) {
-   currentEvent = event; // 클릭한 이벤트를 현재 이벤트로 설정
+   currentEvent = event;
    document.getElementById('eventModal').style.display = 'block';
    document.getElementById('modalBackdrop').style.display = 'block';
-   const startDate = event.start.toLocaleDateString('en-CA'); // 'YYYY-MM-DD' 형식
-   const startTime = event.start.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }); // 'HH:MM' 형식
-   const endDate = event.end.toLocaleDateString('en-CA'); // 'YYYY-MM-DD' 형식
-   const endTime = event.end.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }); // 'HH:MM' 형식
-   const eventColor = event.backgroundColor;
    document.getElementById('eventTitle').value = event.title;
-   document.getElementById('startDate').value = startDate;
-   document.getElementById('startTime').value = startTime;
-   document.getElementById('endDate').value = endDate;
-   document.getElementById('endTime').value = endTime;
+   document.getElementById('startDate').value = event.start.toISOString().split('T')[0];
+   document.getElementById('startTime').value = event.start.toISOString().split('T')[1].slice(0, 5);
+   document.getElementById('endDate').value = event.end ? event.end.toISOString().split('T')[0] : '';
+   document.getElementById('endTime').value = event.end ? event.end.toISOString().split('T')[1].slice(0, 5) : '';
    document.getElementById('eventDescription').value = event.extendedProps.description || '';
-   document.getElementById('eventColor').value = eventColor; // 숨겨진 입력 값
-   document.getElementById('eventColorSelect').value = eventColor; // select 요소의 선택 값 업데이트
-   document.getElementById('addEventButton').style.display = 'none'; // 추가 버튼 숨기기
-   document.getElementById('updateEventButton').style.display = 'block'; // 수정 버튼 보이기
-   document.getElementById('deleteEventButton').style.display = 'block'; // 삭제 버튼 보이기      
-   document.getElementById('updateEventButton').onclick = function() {
+   document.getElementById('eventColor').value = event.backgroundColor;
+   document.getElementById('eventColorSelect').value = event.backgroundColor;
+
+   loadPetList().then(() => {
+      document.getElementById('petSelect').value = event.extendedProps.petId || ''; // 반려동물 선택 반영
+   });
+
+   document.getElementById('addEventButton').style.display = 'none';
+   document.getElementById('updateEventButton').style.display = 'block';
+   document.getElementById('deleteEventButton').style.display = 'block';
+
+   document.getElementById('updateEventButton').onclick = function () {
       updateEvent(event);
    };
-   document.getElementById('deleteEventButton').onclick = function() {
+   document.getElementById('deleteEventButton').onclick = function () {
       deleteEvent();
    };
-   document.getElementById('closeModal').onclick = function() {
+   document.getElementById('closeModal').onclick = function () {
       closeEventModal();
    };
-   document.getElementById('modalBackdrop').onclick = function() {
+   document.getElementById('modalBackdrop').onclick = function () {
       closeEventModal();
    };
 }
+
 
 // 모달 창 닫기 함수
 function closeEventModal() {
@@ -263,31 +291,21 @@ function resetEventModal() {
       const endTime = document.getElementById('endTime').value;
       const description = document.getElementById('eventDescription').value;
       const color = document.getElementById('eventColor').value;
-   
+      const petId = document.getElementById('petSelect').value || null; // 반려동물 선택
+
       if (!title || !startDate || !startTime || !endDate || !endTime) {
          alert('모든 필드를 채워주세요.');
          return;
       }
-   
-      // 로컬 시간 문자열 생성
+
       const start = `${startDate}T${startTime}`;
       const end = `${endDate}T${endTime}`;
-   
+
       if (new Date(end) <= new Date(start)) {
          alert('종료 시간은 시작 시간보다 이후여야 합니다.');
          return;
       }
-   
-      // FullCalendar에 이벤트 추가
-      const newEvent = calendar.addEvent({
-         title,
-         start,
-         end,
-         color,
-         extendedProps: { description },
-      });
-   
-      // 서버로 전송
+
       fetch('/api/events', {
          method: 'POST',
          headers: { 'Content-Type': 'application/json' },
@@ -296,16 +314,28 @@ function resetEventModal() {
             eventDateStart: start,
             eventDateEnd: end,
             cd_description: description,
-            cd_color: color
+            cd_color: color,
+            petId: petId
          }),
       })
+         .then(response => response.json())
          .then(data => {
-            console.log('이벤트 추가 성공:', data);
-            newEvent.setProp('id', data.calendar_id); // 서버에서 반환된 ID 설정
+            calendar.addEvent({
+               id: data.calendar_id,
+               title,
+               start,
+               end,
+               backgroundColor: color,
+               extendedProps: {
+                  description,
+                  petId: petId
+               }
+            });
             closeEventModal();
          })
          .catch(error => console.error('이벤트 추가 실패:', error));
    }
+
    
    
    // 이벤트 수정 함수
@@ -317,28 +347,16 @@ function resetEventModal() {
       const endTime = document.getElementById('endTime').value;
       const description = document.getElementById('eventDescription').value;
       const color = document.getElementById('eventColor').value;
-   
+      const petId = document.getElementById('petSelect').value || null;
+
       if (!title || !startDate || !startTime || !endDate || !endTime) {
          alert('모든 필드를 채워주세요.');
          return;
       }
-   
+
       const start = `${startDate}T${startTime}`;
       const end = `${endDate}T${endTime}`;
-   
-      if (new Date(end) <= new Date(start)) {
-         alert('종료 시간은 시작 시간보다 이후여야 합니다.');
-         return;
-      }
-   
-      // FullCalendar에 이벤트 수정
-      event.setProp('title', title);
-      event.setStart(start);
-      event.setEnd(end);
-      event.setProp('color', color);
-      event.setExtendedProp('description', description);
-   
-      // 서버로 수정 요청
+
       fetch(`/api/events/${event.id}`, {
          method: 'PUT',
          headers: { 'Content-Type': 'application/json' },
@@ -347,14 +365,23 @@ function resetEventModal() {
             eventDateStart: start,
             eventDateEnd: end,
             cd_description: description,
-            cd_color: color
+            cd_color: color,
+            petId: petId
          }),
       })
+         .then(response => response.json())
          .then(data => {
-            console.log('이벤트 수정 성공:', data);
+            event.setProp('title', title);
+            event.setStart(start);
+            event.setEnd(end);
+            event.setProp('color', color);
+            event.setExtendedProp('description', description);
+            event.setExtendedProp('petId', petId);
             closeEventModal();
          })
+         .catch(error => console.error('이벤트 수정 실패:', error));
    }
+
    
    // 이벤트 삭제 함수
    function deleteEvent() {
@@ -396,18 +423,20 @@ async function loadEvents() {
       const events = await response.json();
       events.forEach(event => {
          calendar.addEvent({
-            id: event.calendar_id, // 서버에서 반환된 이벤트 ID
-            title: event.cd_title, // 일정 제목
-            start: event.eventDateStart, // 시작 날짜/시간
-            end: event.eventDateEnd, // 종료 날짜/시간
-            backgroundColor: event.cd_color, // 이벤트 색상
+            id: event.calendar_id,
+            title: event.cd_title,
+            start: event.eventDateStart,
+            end: event.eventDateEnd,
+            backgroundColor: event.cd_color,
             extendedProps: {
-               description: event.cd_description // 일정 설명
+               description: event.cd_description,
+               petId: event.pet ? event.pet.petId : null // 반려동물 ID 포함
             }
          });
       });
    }
 }
+
 /* ------------------- 유틸리티 함수 ------------------- */
 // 색상 선택 시 숨겨진 입력값 업데이트
 window.selectColor = function(color) {
