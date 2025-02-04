@@ -173,10 +173,14 @@ public class LogController {
 		@GetMapping("/bookmarked")
 		public ResponseEntity<?> getBookmarkedLogs() {
 		    try {
-		        User user = getAuthenticatedUser();
-		        if (user == null) {
+		        User authenticatedUser = getAuthenticatedUser();
+		        if (authenticatedUser == null) {
 		            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
 		        }
+
+		        // 인증된 사용자를 명시적으로 로드
+		        User user = userRepository.findById(authenticatedUser.getUserId())
+		                .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
 		        List<Log> logs = logRepository.findAll(); // 모든 게시글 가져오기
 		        List<Map<String, Object>> response = logs.stream()
@@ -205,6 +209,7 @@ public class LogController {
 		    }
 		}
 
+
 		
 		@GetMapping("/list/tree")
 		public ResponseEntity<?> getTreeLogs() {
@@ -214,10 +219,14 @@ public class LogController {
 		@GetMapping("/list")
 		public ResponseEntity<?> getAllLogs() {
 		    try {
-		        User user = getAuthenticatedUser();
-		        if (user == null) {
+		        User authenticatedUser = getAuthenticatedUser();
+		        if (authenticatedUser == null) {
 		            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
 		        }
+
+		        // 인증된 사용자를 명시적으로 로드
+		        User user = userRepository.findById(authenticatedUser.getUserId())
+		                .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
 		        List<Log> logs = logRepository.findAll();
 		        List<Map<String, Object>> response = logs.stream().map(log -> {
@@ -241,29 +250,28 @@ public class LogController {
 		            logData.put("likes", likeCount);
 
 		            // 댓글 수
-		            // 댓글 수가 0이면 빈 문자열을 저장
 		            int commentCount = log.getLogComments();
 		            logData.put("comments", commentCount > 0 ? commentCount : "");
-		            
+
 		            // 즐겨찾기 수
-		            int bookmarkCount = log.getBookmarkedUsers().size(); // Lazy 로딩 발생
+		            int bookmarkCount = log.getBookmarkedUsers().size();
 		            logData.put("bookmarks", bookmarkCount);
-		            
+
 		            // 첨부된 이미지 목록
 		            logData.put("images", log.getLogAttachedFiles().stream()
 		                    .map(LogAttachedFile::getLog_saved_filename)
 		                    .toList());
-		            
+
 		            // 좋아요 여부
 		            boolean isLiked = logLikeRepository.findByUserAndLog(user, log).isPresent();
 		            logData.put("isLiked", isLiked);
-		            
+
 		            // 즐겨찾기 여부
 		            boolean isBookmarked = log.getBookmarkedUsers().contains(user);
 		            logData.put("isBookmarked", isBookmarked);
-		            
+
 		            // 본인 여부 확인
-		            logData.put("isAuthor", log.getUser().equals(user)); 
+		            logData.put("isAuthor", log.getUser().equals(user));
 
 		            return logData;
 		        }).toList();
@@ -274,6 +282,7 @@ public class LogController {
 		        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error retrieving logs");
 		    }
 		}
+
 
 		@PostMapping("/{logId}/like")
 		public ResponseEntity<?> toggleLike(@PathVariable("logId") Long logId) {
@@ -320,19 +329,25 @@ public class LogController {
 		        if (user == null) {
 		            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
 		        }
+		        
+		        // 인증된 사용자를 명시적으로 로드
+		        user = userRepository.findById(user.getUserId())
+		                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+		        
+		        // 현재 DB에서 북마크 여부 다시 확인 (최신화)
+		        log = logRepository.findById(logId).orElseThrow();
 
-		        List<User> bookmarkedUsers = new ArrayList<>(log.getBookmarkedUsers());
+		        // 북마크 상태 토글
 		        boolean isBookmarked;
-
-		        if (bookmarkedUsers.contains(user)) {
-		            log.getBookmarkedUsers().remove(user); // 즐겨찾기 취소
+		        if (log.getBookmarkedUsers().contains(user)) {
+		            log.getBookmarkedUsers().remove(user);
 		            isBookmarked = false;
 		        } else {
-		            log.getBookmarkedUsers().add(user); // 즐겨찾기 추가
+		            log.getBookmarkedUsers().add(user);
 		            isBookmarked = true;
 		        }
 
-		        logRepository.save(log);
+		        logRepository.saveAndFlush(log);
 
 		        int totalBookmarks = log.getBookmarkedUsers().size();
 

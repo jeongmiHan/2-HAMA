@@ -695,9 +695,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 		};
 
 		window.toggleBookmark = async function(button) {
-		    const postElement = button.closest(".logPost"); // 게시물 요소 찾기
 
 		    try {
+		        // 버튼 UI 미리 변경
+		        button.classList.toggle("bookmarked");
+						
 		        // 즐겨찾기 API 호출
 		        const response = await fetch(`/log/${logId}/bookmark`, {
 		            method: 'POST',
@@ -726,7 +728,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 		        } else {
 		            button.classList.remove("bookmarked"); // 즐겨찾기 비활성화
 		        }
-				console.log("After toggle:", button.classList.contains("bookmarked"));
 		    } catch (error) {
 		        console.error("즐겨찾기 오류:", error);
 		        alert("즐겨찾기 처리 중 오류가 발생했습니다.");
