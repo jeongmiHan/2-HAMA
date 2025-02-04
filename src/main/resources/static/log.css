@@ -274,6 +274,26 @@ body {
   border-radius: 4px;
 }
 
+#logContentInput,
+#logImageInput {
+  width: 100%; /* 가로 길이 통일 */
+  box-sizing: border-box; /* 테두리 및 패딩 포함 */
+  margin: 10px 0; /* 위아래 여백 */
+  padding: 8px; /* 내부 여백 */
+  border: 1px solid #ccc; /* 동일한 테두리 */
+  border-radius: 8px; /* 둥근 모서리 */
+  font-size: 14px; /* 폰트 크기 동일 */
+}
+
+form#uploadForm {
+  width: 100%; /* 부모 컨테이너 크기 */
+}
+
+#logContentInput{
+	resize: none;
+	height: 200px; /* 원하는 높이 설정 (예: 150px) */
+}
+
 #logSubmitButton {
   margin-top: 10px;
   padding: 8px 16px;
@@ -363,7 +383,7 @@ body {
   color: #aaa;
   border-top: 1px solid #eee; /* 상단 구분선 */
   padding: 10px 0; /* 구분선과 아이콘 간 간격 */
-  color: #333; /* 텍스트 색상 흰색 */
+  color: #666; /* 텍스트 색상 흰색 */
   width: 100%; /* 가로 전체 채우기 */
   text-align: center; /* 텍스트 가운데 정렬 */
   margin-top: auto; /* 상단 요소와의 간격 유지 */

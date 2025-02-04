@@ -145,15 +145,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 	filterButton.classList.add("active"); // 시작할 때 회색 배경 (전체 게시글 보기)
 
+	// 최대 글자 수 제한
+	const maxLength = 300;
+	
     // 게시물 추가 이벤트
 	submitButton.addEventListener("click", async () => {
 	    const contentInput = document.getElementById("logContentInput");
 	    const content = contentInput.value.trim();
 
-	    if (!content) {
-	        alert("내용을 입력하세요!");
-	        return;
-	    }
+		if (!content || content.length > maxLength) {
+		    alert(content ? `글자 수는 최대 ${maxLength}자까지 입력 가능합니다. (${content.length}자 입력됨)` : "내용을 입력하세요!");
+		    return;
+		}
 
 	    const formData = new FormData();
 	    formData.append("logContent", content);

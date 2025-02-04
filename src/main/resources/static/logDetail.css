@@ -4,12 +4,13 @@
   max-width: 550px;
   margin: 0 auto;
   padding: 16px;
-  padding-bottom: 100px; /* 댓글 입력란의 높이만큼 여백 추가 */
+  padding-bottom: 100px; /* 댓글 입력란 높이 확보 */
   background-color: #fff;
   font-family: 'Arial', sans-serif;
   line-height: 1.6;
   color: #333;
   box-sizing: border-box;
+  min-height: calc(100vh - 400px); /* 화면 높이를 기준으로 조정 (상단 네비게이션 높이를 뺀 값)
 }
 
 /* 상단 버튼 */
@@ -54,23 +55,52 @@
   margin-bottom: 20px;
 }
 
-/* 이미지 섹션 */
 .content-image {
-  width: 80%;
-  height: auto;
-  max-height: 80vh;
-  display: block;
-  margin: 0 auto;
-  object-fit: contain;
-  border-radius: 8px;
-  margin-bottom: 16px;
+  display: flex; /* 가로로 나열 */
+  overflow-x: auto; /* 가로 스크롤 활성화 */
+  gap: 16px; /* 이미지 간 간격 */
+  padding: 10px; /* 내부 여백 */
+  margin: 20px auto; /* 전체 중앙 정렬 */
+  max-width: 100%; /* 최대 너비 설정 */
+  box-sizing: border-box; /* 패딩 포함 */
+  scroll-behavior: smooth; /* 부드러운 스크롤 */
 }
+
+.content-image img {
+  flex-shrink: 0; /* 이미지가 축소되지 않도록 고정 */
+  width: 150px; /* 이미지 너비 고정 */
+  height: auto; /* 비율 유지 */
+  object-fit: cover; /* 비율 유지하며 채움 */
+  border-radius: 8px; /* 둥근 모서리 */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 약간의 그림자 효과 */
+  transition: transform 0.2s ease, box-shadow 0.2s ease; /* 호버 애니메이션 */
+}
+
+.content-image img:hover {
+  transform: scale(1.05); /* 호버 시 살짝 확대 */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 강조된 그림자 */
+}
+
+/* 스크롤바 스타일 (선택 사항) */
+.content-image::-webkit-scrollbar {
+  height: 8px; /* 스크롤바 높이 */
+}
+
+.content-image::-webkit-scrollbar-thumb {
+  background: #ccc; /* 스크롤바 색상 */
+  border-radius: 4px; /* 둥근 스크롤바 */
+}
+
+.content-image::-webkit-scrollbar-thumb:hover {
+  background: #999; /* 호버 시 스크롤바 색상 */
+}
+
 
 /* 댓글 목록 */
 #commentList {
   margin-top: 20px;
   border-top: 1px solid #ddd;
-  padding-top: 16px;
+  padding-top: 30px;
   padding-bottom: 120px;
 }
 
@@ -171,7 +201,6 @@
 /* 답글과 좋아요 */
 .comment-footer {
   display: flex;
-  align-items: center;
   gap: 16px;
   margin-top: 8px;
   margin-bottom: 16px;
@@ -208,16 +237,18 @@
   position: fixed;
   bottom: 0;
   width: 100%; /* 화면 전체 너비 */
-  max-width: 500px; /* logDetailContainer와 동일한 너비 */
+  max-width: 520px; /* logDetailContainer와 동일한 너비 */
   margin: 0 auto;
   background: #fff;
   z-index: 999; /* 다른 요소 위로 올리기 */
+  padding: 10px 0; /* 위아래 여백 추가 */
 }
 
 /* 댓글 입력창 스타일 */
 #commentSectionFixed {
   display: flex;
-  margin-bottom: 10px;
+  align-items: center;
+  padding: 10px; /* 내부 여백 추가 */
   background: #fff;
 }
 
@@ -230,6 +261,7 @@
   font-size: 14px;
   resize: none;
   margin-right: 10px;
+  box-sizing: border-box; /* 패딩 포함 */
 }
 
 #commentSectionFixed button {
@@ -253,6 +285,7 @@
   padding-bottom: 15px;
   display: flex;
   justify-content: space-around;
+  color: #666;
 }
 
 #logPostFooter > div {

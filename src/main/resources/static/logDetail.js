@@ -76,14 +76,16 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 	    // 기존 상태 복원은 하지 않음 (모달 닫고 끝냄)
 	});
-
+	const maxLength = 300; // 글자 제한
 	// 팝업 저장 버튼 클릭
 	logSubmitButton.addEventListener("click", async () => {
 	    const content = logContentInput.value.trim();
-	    if (!content) {
-	        alert("내용을 입력하세요!");
-	        return;
-	    }
+		
+		if (!content || content.length > maxLength) {
+		    alert(content ? `글자 수는 최대 ${maxLength}자까지 입력 가능합니다. (${content.length}자 입력됨)` : "내용을 입력하세요!");
+		    return;
+		}
+
 
 	    const formData = new FormData();
 	    formData.append("content", content);
