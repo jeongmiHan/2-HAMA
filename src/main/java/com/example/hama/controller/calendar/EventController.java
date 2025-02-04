@@ -75,29 +75,42 @@ public class EventController {
     }
 
 
-    @PostMapping // POST 요청을 처리하여 새로운 이벤트를 생성
-    public ResponseEntity<Events> createEvent(@RequestBody Events events, @RequestParam(name = "petId", required = false) Long petId) {
-        User loggedInUser = getAuthenticatedUser();  // 인증된 사용자 가져오기
+    @PostMapping
+    public ResponseEntity<Events> createEvent(@RequestBody Map<String, Object> eventData) {
+        User loggedInUser = getAuthenticatedUser();
         if (loggedInUser == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // 인증되지 않은 경우 401 반환
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        events.setUser(loggedInUser);  // 이벤트의 소유자를 설정
 
-        // 반려동물 선택 시 petId 설정
+        // JSON에서 데이터 추출
+        String title = (String) eventData.get("cd_title");
+        String description = (String) eventData.get("cd_description");
+        String color = (String) eventData.get("cd_color");
+        LocalDateTime eventStart = LocalDateTime.parse((String) eventData.get("eventDateStart"));
+        LocalDateTime eventEnd = LocalDateTime.parse((String) eventData.get("eventDateEnd"));
+        
+        // petId를 JSON에서 직접 가져오기
+        Long petId = eventData.get("petId") != null ? ((Number) eventData.get("petId")).longValue() : null;
+
+        Events event = new Events(title, description, eventStart, eventEnd, color, loggedInUser, null);
+
+        // 반려동물 설정
         if (petId != null) {
             Pet pet = petService.getPetById(petId);
             if (pet != null) {
-                events.setPet(pet);
+                event.setPet(pet);
+                log.info("petId {}에 해당하는 반려동물: {}", petId, pet.getPetName());
+            } else {
+                log.warn("petId {}에 해당하는 반려동물이 존재하지 않음", petId);
             }
         }
 
-        Events savedEvent = eventRepository.save(events);
+        Events savedEvent = eventRepository.save(event);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedEvent);
     }
 
-    // 특정 이벤트 수정
     @PutMapping("/{calendar_id}")
-    public ResponseEntity<Events> updateEvent(@PathVariable("calendar_id") Long calendar_id, @RequestBody Events updatedEvent, @RequestParam(name = "petId", required = false) Long petId) {
+    public ResponseEntity<Events> updateEvent(@PathVariable("calendar_id") Long calendar_id, @RequestBody Map<String, Object> eventData) {
         User loggedInUser = getAuthenticatedUser();
         if (loggedInUser == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -112,26 +125,38 @@ public class EventController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
-        existingEvent.setCd_title(updatedEvent.getCd_title());
-        existingEvent.setEventDateStart(updatedEvent.getEventDateStart());
-        existingEvent.setEventDateEnd(updatedEvent.getEventDateEnd());
-        existingEvent.setCd_description(updatedEvent.getCd_description());
-        existingEvent.setCd_color(updatedEvent.getCd_color());
+        // JSON에서 데이터 추출
+        String title = (String) eventData.get("cd_title");
+        String description = (String) eventData.get("cd_description");
+        String color = (String) eventData.get("cd_color");
+        LocalDateTime eventStart = LocalDateTime.parse((String) eventData.get("eventDateStart"));
+        LocalDateTime eventEnd = LocalDateTime.parse((String) eventData.get("eventDateEnd"));
+
+        // petId를 JSON에서 직접 가져오기
+        Long petId = eventData.get("petId") != null ? ((Number) eventData.get("petId")).longValue() : null;
+
+        // 기존 이벤트 데이터 업데이트
+        existingEvent.setCd_title(title);
+        existingEvent.setEventDateStart(eventStart);
+        existingEvent.setEventDateEnd(eventEnd);
+        existingEvent.setCd_description(description);
+        existingEvent.setCd_color(color);
 
         // 반려동물 업데이트
         if (petId != null) {
             Pet pet = petService.getPetById(petId);
             if (pet != null) {
                 existingEvent.setPet(pet);
+            } else {
+                existingEvent.setPet(null);
             }
         } else {
-            existingEvent.setPet(null); // 반려동물을 선택하지 않으면 null로 설정
+            existingEvent.setPet(null); // 반려동물 선택 안 했을 경우 제거
         }
 
         Events savedEvent = eventRepository.save(existingEvent);
         return ResponseEntity.ok(savedEvent);
     }
-
 
     // 특정 이벤트 삭제
     @DeleteMapping("/{calendar_id}")
