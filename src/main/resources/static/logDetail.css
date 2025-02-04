@@ -10,7 +10,7 @@
   line-height: 1.6;
   color: #333;
   box-sizing: border-box;
-  min-height: calc(100vh - 400px); /* 화면 높이를 기준으로 조정 (상단 네비게이션 높이를 뺀 값)
+  min-height: calc(100vh - 400px); /* 화면 높이를 기준으로 조정 (상단 네비게이션 높이를 뺀 값)*/
 }
 
 /* 상단 버튼 */
@@ -215,10 +215,6 @@
   cursor: pointer;
 }
 
-.comment-footer .like:hover {
-  color: #007bff;
-}
-
 .comment-footer .reply-button {
   background: none;
   border: none;
@@ -396,7 +392,10 @@
 .logPostLike.liked i {
     color: red;
 }
-
+/* 댓글 활성화된 경우 */
+.like.liked i{
+    color: red; /* 유지될 색상 */
+}
 /* 즐겨찾기(북마크) 활성화된 경우 */
 .logPostBookmark.bookmarked i {
     color: gold;

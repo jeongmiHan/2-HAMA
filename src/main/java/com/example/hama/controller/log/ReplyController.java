@@ -27,10 +27,13 @@ import com.example.hama.config.CustomUserDetails;
 import com.example.hama.dto.ReplyDTO;
 import com.example.hama.model.log.Log;
 import com.example.hama.model.log.LogLikes;
+import com.example.hama.model.log.LogReplyLikes;
 import com.example.hama.model.log.Reply;
 import com.example.hama.model.user.User;
 import com.example.hama.repository.LogRepository;
+import com.example.hama.repository.UserRepository;
 import com.example.hama.repository.LogLikeRepository;
+import com.example.hama.repository.LogReplyLikeRepository;
 import com.example.hama.repository.LogReplyRepository;
 import com.example.hama.service.UserService;
 
@@ -44,7 +47,9 @@ public class ReplyController {
 	private final LogRepository logRepository;
 	private final LogLikeRepository logLikeRepository;
  	private final LogReplyRepository logReplyRepository;
+ 	private final LogReplyLikeRepository logReplyLikeRepository;
  	private final UserService userService;
+ 	private final UserRepository userRepository;
 	
     private User getAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -145,31 +150,36 @@ public class ReplyController {
 	            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
 	        }
 
+	        // 명시적으로 User 엔티티 로드
+	        user = userRepository.findById(user.getUserId())
+	                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
 	        // 댓글에 대한 좋아요 상태 확인 및 토글
-	        Optional<LogLikes> existingLikeOpt = logLikeRepository.findByUserAndReply(user, reply);
+	        Optional<LogReplyLikes> existingLikeOpt = logReplyLikeRepository.findByUserAndReply(user, reply);
 	        boolean isLiked;
 
 	        if (existingLikeOpt.isPresent()) {
-	            logLikeRepository.delete(existingLikeOpt.get());
+	            logReplyLikeRepository.delete(existingLikeOpt.get()); // 좋아요 취소
 	            isLiked = false;
 	        } else {
-	        	LogLikes newLike = new LogLikes(user, reply);
-	        	logLikeRepository.save(newLike);
+	            LogReplyLikes newLike = new LogReplyLikes(user, reply);
+	            logReplyLikeRepository.save(newLike); // 좋아요 추가
 	            isLiked = true;
 	        }
 
 	        // 댓글의 총 좋아요 수 계산
-	        int totalLikes = logLikeRepository.countByReply(reply);
+	        int totalLikes = logReplyLikeRepository.countByReply(reply);
 
 	        return ResponseEntity.ok(Map.of(
-	            "isLiked", isLiked,
-	            "totalLikes", totalLikes
+	                "isLiked", isLiked,
+	                "totalLikes", totalLikes
 	        ));
 	    } catch (Exception e) {
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 	                .body("댓글 좋아요 처리 중 오류 발생: " + e.getMessage());
 	    }
 	}
+
 
 	// 댓글 개수 동기화 
 	@GetMapping("/log/{postId}/count")
@@ -209,7 +219,8 @@ public class ReplyController {
 	    List<ReplyDTO> roots = new ArrayList<>();
 
 	    for (Reply reply : replies) {
-	        ReplyDTO dto = new ReplyDTO(reply, currentUser); // 현재 사용자 정보 전달
+	        int likeCount = logReplyLikeRepository.countByReply(reply);
+	        ReplyDTO dto = new ReplyDTO(reply, currentUser, likeCount);
 	        replyMap.put(dto.getId(), dto);
 	    }
 
@@ -227,6 +238,7 @@ public class ReplyController {
 	    }
 	    return roots;
 	}
+
 
 
 	@PutMapping("/log/{replyId}/edit")

@@ -657,16 +657,17 @@ document.addEventListener("DOMContentLoaded", async () => {
 		};
 		
 		// 댓글 좋아요 기능
-		window.toggleReplyLike = async (button) => {
-			console.log(`💡 댓글 좋아요 요청 - replyId: ${replyId}`); // 로그 출력
+		window.toggleReplyLike = async (button, replyId) => {
+			isEditMode = false; // 답글 모드로 설정
+			parentReplyId = null; // 부모 ID 설정
+		    console.log(`💡 댓글 좋아요 요청 - replyId: ${replyId}`);
 
-			// replyId가 유효한지 확인
-			if (!replyId || isNaN(replyId)) {
-			    console.error("❌ 오류: 잘못된 replyId 값이 전달되었습니다.", replyId);
-			    alert("댓글 정보가 올바르지 않습니다.");
-			    return;
-			}
-			
+		    if (!replyId || isNaN(replyId)) {
+		        console.error("❌ 오류: 잘못된 replyId 값이 전달되었습니다.", replyId);
+		        alert("댓글 정보가 올바르지 않습니다.");
+		        return;
+		    }
+
 		    try {
 		        const response = await fetch(`/reply/log/${replyId}/like`, {
 		            method: 'POST',
@@ -687,14 +688,17 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 		        if (isLiked) {
 		            button.classList.add("liked");
+		            localStorage.setItem(`liked-comment-${replyId}`, "true"); // Save state
 		        } else {
 		            button.classList.remove("liked");
+		            localStorage.removeItem(`liked-comment-${replyId}`); // Remove state
 		        }
 		    } catch (error) {
 		        console.error("댓글 좋아요 오류:", error);
 		        alert("댓글 좋아요 처리 중 오류가 발생했습니다.");
 		    }
 		};
+
 
 		window.toggleBookmark = async function(button) {
 
