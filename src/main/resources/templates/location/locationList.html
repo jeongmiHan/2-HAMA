@@ -63,7 +63,7 @@
 <div class="white-background">			
 <h1>장소 추천</h1>
 <div id="search-bar-location">
-    <input type="text" id="keyword" placeholder="검색어를 입력하세요" />
+    <input type="text" id="keyword" class="locationkeyword" placeholder="검색어를 입력하세요" />
     <button onclick="searchPlaces()" class="locationsearch"><i class="fas fa-search"></i></button>
 </div>
 <div id="map">
@@ -137,7 +137,7 @@
 	<option value="distance" th:selected="${selectedFilter == 'distance'}">가까운 순</option>
 	<option value="myLocations" th:selected="${selectedFilter == 'myLocations'}">내가 쓴 추천글</option>
 </select>
-<input type="text" id="search" name="search" placeholder="장소 이름 검색" th:value="${search}">
+<input type="text" id="search" class="locationselect" name="search" placeholder="장소 이름 검색" th:value="${search}">
 <button type="submit" class="locationsearch"><i class="fas fa-search"></i></button>
 </form>
 </div>
