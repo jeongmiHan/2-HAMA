@@ -189,7 +189,15 @@ document.addEventListener('DOMContentLoaded', () => {
 				card.classList.remove('selected');
 			}
 		});
-		alert(`"${name}"을(를) 선택했습니다.`);
+		Swal.fire({
+		        title: '선택 완료!',
+		        text: `"${name}"을(를) 선택했습니다.`,
+		        icon: 'success',  // ✅ 체크 아이콘 표시
+		        confirmButtonText: '확인',
+		        confirmButtonColor: '#3085d6',  // 버튼 색상 변경
+		        background: '#fff',  // 배경색
+		        iconColor: '#6fcf97'  // 아이콘 색상
+		    });
 	}
 
 	// 프로필 수정
