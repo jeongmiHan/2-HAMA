@@ -16,6 +16,14 @@
   
 }
 
+.fc-event {
+    display: flex;
+    align-items: center;  /* 아이콘과 텍스트 높이 맞춤 */
+    height: auto; /* 내용에 맞게 높이 자동 조정 */
+    min-height: 20px; /* 너무 작아지는 것 방지 */
+    padding: 2px 5px;
+}
+
 .fc-button {
   background-color: #4e73df; /* 버튼의 배경색을 밝은 파란색으로 설정합니다. */
   color: white; /* 버튼의 텍스트 색을 흰색으로 설정합니다. */

@@ -283,8 +283,9 @@ h1.profile-title {
 /* 캘린더에서기능사용하기위한수정-캘린더 일정 사진 */
 .event-title-container {
     display: flex;
-    align-items: center;
-    gap: 5px;
+    align-items: center;  /* 아이콘과 텍스트 높이 정렬 */
+    gap: 5px; /* 아이콘과 텍스트 사이 간격 */
+    height: 100%; /* 일정 크기와 동일한 높이 유지 */
 }
 
 .event-pet-icon {
