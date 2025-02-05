@@ -26,9 +26,9 @@ public class CalendarNotificationScheduler {
     public void generateNotificationsFromCalendar() {
         System.out.println("스케줄러 실행 중: " + LocalDateTime.now());
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime fiveHourLater = now.plusHours(5);
+        LocalDateTime fiveHourLater = now.plusHours(24);
 
-        // 현재 시각과 5시간 후 사이에 시작하는 이벤트 조회
+        // 현재 시각과 24시간 후 사이에 시작하는 이벤트 조회
         List<Events> upcomingEvents = eventRepository.findByEventDateStartBetween(now, fiveHourLater);
 
         if (!upcomingEvents.isEmpty()) {

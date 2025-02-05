@@ -25,8 +25,7 @@ public class CalendarController {
     public String getCalendarPage(Model model) {
         // 현재 인증된 사용자 정보 가져오기
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        log.info("SecurityContext 인증 객체: {}", authentication);
-
+        
         if (authentication != null && authentication.isAuthenticated()) {
             Object principal = authentication.getPrincipal();
             User user = null;
@@ -54,7 +53,6 @@ public class CalendarController {
         }
 
         // 인증되지 않은 경우 로그인 페이지로 리디렉션
-        log.warn("인증되지 않은 접근. 로그인 페이지로 리디렉션.");
         return "redirect:/user/login";
     }
 }

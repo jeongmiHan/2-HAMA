@@ -272,7 +272,7 @@ h1.profile-title {
     margin: 10px;
 }
 
-/* 🟢 선택된 반려동물 카드 스타일 (더 강조) */
+/* 캘린더에서기능사용하기위한수정-반려동물카드 */
 .profile-card.selected {
  background-color: #fff6e5;}
 
@@ -280,8 +280,7 @@ h1.profile-title {
     background-color: #0056b3;
 }
 
-
-
+/* 캘린더에서기능사용하기위한수정-캘린더 일정 사진 */
 .event-title-container {
     display: flex;
     align-items: center;

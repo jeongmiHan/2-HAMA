@@ -34,6 +34,5 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     List<Notification> findByUserAndIsReadAndIsExpiredFalse(User user, boolean isRead);
     
    // 이벤트로 알림 조회 추가
-    List<Notification> findByEvent(Events event); // 추가
-
+    List<Notification> findByEvent(Events event); 
 }
