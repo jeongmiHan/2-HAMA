@@ -237,6 +237,45 @@ document.addEventListener("DOMContentLoaded", async () => {
 	        console.error("Error toggling like:", error);
 	    }
 	};
+	// 내가 쓴 글 보기
+	// "내가 쓴 글 보기" 버튼 추가
+	const myPostsButton = document.createElement("button");
+	myPostsButton.textContent = "내가 쓴 글 보기";
+	myPostsButton.id = "myPostsButton";
+	myPostsButton.innerHTML = '<i class="fas fa-user"></i>'; // 아이콘 추가
+	document.body.appendChild(myPostsButton);
+
+	// 버튼 위치 지정 (기존 버튼과 함께 배치)
+	myPostsButton.style.position = "fixed";
+	myPostsButton.style.right = "30px"; 
+
+	let showMyPosts = false;
+
+	// "내가 쓴 글 보기" 버튼 클릭 이벤트
+	myPostsButton.addEventListener("click", async () => {
+	    showMyPosts = !showMyPosts;
+	    
+	    const url = showMyPosts ? "/log/myLogs" : "/log/list";
+	    
+	    try {
+	        const response = await fetch(url);
+	        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+	        
+	        const logs = await response.json();
+	        postContainer.innerHTML = ""; // 기존 게시글 초기화
+	        logs.reverse().forEach((log) => renderPost(log, false));
+	    } catch (error) {
+	        console.error("Error fetching logs:", error);
+	    }
+	    
+	    // 버튼 스타일 업데이트
+	    if (showMyPosts) {
+	        myPostsButton.classList.add("active");
+	    } else {
+	        myPostsButton.classList.remove("active");
+	    }
+	});
+
 	
 	window.toggleBookmark = async function (button) {
 	    const postElement = button.closest(".logPost");

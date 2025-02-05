@@ -169,6 +169,32 @@ public class LogController {
 		        return ResponseEntity.ok().build();
 		    }
 		}
+		@GetMapping("/myLogs")
+		public ResponseEntity<?> getMyLogs() {
+		    User user = getAuthenticatedUser();
+		    if (user == null) {
+		        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+		    }
+
+		    List<Log> logs = logRepository.findByUser(user); // 현재 사용자 작성 글만 가져오기
+		    List<Map<String, Object>> response = logs.stream().map(log -> {
+		        Map<String, Object> logData = new HashMap<>();
+		        logData.put("author", log.getUser().getName());
+		        logData.put("id", log.getLogId());
+		        logData.put("content", log.getLogContent());
+		        logData.put("timeAgo", SNSTime.getTimeAgo(log.getLogCreatedDate()));
+		        logData.put("likes", log.getLogLikes().size());
+		        logData.put("comments", log.getLogComments());
+		        logData.put("bookmarks", log.getBookmarkedUsers().size());
+		        logData.put("images", log.getLogAttachedFiles().stream()
+		                .map(LogAttachedFile::getLog_saved_filename)
+		                .toList());
+		        return logData;
+		    }).toList();
+
+		    return ResponseEntity.ok(response);
+		}
+
 		// 북마크 불러오기
 		@GetMapping("/bookmarked")
 		public ResponseEntity<?> getBookmarkedLogs() {

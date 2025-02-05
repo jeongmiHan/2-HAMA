@@ -1,11 +1,15 @@
 package com.example.hama.repository;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.example.hama.model.log.Log;
+import com.example.hama.model.user.User;
 
 
 public interface LogRepository extends JpaRepository<Log, Long> {
+	List<Log> findByUser(User user);
 	//일지 등록
 	//save(log);
 	

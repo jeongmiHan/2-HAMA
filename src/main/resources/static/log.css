@@ -639,7 +639,40 @@ form#uploadForm {
 #filterBookmarkButton.active {
   background-color: #808080; /* 회색 */
 }   
-        
+
+/* 내가 쓴 글 보기 버튼 */
+#myPostsButton {
+  position: fixed;
+  bottom: 170px; /* 즐겨찾기 버튼 위에 위치 */
+  right: 30px;
+  background-color: #4caf50; /* 기본 색상 (녹색) */
+  color: white;
+  border: none;
+  border-radius: 50%; /* 완벽한 원형 */
+  cursor: pointer;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  padding: 0;
+  z-index: 999;
+  transition: background-color 0.3s ease;
+}
+
+/* 아이콘 크기 */
+#myPostsButton i {
+  font-size: 24px; /* 아이콘 크기 */
+  line-height: 1;
+  display: block;
+}
+
+/* 활성화 상태 */
+#myPostsButton.active {
+  background-color: #808080; /* 회색 */
+}
+       
         
         
         
