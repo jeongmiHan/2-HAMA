@@ -47,13 +47,13 @@ document.addEventListener('DOMContentLoaded', function() {
 	      const petImage = info.event.extendedProps.petImage;
 	      const eventColor = info.event.extendedProps.cd_color || "#000"; // 기본 검은색
 
-	      // ✅ 기존의 중복 요소 삭제
+	      // 기존의 중복 요소 삭제
 	      let existingContainer = eventEl.querySelector('.event-title-container');
 	      if (existingContainer) {
 	          existingContainer.remove();
 	      }
 
-	      // 🟢 새로운 UI 적용 (이벤트 색상 + 반려동물 사진 + 타이틀)
+	      // 프로필에서 사진 가져오기
 	      const titleContainer = document.createElement('div');
 	      titleContainer.classList.add('event-title-container');
 	      titleContainer.innerHTML = `
@@ -120,9 +120,6 @@ document.addEventListener('DOMContentLoaded', function() {
          searchButton.click();
       }
    };
-
-
-
 });
 
 /* ---------------- 모달 창 관련 함수 ---------------- */
@@ -179,7 +176,6 @@ modalBackdrop.onclick = function() {
 };
 
 // 일정 추가 모달 창 표시
-// ✅ 이벤트 추가 모달 표시 시 선택된 반려동물 자동 적용 (수정 버전)
 async function showEventModal(date) {
     resetEventModal();
     currentEvent = null;
@@ -192,7 +188,7 @@ async function showEventModal(date) {
     document.getElementById('eventDescription').value = '';
     document.getElementById('eventColor').value = '#F08080';
 
-    // 🟢 반려동물 목록이 로드된 후 선택 값을 적용하기 위해 `await` 사용
+    // 반려동물 로드
     await loadPets();
 
     if (selectedPetId) {
@@ -285,8 +281,7 @@ function resetEventModal() {
 }
 
 /* ---------------- 이벤트 관리 함수 ---------------- */
-/* ---------------- 이벤트 관리 함수 ---------------- */
-// ✅ 이벤트 추가 함수 (반려동물 ID 정상 저장)
+// 이벤트 추가 
 async function addEvent() {
     const title = document.getElementById('eventTitle').value;
     const startDate = document.getElementById('startDate').value;
@@ -310,7 +305,7 @@ async function addEvent() {
         return;
     }
 
-    // ✅ 반려동물 정보가 먼저 로딩되도록 보장
+    //반려동물 리스트
     await loadPets();
 
     const petImage = petId ? petImages[petId] : null;
@@ -324,8 +319,6 @@ async function addEvent() {
         petId: petId ? Number(petId) : null
     };
 
-    console.log("📤 서버로 전송할 데이터:", JSON.stringify(eventData));
-
     fetch('/api/events', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -333,9 +326,8 @@ async function addEvent() {
     })
     .then(response => response.json())  
     .then(data => {
-        console.log('✅ 이벤트 추가 성공:', data);
 
-        // 🔥 반려동물 사진을 즉시 반영
+        //반려동물 사진
         calendar.addEvent({
             id: data.calendar_id,
             title,
@@ -347,7 +339,7 @@ async function addEvent() {
 
         closeEventModal();
     })
-    .catch(error => console.error('❌ 이벤트 추가 실패:', error));
+    .catch(error => console.error('이벤트 추가 실패:', error));
 }
 
  async function updateEvent(event) {
@@ -389,13 +381,13 @@ async function addEvent() {
      })
      .then(response => response.json())
      .then(async data => {
-         console.log('✅ 이벤트 수정 성공:', data);
+         console.log('이벤트 수정 성공:', data);
 
-         // ✅ 새로운 반려동물 사진 적용
+         //새로운 반려동물 사진 적용
          let newPetImage = petId ? `http://localhost:9000/pets/${petId}/photo` : null;
          petImages[petId] = newPetImage;
 
-         // ✅ 기존 이벤트 삭제 후 다시 추가 (즉시 반영)
+         //기존 이벤트 삭제 후 다시 추가
          event.remove();
          calendar.addEvent({
              id: data.calendar_id,
@@ -412,13 +404,10 @@ async function addEvent() {
 
          closeEventModal();
      })
-     .catch(error => console.error('❌ 이벤트 수정 실패:', error));
+     .catch(error => console.error('이벤트 수정 실패:', error));
  }
 
-
-
-
- // ✅ 이벤트 삭제 함수 (삭제 오류 해결)
+ // 이벤트 삭제 함수
  function deleteEvent() {
     if (!currentEvent) return;
 
@@ -427,15 +416,13 @@ async function addEvent() {
     })
     .then(response => {
        if (response.ok) {
-          console.log("✅ 이벤트 삭제 성공");
           currentEvent.remove();
           closeEventModal();
        } else {
-          console.error('❌ 이벤트 삭제 실패:', response.statusText);
           alert('이벤트 삭제에 실패했습니다.');
        }
     })
-    .catch(error => console.error('❌ 이벤트 삭제 실패:', error));
+    .catch(error => console.error('이벤트 삭제 실패:', error));
  }
 /* ------------------- 필터링 기능 ------------------- */
 // 색상별 이벤트 필터링
@@ -466,13 +453,12 @@ async function loadPets() {
             option.textContent = pet.petName;
             petSelect.appendChild(option);
 
-            // 🔥 반려동물 ID - 사진 URL 매핑 저장 (DB 저장 없이 사용)
+            // 반려동물 ID - 사진 URL 매핑 저장 
             petImages[pet.petId] = `http://localhost:9000/pets/${pet.petId}/photo`;  
         });
-
-        console.log("✅ 반려동물 목록 로드 완료:", pets);
+        console.log(" 반려동물 목록 로드 완료:", pets);
     } catch (error) {
-        console.error('❌ 반려동물 목록 로드 실패:', error);
+        console.error('반려동물 목록 로드 실패:', error);
     }
 }
 
@@ -483,13 +469,13 @@ function updateEventUI(event) {
     const petImage = event.extendedProps.petImage;
     const eventColor = event.extendedProps.cd_color || "#000"; // 기본 검은색
 
-    // ✅ 기존의 중복 요소 삭제
+    //기존의 중복 요소 삭제
     let existingContainer = eventEl.querySelector('.event-title-container');
     if (existingContainer) {
         existingContainer.remove();
     }
-
-    // 🟢 UI 업데이트 (이벤트 색상 + 반려동물 사진 + 타이틀)
+	
+    // UI 업데이트
     const titleContainer = document.createElement('div');
     titleContainer.classList.add('event-title-container');
     titleContainer.innerHTML = `
@@ -498,8 +484,6 @@ function updateEventUI(event) {
 
     eventEl.appendChild(titleContainer);
 }
-
-
 
 
 /* ------------------- 서버 데이터 로드 ------------------- */
@@ -511,29 +495,28 @@ async function loadEvents() {
         const events = await response.json();
         events.forEach(event => {
             const petId = event.pet?.petId;  // 이벤트에 연결된 반려동물 ID
-            const petImage = petId ? petImages[petId] : null; // 🔥 ID 기반 프로필 이미지 찾기
+            const petImage = petId ? petImages[petId] : null; //ID 기반 프로필 이미지 찾기
 
-            // 🔥 FullCalendar에 이벤트 추가
+            // FullCalendar에 이벤트 추가
             calendar.addEvent({
                 id: event.calendar_id, 
-                title: event.cd_title, // 🔥 `title`을 단순 텍스트로만 사용
+                title: event.cd_title, 
                 start: event.eventDateStart,
                 end: event.eventDateEnd,
                 backgroundColor: event.cd_color,
                 extendedProps: {
                     description: event.cd_description, 
                     petId: petId,
-                    petImage: petImage // 🔥 이미지 URL을 `extendedProps`에 저장
+                    petImage: petImage //이미지 URL을 `extendedProps`에 저장
                 }
             });
         });
 
-        console.log("✅ 이벤트 목록 로드 완료:", events);
+        console.log("이벤트 목록 로드 완료:", events);
     } catch (error) {
         console.error('❌ 이벤트 목록 로드 실패:', error);
     }
 }
-
 
 /* ------------------- 유틸리티 함수 ------------------- */
 // 색상 선택 시 숨겨진 입력값 업데이트
