@@ -37,7 +37,11 @@ public class WebConfig implements WebMvcConfigurer {
                     "/admin/**" // 관리자 페이지도 제외
                 );
     }
-
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/uploadPath/**") // URL 패턴
+                .addResourceLocations("file:///c:/upload/"); // 실제 파일 경로
+    }
 
 
    }

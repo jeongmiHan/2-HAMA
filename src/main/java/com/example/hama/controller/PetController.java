@@ -66,6 +66,10 @@ public class PetController {
            if (currentUser == null) {
                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // 비로그인 상태 처리
            }
+           // ✅ 미래 날짜 방지: 예외 발생
+           if (birthdate.isAfter(LocalDate.now())) {
+               throw new IllegalArgumentException("생일은 과거 또는 현재 날짜만 가능합니다.");
+           }
 
         Pet pet = new Pet();
         pet.setPetName(name);
@@ -104,6 +108,11 @@ public class PetController {
             @RequestParam("breed") String breed,
             @RequestParam("birthdate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate birthdate,
             @RequestParam(value = "photo", required = false) MultipartFile photo) throws Exception {
+    	
+    	// ✅ 미래 날짜 방지: 예외 발생
+        if (birthdate.isAfter(LocalDate.now())) {
+            throw new IllegalArgumentException("생일은 과거 또는 현재 날짜만 가능합니다.");
+        }
 
         // 1. 기존 펫 객체를 조회
         Pet existingPet = petService.getPetById(petId);

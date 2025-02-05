@@ -42,7 +42,7 @@ public class Pet {
     private LocalDate petBirthdate; // 반려동물 생일
 
     @Lob
-    @Column(name = "photo", columnDefinition = "BLOB")
+    @Column(name = "photo", columnDefinition = "LONGBLOB")
     private byte[] photo; // 반려동물 사진 (바이너리 데이터)
     
     @Column(name = "photo_mime_type")

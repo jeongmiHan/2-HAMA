@@ -2,10 +2,10 @@
 
 /* FullCalendar 스타일 */
 #calendar {
-  width: 840px;
+  width: 850px;
   max-height: 84vh; /* 화면의 60%를 최대 높이로 설정하여 세로 길이를 제한합니다. */
   position: relative; /* left 속성을 사용하려면 상대적인 위치 지정이 필요 */
-  left: 30px; /* 왼쪽에서 50px 떨어지게 설정 */
+  left: 20px; /* 왼쪽에서 20px 떨어지게 설정 */
 }
 
 .fc-toolbar {
@@ -16,6 +16,14 @@
   
 }
 
+.fc-event {
+    display: flex;
+    align-items: center;  /* 아이콘과 텍스트 높이 맞춤 */
+    height: auto; /* 내용에 맞게 높이 자동 조정 */
+    min-height: 20px; /* 너무 작아지는 것 방지 */
+    padding: 2px 5px;
+}
+
 .fc-button {
   background-color: #4e73df; /* 버튼의 배경색을 밝은 파란색으로 설정합니다. */
   color: white; /* 버튼의 텍스트 색을 흰색으로 설정합니다. */
@@ -24,6 +32,13 @@
   margin: 0 5px; /* 버튼 사이에 5px의 간격을 추가합니다. */
   border-radius: 5px; /* 버튼의 모서리를 둥글게 만듭니다. */
   cursor: pointer; /* 마우스를 올리면 버튼이 클릭 가능한 느낌을 줍니다. */
+}
+
+.fc-button-group .fc-button.fc-button-active {
+    position: static !important;  /* 위치 자동 조정 */
+    transform: none !important;  /* 이동 방지 */
+    top: auto !important;
+    z-index: 0 !important; /* 다른 버튼과 동일한 레이어 */
 }
 
 .fc-button:hover {
