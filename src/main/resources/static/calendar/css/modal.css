@@ -39,6 +39,10 @@ input[type="date"], input[type="time"] { /* 일자, 시간 */
 	justify-content: space-between; /* 항목들 사이에 동일한 간격을 두어 양 끝으로 배치*/
 }
 
+#petSelect {
+    margin-bottom: 15px; /* 반려동물 선택창 아래 여백 추가 */
+}
+
 button {
 	padding: 10px 20px; /* 버튼 내부 여백 (위아래) (좌우) */
 	background-color: #007bff; /* 버튼 색상 */

@@ -26,6 +26,13 @@
   cursor: pointer; /* 마우스를 올리면 버튼이 클릭 가능한 느낌을 줍니다. */
 }
 
+.fc-button-group .fc-button.fc-button-active {
+    position: static !important;  /* 위치 자동 조정 */
+    transform: none !important;  /* 이동 방지 */
+    top: auto !important;
+    z-index: 0 !important; /* 다른 버튼과 동일한 레이어 */
+}
+
 .fc-button:hover {
   background-color:  #4e73df; /* 버튼 위에 마우스를 올렸을 때 배경색을 더 어두운 파란색으로 변경합니다. */
 }

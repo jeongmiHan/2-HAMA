@@ -34,7 +34,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const today = new Date();
         const diffTime = targetDate - today;
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
         const d = "D";
         const sign = diffDays === 0 ? "-" : diffDays > 0 ? "-" : "+";
         const days = diffDays === 0 ? "Day" : Math.abs(diffDays);
