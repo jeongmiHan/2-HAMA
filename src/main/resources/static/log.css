@@ -612,7 +612,7 @@ form#uploadForm {
   position: fixed;
   bottom: 100px; /* 글쓰기 버튼 위에 위치 */
   right: 30px;
-  background-color: #f4b400; /* 기본 색상 (노란색) */
+  background-color: #808080; /* 기본 색상 (노란색) */
   color: white;
   border: none;
   border-radius: 50%;
@@ -637,7 +637,7 @@ form#uploadForm {
 
 /* 활성화 상태 (전체 게시글 보기) */
 #filterBookmarkButton.active {
-  background-color: #808080; /* 회색 */
+  background-color: #f4b400; /* 회색 */
 }   
 
 /* 내가 쓴 글 보기 버튼 */
@@ -645,7 +645,7 @@ form#uploadForm {
   position: fixed;
   bottom: 170px; /* 즐겨찾기 버튼 위에 위치 */
   right: 30px;
-  background-color: #4caf50; /* 기본 색상 (녹색) */
+  background-color: #808080; /* 기본 색상 (회색) */
   color: white;
   border: none;
   border-radius: 50%; /* 완벽한 원형 */
@@ -670,7 +670,7 @@ form#uploadForm {
 
 /* 활성화 상태 */
 #myPostsButton.active {
-  background-color: #808080; /* 회색 */
+  background-color: #4caf50; /* 녹색 */
 }
        
         

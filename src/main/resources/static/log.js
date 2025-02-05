@@ -108,47 +108,113 @@ document.addEventListener("DOMContentLoaded", async () => {
 	const writeButtonRect = writeButton.getBoundingClientRect();
 	filterButton.style.position = "fixed";
 	filterButton.style.right = "30px";
+	
+	// "내가 쓴 글 보기" 버튼 추가
+	const myPostsButton = document.createElement("button");
+	myPostsButton.textContent = "내가 쓴 글 보기";
+	myPostsButton.id = "myPostsButton";
+	myPostsButton.innerHTML = '<i class="fas fa-user"></i>'; // 아이콘 추가
+	document.body.appendChild(myPostsButton);
 
-    let showBookmarked = false; // 필터 활성화 여부
+	// 버튼 위치 지정 (기존 버튼과 함께 배치)
+	myPostsButton.style.position = "fixed";
+	myPostsButton.style.right = "30px";
 
-    filterButton.addEventListener("click", async () => {
-        showBookmarked = !showBookmarked; // 상태 변경
-		// 버튼 색상 변경 (활성화 여부에 따라)
-		if (showBookmarked) {
-		    filterButton.classList.remove("active"); // 즐겨찾기 필터 ON (노란색)
-		} else {
-		    filterButton.classList.add("active"); // 전체 게시글 보기 (회색)
-		}
-        const url = showBookmarked ? "/log/bookmarked" : "/log/list";
-        try {
-            const response = await fetch(url);
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+	let showMyPosts = false;
+	let showBookmarked = false;
 
-            const logs = await response.json();
-            postContainer.innerHTML = ""; // 기존 게시글 초기화
-            logs.reverse().forEach((log) => renderPost(log, false));
-        } catch (error) {
-            console.error("Error fetching logs:", error);
-        }
-		
-    });
+	// 게시글을 불러오는 공통 함수
+	async function loadPosts(url) {
+	    try {
+	        const response = await fetch(url);
+	        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
-    // 기본적으로 전체 게시글 불러오기
-    try {
-        const response = await fetch("/log/list");
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+	        const logs = await response.json();
+	        postContainer.innerHTML = ""; // 기존 게시글 초기화
+	        logs.reverse().forEach((log) => renderPost(log, false));
+	    } catch (error) {
+	        console.error("Error fetching logs:", error);
+	    }
+	}
 
-        const logs = await response.json();
-        logs.reverse().forEach((log) => renderPost(log, false));
-    } catch (error) {
-        console.error("Error fetching logs:", error);
-    }
-	filterButton.classList.add("active"); // 시작할 때 회색 배경 (전체 게시글 보기)
+	// "내가 쓴 글 보기" 버튼 클릭 이벤트
+	myPostsButton.addEventListener("click", async () => {
+	    if (showBookmarked) {
+	        // "즐겨찾기" 버튼이 켜져 있으면 비활성화
+	        showBookmarked = false;
+	        filterButton.classList.remove("active");
+	    }
 
+	    showMyPosts = !showMyPosts;
+
+	    // 버튼 상태 업데이트
+	    myPostsButton.classList.toggle("active", showMyPosts);
+	    filterButton.classList.remove("active"); // 항상 다른 버튼 비활성화
+
+	    // 게시글 불러오기
+	    await loadPosts(showMyPosts ? "/log/myLogs" : "/log/list");
+	});
+
+	// "즐겨찾기" 버튼 클릭 이벤트
+	filterButton.addEventListener("click", async () => {
+	    if (showMyPosts) {
+	        // "내가 쓴 글 보기" 버튼이 켜져 있으면 비활성화
+	        showMyPosts = false;
+	        myPostsButton.classList.remove("active");
+	    }
+
+	    showBookmarked = !showBookmarked;
+
+	    // 버튼 상태 업데이트
+	    filterButton.classList.toggle("active", showBookmarked);
+	    myPostsButton.classList.remove("active"); // 항상 다른 버튼 비활성화
+
+	    // 게시글 불러오기
+	    await loadPosts(showBookmarked ? "/log/bookmarked" : "/log/list");
+	});
+	// 페이지 로드 시 모든 게시글 불러오기
+	await loadPosts("/log/list");
+
+	window.toggleBookmark = async function (button) {
+	    const postElement = button.closest(".logPost");
+	    const postId = postElement.querySelector(".logPostContent").dataset.id;
+
+	    try {
+	        // 서버로 API 요청
+	        const response = await fetch(`/log/${postId}/bookmark`, {
+	            method: "POST",
+	            headers: { "Content-Type": "application/json" },
+	        });
+
+	        if (!response.ok) {
+	            const errorMessage = await response.text();
+	            console.error("Server Error:", errorMessage);
+	            throw new Error("즐겨찾기 토글 실패");
+	        }
+
+	        const { isBookmarked, totalBookmarks } = await response.json();
+	        console.log(`isBookmarked: ${isBookmarked}, totalBookmarks: ${totalBookmarks}`);
+
+	        // UI 업데이트
+	        const bookmarkCount = button.querySelector("span");
+	        bookmarkCount.textContent = totalBookmarks;
+
+	        if (isBookmarked) {
+	            button.classList.add("bookmarked");
+	        } else {
+	            button.classList.remove("bookmarked");
+	        }
+
+	        console.log("Bookmark toggle completed successfully");
+	    } catch (error) {
+	        console.error("즐겨찾기 처리 중 오류:", error);
+	        alert("즐겨찾기 처리 중 오류가 발생했습니다.");
+	    }
+	};
 	// 최대 글자 수 제한
 	const maxLength = 300;
-	
-    // 게시물 추가 이벤트
+
+	// 게시물 추가 이벤트
 	submitButton.addEventListener("click", async () => {
 	    const contentInput = document.getElementById("logContentInput");
 	    const content = contentInput.value.trim();
@@ -199,7 +265,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 	         imageInput.value = ""; // 선택한 파일 초기화
 	     }
 	 });
-	
+
 	// 더보기 링크 클릭 이벤트
 	window.showMore = (element) => {
 	    const postElement = element.closest(".logPost");
@@ -207,7 +273,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 	    const fullContent = postElement.dataset.fullContent;
 	    postContent.innerHTML = fullContent; // 전체 내용으로 교체
 	};
-	
+
 	// 좋아요 증가 또는 취소
 	window.increaseLike = async (button) => {
 	    const postElement = button.closest(".logPost");
@@ -235,82 +301,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 	        button.classList.toggle("liked", isLiked);
 	    } catch (error) {
 	        console.error("Error toggling like:", error);
-	    }
-	};
-	// 내가 쓴 글 보기
-	// "내가 쓴 글 보기" 버튼 추가
-	const myPostsButton = document.createElement("button");
-	myPostsButton.textContent = "내가 쓴 글 보기";
-	myPostsButton.id = "myPostsButton";
-	myPostsButton.innerHTML = '<i class="fas fa-user"></i>'; // 아이콘 추가
-	document.body.appendChild(myPostsButton);
-
-	// 버튼 위치 지정 (기존 버튼과 함께 배치)
-	myPostsButton.style.position = "fixed";
-	myPostsButton.style.right = "30px"; 
-
-	let showMyPosts = false;
-
-	// "내가 쓴 글 보기" 버튼 클릭 이벤트
-	myPostsButton.addEventListener("click", async () => {
-	    showMyPosts = !showMyPosts;
-	    
-	    const url = showMyPosts ? "/log/myLogs" : "/log/list";
-	    
-	    try {
-	        const response = await fetch(url);
-	        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-	        
-	        const logs = await response.json();
-	        postContainer.innerHTML = ""; // 기존 게시글 초기화
-	        logs.reverse().forEach((log) => renderPost(log, false));
-	    } catch (error) {
-	        console.error("Error fetching logs:", error);
-	    }
-	    
-	    // 버튼 스타일 업데이트
-	    if (showMyPosts) {
-	        myPostsButton.classList.add("active");
-	    } else {
-	        myPostsButton.classList.remove("active");
-	    }
-	});
-
-	
-	window.toggleBookmark = async function (button) {
-	    const postElement = button.closest(".logPost");
-	    const postId = postElement.querySelector(".logPostContent").dataset.id;
-
-	    try {
-	        // 서버로 API 요청
-	        const response = await fetch(`/log/${postId}/bookmark`, {
-	            method: "POST",
-	            headers: { "Content-Type": "application/json" },
-	        });
-
-	        if (!response.ok) {
-	            const errorMessage = await response.text();
-	            console.error("Server Error:", errorMessage);
-	            throw new Error("즐겨찾기 토글 실패");
-	        }
-
-	        const { isBookmarked, totalBookmarks } = await response.json();
-	        console.log(`isBookmarked: ${isBookmarked}, totalBookmarks: ${totalBookmarks}`);
-
-	        // UI 업데이트
-	        const bookmarkCount = button.querySelector("span");
-	        bookmarkCount.textContent = totalBookmarks;
-
-	        if (isBookmarked) {
-	            button.classList.add("bookmarked");
-	        } else {
-	            button.classList.remove("bookmarked");
-	        }
-
-	        console.log("Bookmark toggle completed successfully");
-	    } catch (error) {
-	        console.error("즐겨찾기 처리 중 오류:", error);
-	        alert("즐겨찾기 처리 중 오류가 발생했습니다.");
 	    }
 	};
 	
