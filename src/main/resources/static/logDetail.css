@@ -43,7 +43,7 @@
 }
 
 #logTime {
-  font-size: 12px;
+  font-size: 14px;
   color: #888;
   margin-bottom: 16px;
 }
@@ -121,7 +121,9 @@
 
 /* 작성자 정보 및 프로필 */
 .comment-author {
-  align-items: center; /* 프로필 사진과 텍스트 세로 정렬 */
+    display: flex;
+    justify-content: space-between; /* 닉네임과 버튼을 양쪽 정렬 */
+    align-items: center; /* 수직 가운데 정렬 */
 }
 
 .author-info {
@@ -156,14 +158,15 @@
   line-height: 1.4; /* 가독성을 위한 줄 간격 */
 }
 .comment-time {
-  font-size: 12px;
+  font-size: 14px;
   color: #888;
-  margin-bottom: 16px;
+  padding: 4px 0 0;
+  
 }
 
 .author-name {
   font-weight: bold;
-  font-size: 14px;
+  font-size: 16px;
   margin: 0;
   color: #333;
 }
@@ -181,8 +184,8 @@
 /* 수정/삭제 버튼 */
 .comment-actions {
   display: flex;
-  gap: 12px; /* 버튼 간격 */
-  
+  gap: 8px; /* 수정/삭제 버튼 간격 */
+  padding: 0 10px;
 }
 
 .comment-actions button {
@@ -191,6 +194,7 @@
   color: #555;
   font-size: 12px;
   cursor: pointer;
+  
 }
 
 .comment-actions button:hover {
@@ -223,8 +227,8 @@
   cursor: pointer;
 }
 
-.comment-footer .reply-button:hover {
-  text-decoration: underline;
+.comment-footer .reply-button:hover, 
+.comment-footer .like:hover {
   color: #007bff;
 }
 
