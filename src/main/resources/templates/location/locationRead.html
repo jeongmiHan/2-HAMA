@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>장소보기</title>
+<link rel="stylesheet" href="/calendar/css/style.css">
+<link rel="stylesheet" href="/calendar/css/default.css">
+
+<link rel="stylesheet" href="/calendar/css/memo.css">
+<link rel="stylesheet" href="/calendar/css/notifications.css">
+<link rel="stylesheet" href="/location/css/location-read.css">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=278940b595d1bf12680c71409de85eda&libraries=services"></script>
+</head>
+
+<body>
+<div class="wrapper">
+		<!--wrapper : 전체 페이지를 감싸는 컨테이너-->
+		<!-- Sidebar -->
+		<nav class="sidebar" th:replace="~{profile}"></nav>
+		<!-- Content Wrapper -->
+		<!--Content Wrapper : 메인 콘텐츠와 상단 네비게이션 바를 감싸는 컨테이너 -->
+		<div class="content-wrapper">
+			<!-- Navbar -->
+			<!--Navbar: 페이지 상단에 위치한 검색창과 알림 프로필 등-->
+			 <nav class="navbar">
+                <div class="navbar-container">
+                    <a href="#" class="navbar-logo">もふもふ</a>
+                    <ul class="navbar-menu">
+                        <li><a href="/calendar">홈</a></li>
+                        <li><a href="#services">피드</a></li>
+                        <li><a href="/board/list">게시판</a></li>
+                        <li><a href="/location/locationList">장소추천</a></li>
+                    </ul>
+                    <div class="navbar-icons">
+                        <div class="icon-group">
+                            <div class="noti_icon-item" onclick="openNotificationModal()">
+                                <i class="fas fa-bell"></i>
+                                알람 <span id="notification-count" class="noti_badge" style="display: none;">0</span>
+                            </div>
+                        </div>
+                        <div class="profile-group">
+                            <span class="divider"></span>
+                            <span class="profile-name">닉네임: <span th:text="${nickname}"></span></span>
+                            <button id="logoutButton" onclick="window.location.href='/user/logout'">로그아웃</button>
+                            <!-- 관리자 페이지 버튼 -->
+                            <button id="adminButton" style="display: none;" onclick="window.location.href='/admin/adminpage'">관리자 페이지</button>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+            <!-- 알림 모달 -->
+                <div id="noti_modal" class="noti_modal">
+                    <div class="noti_modal-content">
+                        <span class="noti_close-button" onclick="closeNotificationModal()">&times;</span>
+                        <h3>현재 예정된 일정</h3>
+                        <ul id="notification-list"></ul>
+                    </div>
+                </div>
+			
+<div class="centered-container">
+<div class="white-background">			
+<div id="map">
+	<!-- 버튼 컨테이너 -->
+    <div id="mapControls" style="position:absolute; top:10px; left:10px; z-index:50;">
+    <button onclick="setOverlayMapTypeId('traffic')" style="margin-bottom:5px; padding:8px 12px; font-size:12px; color:black; background:white; border:1px solid #ddd; border-radius:5px; cursor:pointer; box-shadow:0 2px 4px rgba(0,0,0,0.1);">
+        교통정보
+    </button>
+    <button onclick="setOverlayMapTypeId('terrain')" style="margin-bottom:5px; padding:8px 12px; font-size:12px; color:black; background:white; border:1px solid #ddd; border-radius:5px; cursor:pointer; box-shadow:0 2px 4px rgba(0,0,0,0.1);">
+        지형정보
+    </button>
+    <button onclick="setOverlayMapTypeId('bicycle')" style="margin-bottom:5px; padding:8px 12px; font-size:12px; color:black; background:white; border:1px solid #ddd; border-radius:5px; cursor:pointer; box-shadow:0 2px 4px rgba(0,0,0,0.1);">
+        자전거 도로
+    </button>
+    <button onclick="resetMap()" style="padding:8px 12px; font-size:12px; color:black; background:white; border:1px solid #ddd; border-radius:5px; cursor:pointer; box-shadow:0 2px 4px rgba(0,0,0,0.1);">
+        초기화
+    </button>
+	</div>
+</div>
+    <!-- 장소 정보 (locationList 스타일 재사용) -->
+    <div class="location-item">
+        <div class="location-header">
+            <a class="location-title" th:href="@{/location/locationRead(id=${location.locationId})}" th:text="${location.locationName}"></a>
+        </div>
+
+        <div class="location-info">
+        	<span class="location-address">
+                <i class="fa fa-map-marker-alt" style="color:#dc3545;"></i>
+                <span th:text="${location.locationAddress}"></span>
+            </span>
+        <div class="location-details">
+            <span class="location-category">
+                <span th:switch="${location.locationCategory.name()}">
+                    <span th:case="'HOSPITAL'" style="color:#dc3545;">🏥</span>
+                    <span th:case="'PARK'" style="color:#28a745;">🏞️</span>
+                    <span th:case="'CAFE'" style="color:#6f4e37;">☕</span>
+                    <span th:case="'KINDERGARTEN'" style="color:#f39c12;">🏠</span>
+                    <span th:case="'PETSHOP'" style="color:#6a0dad;">🛒</span>
+                    <span th:case="*" style="color:#808080;">🏷️</span>
+                </span>
+                <span th:text="${location.locationCategory.getDescription()}"></span>
+            </span>
+
+            <span class="location-author">
+                <i class="fa fa-user author-icon"></i>
+                <span th:text="${location.user.name}"></span> 
+            </span>
+
+            <span class="location-review-count">
+                <i class="fa fa-comment-dots review-count-icon"></i>
+                <span th:text="${location.reviewCount}"></span>
+            </span>
+
+            <span class="location-rating">
+                <i class="fa fa-paw rating-icon"></i>
+                <span th:text="${#numbers.formatDecimal(location.locationRating, 1, 1)}">0.0</span>
+            </span>       
+        	</div>
+    		</div>
+			</div>
+ 		
+<h4>방문자 사진</h4>
+<div class="visitor-photo-slider">
+    <div class="visitor-photo-list" id="visitor-photo-list">
+        <!-- 방문자 사진들이 동적으로 추가됨 -->
+    </div>
+<!-- 방문자 사진이 없는 경우 메시지 -->
+<div th:if="${#lists.isEmpty(listR)}" style="text-align:center; color:#555; margin:20px 0;">
+    <p>방문자 사진이 존재하지 않습니다.</p>
+</div>
+</div>
+
+<h2>리뷰 목록</h2>
+<div class="seachReview">
+<div class="reviewbuttons">      
+	<input type="button" class="reviewbutton" value="리뷰 작성" th:onclick="|window.open('/review/reviewwrite?locationId=' + [[${location.locationId}]], 'popup', 'width=500,height=670')|">
+</div>
+<!-- 검색 필터 선택 영역 -->
+<form method = "get" action = "/location/locationRead" style="text-align: right;">
+	<input type="hidden" name="id" th:value="${location.locationId}">
+	<label for = "filter">정렬 기준:</label>
+	<select id="filter" name="filter">
+		<option value = "default" th:selected="${selectedFilter == 'default'}">기본</option>
+		<option value = "reviewRating" th:selected="${selectedFilter == 'reviewRating'}">평점 높은 순</option>
+		<option value = "reviewDate" th:selected="${selectedFilter == 'reviewDate'}">최신순</option>
+		<option value = "myReviews" th:selected="${selectedFilter == 'myReviews'}">내가 쓴 리뷰</option>
+	</select>
+	<button type="submit" class="reviewsearch"><i class="fas fa-search"></i></button>
+</form>
+</div>
+
+<!-- 리뷰가 단 하나도 없는 경우 메세지 -->
+<div th:if="${#lists.isEmpty(listR)}" style="text-align:center; color:#555; margin:20px 0;">
+	<p th:text="|${location.locationName}의 첫 리뷰를 달아보세요!|"></p>
+</div>
+
+<div class="review-list">
+    <div th:each="review, iterStat : ${listR}" class="review-item" th:classappend="${iterStat.index >= 5} ? 'hidden' : ''">
+    	<div class="review-header">
+	    	<div class="review-author">
+	        	<i class="fa fa-user author-icon"></i>
+	            <span th:text="${review.user.name}">작성자</span>
+	        </div>
+	        <!-- 날짜 영역 -->
+	        <span class="review-date" th:text="${review.reviewDate}">작성일</span>
+    	</div>
+    <div class="review-body">
+    
+    <!-- 이미지 영역 -->
+    <div class="review-image" style="position: relative;">
+    <!-- 이미지 조건 처리 추가 -->
+    <th:block th:if="${review.reviewImagePath != null and review.reviewImagePath != ''}">   
+        <img th:src="@{'/uploads/' + ${#strings.arraySplit(review.reviewImagePath, ',')[0].trim()}}" alt="첨부 이미지" 
+        th:attr="data-images=${review.reviewImagePath}" onclick="openImageModal(this)">
+        <!-- 이미지 개수 표시 -->
+        <span class="image-count" th:text="${#strings.arraySplit(review.reviewImagePath, ',').length}"></span>  
+    </th:block>
+    <th:block th:if="${review.reviewImagePath == null or review.reviewImagePath == ''}">
+        <span>첨부이미지 없음</span>
+    </th:block>
+	</div>
+     <!-- 내용 영역 -->
+     <div class="review-content-box">
+         <div class="review-text">
+             <p th:text="${review.reviewContent}">리뷰 내용</p>
+         </div>
+     </div>	
+    </div>
+        
+        <div class="review-bottom">
+	        <!-- 수정, 삭제 버튼 (책갈피 형태)-->
+	        <div class="bookmark-buttons" th:if="${sessionUser.userId == review.user.userId}">
+	            <button class="review-edit-btn" th:onclick="window.open('/review/reviewUpdate?reviewId= + [[${review.reviewId}]]', 'popup', 'width=500,height=670')">
+	                <i class="fa fa-edit"></i>
+	            </button>
+	            <button class="review-delete-btn" th:onclick="|confirmAction('@{/review/reviewDelete(reviewId=${review.reviewId}, locationId=${location.locationId})}', '리뷰를 삭제하시겠습니까?')|">
+	    			<i class="fa fa-trash"></i>
+				</button>
+	        </div>
+	        <div class="review-rating">
+		    <span th:each="i : ${#numbers.sequence(1, review.reviewRating)}">
+		        <i class="fa fa-paw rating-icon"></i>
+		    </span>
+			</div>
+        </div>
+    	 
+    </div>
+</div>
+
+<!-- 더보기 버튼 -->
+<div style="text-align: center; margin-top: 20px;">
+    <button id="loadMoreReviewsBtn" style="padding: 10px 20px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">더보기</button>
+</div>
+
+</div>
+</div>
+</div>
+<!-- 리뷰이미지 모달 창 추가 -->
+<div id="imageModal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1000;">
+    <span class="close" onclick="closeImageModal()" style="position:absolute; top:10px; right:20px; font-size:30px; color:white; cursor:pointer;">&times;</span>
+    <div style="display:flex; align-items:center; justify-content:center; height:100%;">
+        <button onclick="prevImage()" style="background:none; border:none; font-size:30px; color:white;">&#10094;</button>
+        <img id="modalImage" src="" style="max-width:90%; max-height:90%; border-radius:10px; object-fit:contain;">
+        <button onclick="nextImage()" style="background:none; border:none; font-size:30px; color:white;">&#10095;</button>
+    </div>
+</div>
+
+<!-- 방문자 사진 모달 창 -->
+<div id="visitorImageModal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1000;">
+    <span class="close" onclick="closeVisitorImageModal()" style="position:absolute; top:10px; right:20px; font-size:30px; color:white; cursor:pointer;">&times;</span>
+    <div style="display:flex; align-items:center; justify-content:center; height:100%;">
+        <button onclick="prevVisitorImage()" style="background:none; border:none; font-size:30px; color:white;">&#10094;</button>
+        <img id="visitorModalImage" src="" style="max-width:90%; max-height:90%; border-radius:10px; object-fit:contain;">
+        <button onclick="nextVisitorImage()" style="background:none; border:none; font-size:30px; color:white;">&#10095;</button>
+    </div>
+</div>
+
+<div class="help-icon-container">
+    <div class="help-icon" onclick="toggleHelpBalloon()">?</div>
+    <div class="help-balloon hidden" id="helpBalloon">
+        <span class="close-help" onclick="toggleHelpBalloon()">&times;</span>
+        <div id="helpContent">
+            <!-- 여기에 도움말 내용을 추가하세요 -->
+            <p>※ 다양한 정렬 기준으로 리뷰를 감상할 수 있습니다.</p>
+            <p>※ 방문자 사진 아래 좌측 상단에 리뷰를 작성할 수 있습니다.</p>
+            <p>※ 리뷰 우측 상단의 날짜는 "방문날짜"입니다.</p>
+            <p>※ 정렬 기준의 최신순은 방문날짜가 현재에 가까운 순을 의미합니다.</p>
+            <p>※ 길찾기를 누르면 카카오맵으로 이동합니다.</p>
+            <p>※ 하단의 더보기를 누르면 더 많은 리뷰들을 볼 수 있습니다.</p>
+            <p>※ 리뷰가 더 존재하지 않을 경우, 더보기는 사라집니다.</p>
+            <p>※ <i class="fa fa-comment-dots review-count-icon"></i>은 해당 장소에 대한 리뷰 개수입니다.</p>
+            <p>※ <i class="fa fa-paw rating-icon"></i>은 해당 장소에 대한 평점들의 평균입니다.<br>(리뷰에서는 각 평점을 의미합니다.)</p>
+        </div>
+    </div>
+</div>
+
+
+<script>
+//리뷰 사진 모달
+let imagePaths = [];
+let currentIndex = 0;
+
+//모달 창 열기
+function openImageModal(imgElement) {
+    // data-images 속성에서 이미지 경로를 가져오기
+    let paths = imgElement.getAttribute('data-images');
+    imagePaths = paths.split(','); // 콤마로 구분된 경로를 배열로 변환
+    currentIndex = 0;
+
+    // 첫 번째 이미지 표시
+    updateModalImage();
+    document.getElementById('imageModal').style.display = 'block';
+}
+
+// 모달 이미지 업데이트
+function updateModalImage() {
+    document.getElementById('modalImage').src = '/uploads/' + imagePaths[currentIndex].trim();
+}
+
+// 이전 이미지 보기
+function prevImage() {
+    if (currentIndex > 0) {
+        currentIndex--;
+        updateModalImage();
+    }
+}
+
+// 다음 이미지 보기
+function nextImage() {
+    if (currentIndex < imagePaths.length - 1) {
+        currentIndex++;
+        updateModalImage();
+    }
+}
+
+// 모달 이미지 업데이트
+function updateModalImage() {
+	let modalImage = document.getElementById('modalImage');
+    modalImage.src = '/uploads/' + imagePaths[currentIndex].trim(); // 절대경로 보장
+}
+
+//닫기
+function closeImageModal() {
+    document.getElementById('imageModal').style.display = 'none';
+    imagePaths = []; // 이미지 경로 초기화
+    currentIndex = 0; // 인덱스 초기화
+}
+//수정, 삭제
+function confirmAction(url, message) {
+    if (confirm(message)) {
+        window.location.href = url;
+    }
+}
+
+//카카오 맵 열기
+var locationLat = '[[${location.locationLatitude}]]'; // 장소의 위도
+var locationLng = '[[${location.locationLongitude}]]'; // 장소의 경도
+var locationName = '[[${location.locationName}]]'; // 장소 이름
+
+// 지도 초기화
+var mapContainer = document.getElementById('map'); 
+var mapOption = {
+    center: new kakao.maps.LatLng(locationLat, locationLng), 
+    level: 4 
+};
+
+var map = new kakao.maps.Map(mapContainer, mapOption);
+
+// 마커 생성
+var markerPosition = new kakao.maps.LatLng(locationLat, locationLng); // 장소의 위치
+var marker = new kakao.maps.Marker({
+    position: markerPosition,
+});
+marker.setMap(map);
+//InfoWindow 생성
+var infoWindowContent = `
+    <div style="padding:5px; text-align:center;">
+        <strong>${locationName}</strong><br>
+        <button onclick="openRoute(${locationLat}, ${locationLng}, '${locationName}')">
+            길찾기
+        </button>
+    </div>
+`;
+var infoWindow = new kakao.maps.InfoWindow({
+    content: infoWindowContent, // 말풍선의 HTML 내용
+    removable: true // 닫기 버튼 표시 여부
+});
+
+//InfoWindow 생성 (말풍선)
+var infoWindowContent = `
+    <div style="padding:10px; text-align:center; font-size:14px;">
+        <strong>${locationName}</strong><br>
+        <button onclick="openRoute(${locationLat}, ${locationLng}, '${locationName}')"
+                style="margin-top:5px; padding:5px 10px; background-color:#007bff; color:white; border:none; border-radius:5px; cursor:pointer;">
+            길찾기
+        </button>
+    </div>
+`;
+var infoWindow = new kakao.maps.InfoWindow({
+    content: infoWindowContent, // 말풍선의 HTML 내용
+    removable: false // 닫기 버튼 표시 여부 (true: 닫기 버튼 표시, false: 닫기 버튼 숨김)
+});
+
+// 지도 로드 시 InfoWindow 표시
+infoWindow.open(map, marker); // 지도와 마커에 말풍선 표시
+
+// 길찾기 버튼 함수
+function openRoute(lat, lng, name) {
+    var routeUrl = `https://map.kakao.com/link/to/${encodeURIComponent(name)},${lat},${lng}`;
+    window.open(routeUrl, '_blank'); // 새 창에서 길찾기 페이지 열기
+}
+//중심을 장소로 이동
+map.setCenter(new kakao.maps.LatLng(locationLat, locationLng));
+
+//일반 지도와 스카이뷰로 지도 타입을 전환할 수 있는 지도타입 컨트롤을 생성합니다
+var mapTypeControl = new kakao.maps.MapTypeControl();
+
+//지도에 컨트롤을 추가해야 지도위에 표시됩니다
+//kakao.maps.ControlPosition은 컨트롤이 표시될 위치를 정의하는데 TOPRIGHT는 오른쪽 위를 의미합니다
+map.addControl(mapTypeControl, kakao.maps.ControlPosition.TOPRIGHT);
+
+//지도 확대 축소를 제어할 수 있는  줌 컨트롤을 생성합니다
+var zoomControl = new kakao.maps.ZoomControl();
+map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
+
+//지도 교통정보, 지형정보
+//지도에 추가된 지도타입정보를 가지고 있을 변수입니다
+var currentTypeId;
+//버튼이 클릭되면 호출되는 함수입니다
+function setOverlayMapTypeId(maptype) {
+ var changeMaptype;  
+ // maptype에 따라 지도에 추가할 지도타입을 결정합니다
+ if (maptype === 'traffic') {            
+     changeMaptype = kakao.maps.MapTypeId.TRAFFIC;     
+ } else if (maptype === 'terrain') {
+     changeMaptype = kakao.maps.MapTypeId.TERRAIN;    
+ } else if (maptype === 'bicycle') {
+     changeMaptype = kakao.maps.MapTypeId.BICYCLE;    
+ }
+ // 이미 등록된 지도 타입이 있으면 제거합니다
+ if (currentTypeId) {
+     map.removeOverlayMapTypeId(currentTypeId);    
+ }
+ 
+ // maptype에 해당하는 지도타입을 지도에 추가합니다
+ map.addOverlayMapTypeId(changeMaptype);
+ 
+ // 지도에 추가된 타입정보를 갱신합니다
+ currentTypeId = changeMaptype;        
+}
+//지도 초기화 함수
+function resetMap() {
+ if (currentTypeId) {
+     map.removeOverlayMapTypeId(currentTypeId); // 지도 타입 제거
+     currentTypeId = null; // 상태 초기화
+ }
+}
+
+
+//방문자 사진
+document.addEventListener("DOMContentLoaded", () => {
+    const visitorPhotoList = document.getElementById("visitor-photo-list");
+    
+    let currentIndex = 0; // 현재 인덱스
+    let itemWidth = 0; // 슬라이더 아이템의 너비
+    let totalItems = 0; // 슬라이더 전체 아이템 개수
+
+    // 방문자 사진 리스트 생성
+    const reviewItems = document.querySelectorAll(".review-item");
+    reviewItems.forEach((reviewItem) => {
+        const reviewImages = reviewItem.querySelector(".review-image img");
+        if (reviewImages) {
+            const images = reviewImages.getAttribute("data-images").split(",");
+
+            images.forEach((path) => {
+                const trimmedPath = path.trim();
+
+                // 방문자 사진 아이템 생성
+                const photoItem = document.createElement("div");
+                photoItem.classList.add("visitor-photo-item");
+
+                // 이미지 태그 생성
+                const imgElement = document.createElement("img");
+                imgElement.src = `/uploads/${trimmedPath}`;
+                imgElement.alt = "방문자 사진";
+
+                // 클릭 이벤트: 모달 창 열기
+                imgElement.addEventListener("click", () => openImageModal(imgElement));
+                
+                photoItem.appendChild(imgElement);
+                visitorPhotoList.appendChild(photoItem);
+            });
+        }
+    });
+
+    // 클론 생성: 처음과 끝 복사
+    const items = visitorPhotoList.children;
+    totalItems = items.length;
+    
+ 	// 8개 이하일 경우 슬라이더 적용하지 않음
+    if (totalItems < 9) {
+        return; // 슬라이더 기능 종료
+    }
+
+    // 앞뒤 클론 추가
+    Array.from(items).forEach((item) => {
+        const cloneFirst = item.cloneNode(true);
+        visitorPhotoList.appendChild(cloneFirst); // 끝에 추가
+    });
+
+    // 초기 설정
+    const updateSlider = () => {
+        itemWidth = items[0].offsetWidth + 10; // 아이템 너비 + 간격
+        visitorPhotoList.style.transform = `translateX(-${currentIndex * itemWidth}px)`; // 초기 위치로 이동
+    };
+    updateSlider();
+    window.addEventListener("resize", updateSlider); // 화면 크기 변경 시 업데이트
+
+    // 슬라이더 작동
+    function startSlider() {
+        setInterval(() => {
+            currentIndex++;
+            visitorPhotoList.style.transition = "transform 0.5s ease-in-out";
+            visitorPhotoList.style.transform = `translateX(-${currentIndex * itemWidth}px)`;
+
+            // 무한 루프 처리
+            setTimeout(() => {
+                if (currentIndex >= totalItems) {
+                    // 첫 번째로 되돌아가기
+                    currentIndex = 0;
+                    visitorPhotoList.style.transition = "none";
+                    visitorPhotoList.style.transform = `translateX(-${currentIndex * itemWidth}px)`;
+                }
+            }, 500); // 애니메이션 시간 후 리셋
+        }, 3000); // 3초 간격
+    }
+
+    startSlider();
+});
+// 버튼 눌러서 장소 리스트 갈때, 위치정보 가져가게
+document.addEventListener('DOMContentLoaded', function () {
+            const recommendLink = document.querySelector('.navbar-menu li a[href="/location/locationList"]');
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function (position) {
+                        const userLat = position.coords.latitude;
+                        const userLng = position.coords.longitude;
+
+                        // 장소추천 링크 클릭 시 좌표 포함 URL로 이동
+                        recommendLink.onclick = function (event) {
+                            event.preventDefault(); // 기본 동작 막기
+                            location.href = `/location/locationList?userLat=${userLat}&userLng=${userLng}&region=ALL&category=ALL&filter=default`;
+                        };
+                    },
+                    function (error) {
+                        console.error("위치 정보를 가져올 수 없습니다:", error);
+                        // 위치 정보를 가져오지 못하면 기본 URL로 이동
+                        recommendLink.onclick = function () {
+                            location.href = `/location/locationList`;
+                        };
+                    }
+                );
+            } else {
+                console.error("브라우저가 위치 정보를 지원하지 않습니다.");
+                recommendLink.onclick = function () {
+                    location.href = `/location/locationList`;
+                };
+            }
+        });
+
+//방문자 사진 모달 관련 코드
+let visitorImagePaths = [];
+let visitorCurrentIndex = 0;
+
+// 방문자 사진 클릭 시 모달 열기
+function openVisitorImageModal(imgElement) {
+    const allVisitorImages = document.querySelectorAll('.visitor-photo-item img');
+    visitorImagePaths = Array.from(allVisitorImages).map(img => img.src);
+    visitorCurrentIndex = Array.from(allVisitorImages).indexOf(imgElement);
+
+    updateVisitorModalImage();
+    document.getElementById('visitorImageModal').style.display = 'block';
+}
+
+// 방문자 사진 모달 이미지 업데이트
+function updateVisitorModalImage() {
+    const modalImage = document.getElementById('visitorModalImage');
+    modalImage.src = visitorImagePaths[visitorCurrentIndex];
+}
+
+// 이전 방문자 사진 보기
+function prevVisitorImage() {
+    visitorCurrentIndex = (visitorCurrentIndex > 0) ? visitorCurrentIndex - 1 : visitorImagePaths.length - 1;
+    updateVisitorModalImage();
+}
+
+// 다음 방문자 사진 보기
+function nextVisitorImage() {
+    visitorCurrentIndex = (visitorCurrentIndex < visitorImagePaths.length - 1) ? visitorCurrentIndex + 1 : 0;
+    updateVisitorModalImage();
+}
+
+// 방문자 사진 모달 닫기
+function closeVisitorImageModal() {
+    document.getElementById('visitorImageModal').style.display = 'none';
+}
+
+// 방문자 사진 이벤트 초기화
+function initializeVisitorPhotoModal() {
+    const visitorImages = document.querySelectorAll('.visitor-photo-item img');
+    visitorImages.forEach(img => {
+        img.addEventListener('click', () => openVisitorImageModal(img));
+    });
+}
+
+document.addEventListener('DOMContentLoaded', initializeVisitorPhotoModal);
+
+//도움말 말풍선
+function toggleHelpBalloon() {
+    const helpBalloon = document.getElementById('helpBalloon');
+    if (helpBalloon.classList.contains('hidden')) {
+        helpBalloon.classList.remove('hidden');
+    } else {
+        helpBalloon.classList.add('hidden');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    const reviews = document.querySelectorAll('.review-item'); // 리뷰 항목
+    const loadMoreBtn = document.getElementById('loadMoreReviewsBtn'); // "더보기" 버튼
+    let currentIndex = 3; // 초기 표시할 리뷰 개수
+
+    // 초기 상태: 첫 3개만 표시
+    reviews.forEach((review, index) => {
+        if (index >= currentIndex) {
+            review.classList.add('hidden');
+        }
+    });
+
+    // "더보기" 버튼 클릭 이벤트
+    loadMoreBtn.addEventListener('click', function () {
+        let hiddenCount = 0;
+
+        // 다음 3개 항목을 표시
+        for (let i = currentIndex; i < currentIndex + 3 && i < reviews.length; i++) {
+            reviews[i].classList.remove('hidden');
+            hiddenCount++;
+        }
+
+        // 현재 인덱스 업데이트
+        currentIndex += hiddenCount;
+
+        // 모든 리뷰가 표시되면 "더보기" 버튼 숨기기
+        if (currentIndex >= reviews.length) {
+            loadMoreBtn.style.display = 'none';
+        }
+    });
+});
+
+</script>
+<script src="/calendar/js/notifications.js"></script>            
+</body>
+</html>

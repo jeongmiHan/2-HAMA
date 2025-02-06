@@ -1,0 +1,158 @@
+/* 기본 스타일 설정 */
+body {
+    line-height: 1.6;
+    padding: 0;
+}
+#container {
+    max-width: 1200px;
+    margin: 10px;
+    background: #fff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    border-radius: 8px;
+}
+
+
+/* 검색 영역 스타일 */
+.right {
+    text-align: right;
+    margin-bottom: 10px;
+}
+
+.right input[type="search"] {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 200px;
+}
+
+.right input[type="button"] {
+    padding: 5px 10px;
+    background-color: #007BFF;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.right input[type="button"]:hover {
+    background-color: #0056b3;
+}
+
+/* 테이블 스타일 */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+table th, table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+
+table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+}
+
+table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+table tr:hover {
+    background-color: #f1f1f1;
+}
+
+table a {
+    color: #007BFF;
+    text-decoration: none;
+}
+
+table a:hover {
+    text-decoration: underline;
+}
+
+/* 테이블 열 너비 조정 */
+table th:nth-child(1), table td:nth-child(1) {
+    width: 5%; /* No 칸 */
+}
+
+/* 제목 열 데이터 왼쪽 정렬 */
+table th:nth-child(2), table td:nth-child(2) {
+    width: 50%; /* 제목 열 너비 */
+}
+
+table td:nth-child(2) {
+    text-align: left; /* 데이터는 왼쪽 정렬 */
+}
+
+table th:nth-child(3), table td:nth-child(3) {
+    width: 15%; /* 작성자 칸 */
+}
+
+table th:nth-child(4), table td:nth-child(4) {
+    width: 10%; /* 조회수 칸 */
+}
+
+table th:nth-child(5), table td:nth-child(5) {
+    width: 10%; /* 작성일 칸 */
+}
+
+
+/* 빈 메시지 스타일 */
+.center {
+    text-align: center;
+}
+
+.center .emptyMsg {
+    color: #999;
+    font-style: italic;
+    margin: 20px 0;
+}
+
+/* 페이지 네비게이션 스타일 */
+#navigator a {
+    margin: 0 5px;
+    text-decoration: none;
+    color: #007BFF;
+}
+
+#navigator a:hover {
+    text-decoration: underline;
+    color: #0056b3;
+}
+
+/* 버튼 스타일 */
+input[type="button"] {
+    padding: 8px 15px;
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 5px;
+}
+
+input[type="button"]:hover {
+    background-color: #218838;
+}
+
+/* 정렬 옵션 전체 Wrapper */
+.sort-options {
+  display: flex;
+  justify-content: flex-start; /* 왼쪽 정렬 강제 */
+  margin-bottom: 20px; /* 아래 간격 */
+  width: 100%; /* 부모 컨테이너 전체 사용 */
+}
+
+/* 정렬 폼 */
+.sort-options-form {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* 라벨과 드롭다운 사이 간격 */
+  margin-left: 0; /* 왼쪽 정렬 */
+}
+
+

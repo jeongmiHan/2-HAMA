@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="kor">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>もふもふ</title>
+  
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+  
+  <!-- Bootstrap 4.6 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Summernote CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
+  <!-- Cropper.js 스타일 -->
+  <link href="https://cdn.jsdelivr.net/npm/cropperjs@1.5.13/dist/cropper.min.css" rel="stylesheet">
+
+<!-- Cropper.js 스크립트 -->
+  <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.13/dist/cropper.min.js"></script>
+  <link rel="stylesheet" href="/calendar/css/notifications.css">
+  <link rel="stylesheet" href="/calendar/css/style.css">
+  <link rel="stylesheet" href="/assets/css/wirte.css">
+</head>
+<body>
+  <script src="/assets/js/board.js"></script>
+  <script src="/assets/js/profile.js"></script>
+  <div class="wrapper"> <!--wrapper : 전체 페이지를 감싸는 컨테이너-->
+  <nav class="sidebar" th:replace="~{profile}"></nav>
+    
+    <!-- Content Wrapper -->
+    <div class="content-wrapper">
+      <!-- Navbar -->
+      <!-- Navbar -->
+            <nav class="navbar">
+                <div class="navbar-container">
+                    <a href="#" class="navbar-logo">もふもふ</a>
+                    <ul class="navbar-menu">
+                        <li><a href="/calendar">홈</a></li>
+                        <li><a href="#services">피드</a></li>
+                        <li><a href="/board/list">게시판</a></li>
+                        <li><a href="/location/locationList">장소추천</a></li>
+                    </ul>
+                    <div class="navbar-icons">
+                        <div class="icon-group">
+                            <div class="noti_icon-item" onclick="openNotificationModal()">
+                                <i class="fas fa-bell"></i>
+                                알람 <span id="notification-count" class="noti_badge" style="display: none;">0</span>
+                            </div>
+                        </div>
+                        <div class="profile-group">
+                            <span class="divider"></span>
+                            <span class="profile-name">닉네임: <span th:text="${nickname}"></span></span>
+                            <button id="logoutButton" onclick="window.location.href='/user/logout'">로그아웃</button>
+                            <!-- 관리자 페이지 버튼 -->
+                            <button id="adminButton" style="display: none;" onclick="window.location.href='/admin/adminpage'">관리자 페이지</button>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+      <!-- Main Content -->
+      <div class="content">
+        <section class="board-container">
+          <!-- 게시글 작성 폼 -->
+          <div class="post-form">
+            <form action="write" method="post" th:object="${boardWrite}" enctype="multipart/form-data">
+              <table>
+                <tr>
+                  <th>제목</th>
+                  <td>
+                    <input type="text" th:field="*{bdTitle}">
+                    <div th:errors="*{bdTitle}" class="error"></div>  
+                  </td>
+                </tr>
+                <tr>
+                  <th>내용</th>
+                  <td>
+                     <div id="summernote"></div> <!-- Summernote 에디터 사용 -->
+                      <textarea id="bdContent" name="bdContent" style="display:none;"></textarea>
+                    <div th:errors="*{bdContent}" class="error"></div> 
+                  </td>
+                </tr>
+                <tr>
+                  <th>첨부파일</th>
+                  <td>
+                    <input type="file" name="file">
+                  </td>
+                </tr>
+              </table>
+              <button type="submit" class="submit-button">Post</button>
+              <input type="button" onclick="location.href='/board/list'" value="취소">
+            </form>
+          </div>
+        </section>
+        
+      </div>
+      <!-- 알림 모달 -->
+                <div id="noti_modal" class="noti_modal">
+                    <div class="noti_modal-content">
+                        <span class="noti_close-button" onclick="closeNotificationModal()">&times;</span>
+                        <h3>현재 예정된 일정</h3>
+                        <ul id="notification-list"></ul>
+                    </div>
+                </div>
+    </div>
+  </div>
+
+  <!-- jQuery 로드 -->
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <!-- Bootstrap JS 로드 (jQuery 후에 로드) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+	
+  <!-- Summernote JS 로드 (Bootstrap 후에 로드) -->
+  <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
+
+	  <script>
+	  $(document).ready(function () {
+		    $('#summernote').summernote({
+		        height: 400, // 에디터 높이 설정
+		        placeholder: '내용을 입력하세요...', // 기본 텍스트
+		        toolbar: [
+		            ['style', ['bold', 'italic', 'underline']], // 글꼴 스타일
+		            ['fontsize', ['fontsize']], // 글꼴 크기
+		            ['color', ['color']], // 글자색
+		            ['para', ['ul', 'ol', 'paragraph']], // 문단 정렬 및 목록
+		            ['insert', ['picture']] // 삽입 (이미지)
+		        ],
+		        dialogsInBody: true, // 대화 상자를 DOM 내에 추가
+		        callbacks: {
+		            // 이미지 업로드 콜백
+		            onImageUpload: function (files) {
+		                uploadImages(files); // 여러 파일 처리 함수 호출
+		            }
+		        }
+		    });
+
+		    // URL 입력란 제거
+		    $('#summernote').on('summernote.dialog.shown', function () {
+		        $('.note-image-url').parent().remove(); // URL 입력 필드 제거
+		    });
+
+		    // 폼 제출 시 Summernote 내용을 숨겨진 textarea에 동기화
+		    $('form').on('submit', function () {
+		        let content = $('#summernote').summernote('code'); // Summernote의 HTML 코드 가져오기
+		        $('#bdContent').val(content); // 숨겨진 textarea에 설정
+		    });
+
+		    // 여러 이미지 업로드 처리 함수
+		    function uploadImages(files) {
+		        Array.from(files).forEach(file => {
+		            let formData = new FormData(); // formData 생성
+		            formData.append('imageFile', file); // 파일 추가
+
+		            $.ajax({
+		                url: '/board/uploadImage', // 서버 업로드 API 경로
+		                method: 'POST',
+		                data: formData,
+		                contentType: false,
+		                processData: false,
+		                success: function (data) {
+		                    $('#summernote').summernote('insertImage', data); // 에디터에 이미지 삽입
+		                },
+		                error: function (xhr, status, error) {
+		                    console.error('에러 발생:', xhr.responseText); // 콘솔에 오류 출력
+		                    alert('이미지 업로드 실패: ' + xhr.responseText); // 사용자 알림
+		                }
+		            });
+		        });
+		    }
+		});
+
+
+	  </script>
+	  <script src="/calendar/js/notifications.js"></script>
+</body>
+</html>

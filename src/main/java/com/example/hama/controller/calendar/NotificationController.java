@@ -1,8 +1,10 @@
 package com.example.hama.controller.calendar;
 
 import com.example.hama.config.CustomUserDetails;
+import com.example.hama.model.Events;
 import com.example.hama.model.Notification;
 import com.example.hama.model.user.User;
+import com.example.hama.repository.EventRepository;
 import com.example.hama.service.NotificationService;
 import com.example.hama.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +28,9 @@ public class NotificationController {
 
     @Autowired
     private UserService userService;
+    
+    @Autowired
+    private EventRepository eventRepository; 
 
     private User getAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -71,19 +76,26 @@ public class NotificationController {
         return ResponseEntity.ok(validNotifications); // 만료되지 않은 알림만 반환
     }
 
-    // 새로운 알림 생성
     @PostMapping
-    public ResponseEntity<Notification> createNotification(@RequestBody String content) {
+    public ResponseEntity<Notification> createOrUpdateNotification(@RequestParam String content, @RequestParam Long eventId) {
         User loggedInUser = getAuthenticatedUser();
         if (loggedInUser == null) {
-            log.warn("인증되지 않은 사용자가 알림을 생성하려고 시도했습니다.");
+            log.warn("인증되지 않은 사용자가 알림을 생성 또는 수정하려고 시도했습니다.");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        log.info("사용자 {}가 새로운 알림을 생성합니다. 내용: {}", loggedInUser.getUserId(), content);
-        // 알림 생성시 이벤트 정보도 필요
-        Notification createdNotification = notificationService.createNotificationForUser(content, loggedInUser, null);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdNotification);
+        log.info("사용자 {}가 새로운 알림을 생성 또는 업데이트합니다. 내용: {}", loggedInUser.getUserId(), content);
+
+        // eventId에 해당하는 이벤트 찾기 (EventService 없이 EventRepository 직접 사용)
+        Events event = eventRepository.findById(eventId).orElse(null);
+        if (event == null) {
+            log.warn("eventId {}에 해당하는 이벤트를 찾을 수 없습니다.", eventId);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        // 기존 알림이 있으면 업데이트, 없으면 새로 생성
+        Notification createdOrUpdatedNotification = notificationService.createOrUpdateNotificationForUser(content, loggedInUser, event);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdOrUpdatedNotification);
     }
 
     // 특정 알림 읽음 처리

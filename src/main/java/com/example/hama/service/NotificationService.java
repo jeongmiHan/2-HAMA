@@ -23,11 +23,23 @@ public class NotificationService {
     }
 
     // 사용자별 알림 생성
-    public Notification createNotificationForUser(String content, User user, Events event) {
-        Notification notification = new Notification(content, event);
-        notification.setUser(user);
-        return notificationRepository.save(notification);
+    public Notification createOrUpdateNotificationForUser(String content, User user, Events event) {
+        // 기존 알림 확인 (같은 이벤트와 연관된 알림이 있는지 조회)
+        List<Notification> existingNotifications = notificationRepository.findByEvent(event);
+
+        if (!existingNotifications.isEmpty()) {
+            // 기존 알림이 있으면 첫 번째 알림의 내용만 업데이트
+            Notification existingNotification = existingNotifications.get(0);
+            existingNotification.setContent(content);
+            return notificationRepository.save(existingNotification);
+        }
+
+        // 기존 알림이 없으면 새로운 알림 생성
+        Notification newNotification = new Notification(content, event);
+        newNotification.setUser(user);
+        return notificationRepository.save(newNotification);
     }
+
 
     public List<Notification> getAllNotificationsByUser(User user) {
         return notificationRepository.findByUserAndIsExpiredFalse(user);

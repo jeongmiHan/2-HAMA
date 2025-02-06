@@ -1,0 +1,271 @@
+#map { width: 100%; height: 400px; }
+#search-bar-location { margin: 10px 0; text-align: right;}
+#places-list { margin-top: 20px; }
+.searchLocation {
+	display: flex;
+    align-items: center; /* 세로 정렬 중앙 */
+    gap: 10px; /* 요소 간 간격 */
+    flex-wrap: wrap; /* 요소가 화면에 맞게 줄바꿈 */
+    margin: 10px 0;
+}
+.searchLocation .locationbuttons {
+    margin-right: auto; /* 버튼들을 오른쪽 정렬 */
+}
+.locationbutton{
+	font-size: 13px;
+	background-color: #007bff;
+	color: white;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+	text-align: center;
+	padding: 5px 10px;
+	transition: transform 0.2s ease-in-out; /* 부드러운 전환 효과 */
+}
+.locationbutton:hover {
+    transform: scale(1.05);
+}
+#loadMoreBtn{
+	transition: transform 0.2s ease-in-out; /* 부드러운 전환 효과 */
+}
+#loadMoreBtn:hover {
+    transform: scale(1.05);
+}
+.locationsearch{
+	background-color: #007bff;
+	color: white;
+	border:none;
+	border-radius: 5px;
+	font-size:10px;
+	padding: 5px 10px;
+	transition: transform 0.2s ease-in-out; /* 부드러운 전환 효과 */
+}
+.locationsearch:hover {
+    transform: scale(1.2);
+}
+.place-item {
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-bottom: 5px;      
+}
+.popup {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.5); /* 반투명 배경 */
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	z-index: 1000;
+}
+.popup.hidden {
+   display: none; /* 숨기기 */
+}
+.popup-content {
+   background: #fff;
+   padding: 20px;
+   border-radius: 8px;
+   max-width: 400px;
+   width: 100%;
+   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+   text-align: center;
+   position: relative;
+}
+.popup-content .close-btn {
+   position: absolute;
+   top: 10px;
+   right: 10px;
+   background: none; /* 배경 제거 */
+   border: none; /* 테두리 제거 */
+   font-size: 18px;
+   font-weight: bold; /* 폰트 굵기 */
+   cursor: pointer;
+   color: #333; /* 닫기 버튼 색상 */
+}
+#popup-title {
+   font-size: 20px;
+   font-weight: bold;
+   margin-bottom: 10px;
+}
+#popup-address, #popup-phone {
+   margin-bottom: 10px;
+   font-size: 14px;
+   color: #555;
+}
+#popup-route button {
+	background-color: #007bff;
+	color: white;
+	border: none;
+	padding: 10px 20px;
+	border-radius: 5px;
+	cursor: pointer;
+}
+#popup-route button:hover {
+      background-color: #0056b3;
+}	
+.location-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 0;
+    margin: 0;
+}
+.location-item {
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+.location-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+.location-title {
+    font-size: 20px;
+    color: #333;
+    text-decoration: none;
+}
+.location-title:hover {
+    text-decoration: underline;
+}
+.location-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: 14px;
+    color: #555;
+}
+.location-category,
+.location-author,
+.location-review-count,
+.location-rating,
+.location-address{
+    margin-right: 10px;
+}
+.location-distance{
+	margin-left : auto;
+}
+
+.rating-icon{
+	color: #FF69B4;
+	margin-right: 5px;
+}
+.review-count-icon {
+	color: #4CAF50;
+	margin-right: 5px;
+}
+.author-icon {
+	color: #007bff;
+	margin-right: 5px;
+}
+.category-icon {
+	margin-right: 5px;
+}
+.button-group {
+    display: flex;
+    gap: 10px; /* 버튼 간격 */
+}
+.edit-btn, .delete-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    color: #007bff; /* 파란색 아이콘 */
+    transition: color 0.3s;
+}
+.delete-btn {
+    color: #dc3545; /* 빨간색 아이콘 */
+}
+.edit-btn:hover {
+    color: #0056b3;
+}
+.delete-btn:hover {
+    color: #c82333;
+}
+
+/* 전체 페이지를 감싸는 하얀 배경 */
+.centered-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; /* 화면 전체 높이 */
+    background-color: #f0f0f0; /* 페이지 배경색 (밝은 회색) */
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* 콘텐츠 영역 */
+.white-background {
+    background-color: #ffffff; /* 하얀 배경 */
+    border-radius: 10px; /* 모서리를 둥글게 */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* 부드러운 그림자 */
+    max-width: 1200px; /* 최대 너비 */
+    width: 100%; /* 화면에 꽉 차도록 설정 */
+    padding: 20px; /* 내부 여백 */
+    box-sizing: border-box; /* 박스 크기 포함 */
+}
+
+.help-icon-container {
+    position: fixed;
+    top: 20%;
+    right: 20px;
+    z-index: 2;
+}
+
+.help-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #007bff;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 20px;
+    font-weight: bold;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease-in-out;
+}
+
+.help-icon:hover {
+    transform: scale(1.1);
+}
+
+.help-balloon {
+    position: fixed;
+    top: 20%;
+    right: 80px;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    width: 500px;
+    padding: 15px;
+    z-index: 1;
+}
+
+.help-balloon.hidden {
+    display: none;
+}
+
+.help-balloon .close-help {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #333;
+}
+
+.help-balloon #helpContent {
+    font-size: 14px;
+    color: #555;
+}
+.hidden {
+    display: none;
+}

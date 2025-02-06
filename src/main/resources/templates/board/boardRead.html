@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>もふもふ</title>
+    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="/assets/css/read.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+	<!-- jQuery 로드 -->
+	<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+	
+	<!-- Cropper.js 스타일 -->
+  <link href="https://cdn.jsdelivr.net/npm/cropperjs@1.5.13/dist/cropper.min.css" rel="stylesheet">
+	<!-- Cropper.js 스크립트 -->
+    <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.13/dist/cropper.min.js"></script>
+    <link rel="stylesheet" href="/calendar/css/notifications.css">
+     <link rel="stylesheet" href="/calendar/css/style.css">
+      <link rel="stylesheet" href="/assets/css/update.css">
+	<script th:inline="javascript">
+    const currentUserId = [[${currentUserId}]];
+    console.log("Current User ID:", currentUserId);
+	</script>
+
+  
+   
+</head>
+<body id= "readPage">
+
+ <script src="/assets/js/board.js"></script>
+ <script src="/assets/js/profile.js"></script>
+
+ <div class="wrapper"> <!--wrapper : 전체 페이지를 감싸는 컨테이너-->
+ <nav class="sidebar" th:replace="~{profile}"></nav>
+    
+    <!-- Content Wrapper --> <!--Content Wrapper : 메인 콘텐츠와 상단 네비게이션 바를 감싸는 컨테이너 -->
+    <div class="content-wrapper">
+      <!-- Navbar -->
+            <nav class="navbar">
+                <div class="navbar-container">
+                    <a href="#" class="navbar-logo">もふもふ</a>
+                    <ul class="navbar-menu">
+                        <li><a href="/calendar">홈</a></li>
+                        <li><a href="#services">피드</a></li>
+                        <li><a href="/board/list">게시판</a></li>
+                        <li><a href="/location/locationList">장소추천</a></li>
+                    </ul>
+                    <div class="navbar-icons">
+                        <div class="icon-group">
+                            <div class="noti_icon-item" onclick="openNotificationModal()">
+                                <i class="fas fa-bell"></i>
+                                알람 <span id="notification-count" class="noti_badge" style="display: none;">0</span>
+                            </div>
+                        </div>
+                        <div class="profile-group">
+                            <span class="divider"></span>
+                            <span class="profile-name">닉네임: <span th:text="${nickname}"></span></span>
+                            <button id="logoutButton" onclick="window.location.href='/user/logout'">로그아웃</button>
+                            <!-- 관리자 페이지 버튼 -->
+                            <button id="adminButton" style="display: none;" onclick="window.location.href='/admin/adminpage'">관리자 페이지</button>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+   <!-- Main Content --> <!--Main Content : 메인 콘텐츠 영역-->
+            <!-- 게시글 상세 -->
+            <div class="content">
+    		<div class="post-container">
+            <div class="board" th:data-board-id="${board.boardId}"></div>
+                <!-- 게시글 컨테이너 -->
+        <!-- 게시글 제목 -->
+        <h1 class="post-title" th:text="${board.bdTitle}">게시글 제목</h1>
+
+        <!-- 게시글 메타 정보 -->
+        <div class="post-meta">
+    <!-- 작성자 -->
+    <span><i class="fas fa-user"></i> 작성자: <span th:text="${board.user.name}">작성자</span></span>
+
+    <!-- 작성일 -->
+    <span><i class="fas fa-clock"></i> 
+        <span th:text="${#temporals.format(board.bdCreatedDate, 'yyyy-MM-dd HH:mm')}">2024-12-11 14:30</span>
+    </span>
+
+    <!-- 조회수 -->
+    <span><i class="fas fa-eye"></i> 조회수: <span th:text="${board.hit}">123</span></span>
+
+    <!-- 첨부파일 -->
+    <span th:if="${file}">
+        <i class="fas fa-paperclip"></i>
+        <a th:href="@{/board/download/{id}(id=${file.attachedFileId})}" th:text="${file.original_filename}" class="file-link">첨부파일</a>
+    </span>
+</div>
+        
+        <!-- 게시글 내용 -->
+        <div class="post-content" th:utext="${board.bdContent}">
+		</div>
+
+		<hr>
+        <!-- 버튼 그룹 -->
+        <div class="action-buttons">
+            <button onclick="location.href='/board/list'">목록</button>
+            <button th:if="${isWriter}" th:onclick="|location.href='@{/board/update(id=${board.boardId})}'|">수정</button>
+            <button th:if="${isWriter}" th:onclick="|location.href='@{/board/delete(id=${board.boardId})}'|">삭제</button>
+        </div>
+        
+        <!-- 댓글 보기 버튼 -->
+	<div class="comment-toggle" id="toggle-comments-btn">
+    <i class="far fa-comments comment-icon"></i>
+    <span>댓글</span>
+    <span class="comment-count"  th:text="${replyCount}">0</span>
+	</div>
+    
+    </div>
+          	<div class="comment-container" id="comment-section" style="display: none;">
+    <label for="reply"></label>
+    <input type="text" id="reply" name="reply" placeholder="댓글을 입력하세요.">
+    <input type="checkbox" id="secret-reply-checkbox">
+    <label for="secret-reply-checkbox">비밀댓글</label>
+    <input type="button" value="등록" onclick="writeReply()">
+    <div id="replies"></div> <!-- 댓글 목록 표시 -->
+</div>
+
+        </div>
+        <!-- 알림 모달 -->
+                <div id="noti_modal" class="noti_modal">
+                    <div class="noti_modal-content">
+                        <span class="noti_close-button" onclick="closeNotificationModal()">&times;</span>
+                        <h3>현재 예정된 일정</h3>
+                        <ul id="notification-list"></ul>
+                    </div>
+                </div>
+     	</div>
+    </div>
+   <script src="/calendar/js/notifications.js"></script>
+</body>
+</html>

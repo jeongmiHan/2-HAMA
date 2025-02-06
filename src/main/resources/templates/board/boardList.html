@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="kor">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>もふもふ</title>
+  <!-- jQuery 라이브러리 로드 -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+  <!-- Cropper.js 스타일 -->
+  <link href="https://cdn.jsdelivr.net/npm/cropperjs@1.5.13/dist/cropper.min.css" rel="stylesheet">
+  <!-- Cropper.js 스크립트 -->
+  <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.13/dist/cropper.min.js"></script>
+   <link rel="stylesheet" href="/calendar/css/notifications.css">
+ <link rel="stylesheet" href="/calendar/css/style.css">
+  <link rel="stylesheet" href="/assets/css/list.css">
+  
+  <script>
+  function search() {
+	    let searchText = document.getElementById("searchText").value;
+	    let searchType = document.getElementById("searchType").value;
+
+
+	    location.href = `/board/list?searchText=${encodeURIComponent(searchText)}&searchType=${searchType}`;
+	}
+
+  </script>	
+</head>
+<body id="listPage">
+  <script src="/assets/js/board.js"></script>
+  <div class="wrapper"> <!--wrapper : 전체 페이지를 감싸는 컨테이너-->
+	<nav class="sidebar" th:replace="~{profile}"></nav>
+    <!-- Content Wrapper --> <!--Content Wrapper : 메인 콘텐츠와 상단 네비게이션 바를 감싸는 컨테이너 -->
+    <div class="content-wrapper">
+      <!-- Navbar --> <!--Navbar: 페이지 상단에 위치한 검색창과 알림 프로필 등-->
+      <!-- Navbar -->
+            <nav class="navbar">
+                <div class="navbar-container">
+                    <a href="#" class="navbar-logo">もふもふ</a>
+                    <ul class="navbar-menu">
+                        <li><a href="/calendar">홈</a></li>
+                        <li><a href="/log/indexLog">피드</a></li>
+                        <li><a href="/board/list">게시판</a></li>
+                        <li><a href="/location/locationList">장소추천</a></li>
+                    </ul>
+                    <div class="navbar-icons">
+                        <div class="icon-group">
+                            <div class="noti_icon-item" onclick="openNotificationModal()">
+                                <i class="fas fa-bell"></i>
+                                알람 <span id="notification-count" class="noti_badge" style="display: none;">0</span>
+                            </div>
+                        </div>
+                        <div class="profile-group">
+                            <span class="divider"></span>
+                            <span class="profile-name">닉네임: <span th:text="${nickname}"></span></span>
+                            <button id="logoutButton" onclick="window.location.href='/user/logout'">로그아웃</button>
+                            <!-- 관리자 페이지 버튼 -->
+                            <button id="adminButton" style="display: none;" onclick="window.location.href='/admin/adminpage'">관리자 페이지</button>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+      <!-- Main Content --> <!--Main Content : 메인 콘텐츠 영역-->
+      <div class="content">
+        <div id="container">
+          <h1> 자유게시판 </h1>
+          <p>
+          <div class="right">
+<select id="searchType">
+    <option value="title">제목</option>
+    <option value="content">내용</option>
+    <option value="both">제목 + 내용</option>
+</select>
+
+<input type="search" id="searchText" name="searchText" th:value="${searchText}">
+<input type="button" onclick="search()" value="검색">
+
+          </div>
+         <div class="sort-options">
+  		<form action="/board/list" method="get">
+    	<input type="hidden" name="searchText" th:value="${searchText}">
+    	<label for="sort">정렬 기준:</label>
+    	<select id="sort" name="sort" onchange="this.form.submit()">
+      	<option value="bdCreatedDate" th:selected="${sort == 'bdCreatedDate'}">최신순</option>
+      	<option value="hit" th:selected="${sort == 'hit'}">조회순</option>
+    	</select>
+    	<input type="hidden" name="direction" value="DESC">
+  		</form>
+		</div>
+
+          
+          <p>
+          <table>
+            <tr>
+              <th>No</th>
+              <th>제목</th>
+              <th>작성자</th>
+              <th>조회수</th>
+              <th>작성일</th>
+            </tr>
+              
+              
+            <tr th:each="board:${list}">
+              <td class="center" th:text="${boardStat.count}">일련번호</td>
+              <td class="center">
+    		  <!-- null 체크 후 댓글 수 표시 -->
+    		  <a th:href="@{/board/read(id=${board.boardId})}" 
+      			 th:text="${board.bdTitle} + '(' + (${replyCounts[board.boardId]} ?: 0) + ')'">제목</a>
+			  </td>
+
+              <td class="center" th:text="${board.user.name}">작성자</td>
+              <td class="center" th:text="${board.hit}">조회수</td>
+              <td class="center" th:text="${#temporals.format(board.bdCreatedDate,'yyyy-MM-dd')}">작성일</td>
+            </tr>
+          </table>
+          <p th:if="${emptyMsg}" th:text="${emptyMsg}" class="center">
+          <p>
+          <div th:unless="${emptyMsg}">
+          <div th:if="${navi != null}" id="navigator" class="center">
+            
+            <!-- 이전 그룹이 있을 경우 보여줌 -->
+  		<th:block th:if="${navi.currentPage - navi.pagePerGroup > 0}">
+  		<a th:href="@{/board/list(page=${navi.currentPage - navi.pagePerGroup}, searchText=${searchText})}">◁</a>
+  		</th:block>
+  	
+  		<!-- 이전 페이지가 있을 경우 보여줌 -->
+  		<th:block th:if="${navi.currentPage > 1}">
+  	 	<a th:href="@{/board/list(page=${navi.currentPage - 1}, searchText=${searchText})}">◀</a>
+  		</th:block>
+  
+  		<!-- 루프 돌면서 버튼 생성 -->
+  	  	<th:block th:each="counter : ${#numbers.sequence(navi.startPageGroup, navi.endPageGroup)}">
+		<a th:href="@{/board/list(page=${counter}, searchText=${searchText})}" th:text="${counter}"></a>
+  	  	</th:block>
+  	  
+  		<!-- 다음 페이지가 있을 경우 보여주지 않음 -->
+  	 	<th:block th:if="${navi.currentPage < navi.totalPageCount}">
+  	 	<a th:href="@{/board/list(page=${navi.currentPage + 1},searchText=${searchText})}">▶</a>
+  	 	</th:block>
+  	 
+  	 	<!-- 다음 그룹이 있을 경우 보여줌 -->
+  	 	<th:block th:if="${navi.currentGroup < navi.totalPageCount}">
+  	 	<a th:href="@{/board/list(page=${navi.currentPage + navi.pagePerGroup}, searchText=${searchText})}">▷</a>
+  	 	</th:block>
+             
+          </div>
+          </div>
+            </th:block>
+          <p>
+          <div class="center">
+            <input type="button" onclick="location.href='/board/write'" value="글쓰기">
+          </div>
+        </div>
+        
+      </div>
+      
+       <!-- 알림 모달 -->
+                <div id="noti_modal" class="noti_modal">
+                    <div class="noti_modal-content">
+                        <span class="noti_close-button" onclick="closeNotificationModal()">&times;</span>
+                        <h3>현재 예정된 일정</h3>
+                        <ul id="notification-list"></ul>
+                    </div>
+                </div>
+    </div>
+  </div>
+  <script src="/calendar/js/notifications.js"></script>
+</body>
+</html>

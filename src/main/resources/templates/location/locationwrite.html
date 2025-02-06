@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>장소쓰기</title>
+    <link rel="stylesheet" href="/default.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/location/css/location-write.css">
+    <!-- 카카오맵 API -->
+    <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=278940b595d1bf12680c71409de85eda&libraries=services"></script>
+</head>
+
+<body>
+<div class="container mt-5">
+	<div class="modal-dialog">
+		<th:block th:utext="${successScript}"></th:block>
+		<div class="modal-content p-4">
+			<div class="modal-header">
+				<h3 class="modal-title">장소 추천글 작성</h3>
+			</div>
+			<div class="modal-body">
+				<form id="locationForm" action="/location/locationwrite" method="post" th:object="${locationWrite}" onsubmit="return validateForm()">
+					<!-- 장소명 -->
+					<div class="mb-3">
+                        <label for="locationName" class="form-label">장소</label>
+                        <input type="text" class="form-control" id="locationName" name="locationName" placeholder="장소명을 입력하세요" onkeyup="searchPlaces()" oninput="clearAddress()">
+                        <ul id="placeList" class="list-group mt-2" style="max-height: 150px; overflow-y: auto;"></ul>
+                    </div>
+                    <!-- 주소 -->
+                    <div class="mb-3">
+                        <label for="locationAddress" class="form-label">주소</label>
+                        <input type="text" class="form-control" id="locationAddress" name="locationAddress" placeholder="장소명에 따라 주소는 자동으로 입력됩니다" readonly>
+                    </div>
+                    <!-- 숨겨진 좌표값 -->
+                    <input type="hidden" id="locationLatitude" name="locationLatitude">
+                    <input type="hidden" id="locationLongitude" name="locationLongitude">
+                    <!-- 카테고리 -->
+                    <div class="mb-3">
+                        <label class="form-label">카테고리</label>
+                        <div class="category-icons">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="locationCategory" id="hospital" value="HOSPITAL">
+                                <label class="form-check-label" for="hospital">
+                                    🏥 병원
+                                </label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="locationCategory" id="park" value="PARK">
+                                <label class="form-check-label" for="park">
+                                    🏞️ 공원
+                                </label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="locationCategory" id="cafe" value="CAFE">
+                                <label class="form-check-label" for="cafe">
+                                    ☕ 카페
+                                </label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="locationCategory" id="kindergarten" value="KINDERGARTEN">
+                                <label class="form-check-label" for="kindergarten">
+                                    🏠 유치원
+                                </label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="locationCategory" id="petshop" value="PETSHOP">
+                                <label class="form-check-label" for="petshop">
+                                    🛒 애견샵
+                                </label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="locationCategory" id="others" value="OTHERS">
+                                <label class="form-check-label" for="others">
+                                    🏷️ 기타
+                                </label>
+                            </div>
+                        </div>
+                     </div>
+                    <!-- 버튼 -->
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary me-2">등록하기</button>
+                        <button type="button" class="btn btn-secondary" onclick="window.close()">닫기</button>
+                    </div>
+				</form>
+			</div>	
+		</div>
+	</div>
+</div>
+
+<script src="/location/js/location-write.js"></script>
+
+</body>
+</html>

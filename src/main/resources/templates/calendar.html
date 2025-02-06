@@ -9,15 +9,18 @@
 	src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.14/index.global.min.js"></script>
 <script
 	src="https://cdn.jsdelivr.net/npm/@fullcalendar/google-calendar@6.1.14/index.global.min.js"></script>
+	
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <!-- 외부 CSS 파일 및 Font Awesome 추가 -->
-    <link rel="stylesheet" href="/calendar/css/style.css">
-    <link rel="stylesheet" href="/calendar/css/default.css">
-    <link rel="stylesheet" href="/calendar/css/modal.css">
-    <link rel="stylesheet" href="/calendar/css/memo.css">
-    <link rel="stylesheet" href="/calendar/css/notifications.css">
-    <link rel="stylesheet" href="/calendar/css/dday.css">
-    <link rel="stylesheet" href="/calendar/css/event-list.css"> <!-- 추가된 CSS -->
+<!-- 외부 CSS 파일 및 Font Awesome 추가 -->
+<link rel="stylesheet" href="/calendar/css/style.css">
+<link rel="stylesheet" href="/calendar/css/default.css">
+<link rel="stylesheet" href="/calendar/css/modal.css">
+<link rel="stylesheet" href="/calendar/css/memo.css">
+<link rel="stylesheet" href="/calendar/css/notifications.css">
+<link rel="stylesheet" href="/calendar/css/dday.css">
+<link rel="stylesheet" href="/calendar/css/event-list.css">
+<!-- 추가된 CSS -->
 <link
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
 	rel="stylesheet">
@@ -25,142 +28,154 @@
 <title>もふもふ</title>
 </head>
 <body>
-    <div class="wrapper">
-        <!-- Sidebar -->
-             <nav class="sidebar" th:replace="~{profile}"></nav>
+	<div class="wrapper">
+		<!-- Sidebar -->
+		<nav class="sidebar" th:replace="~{profile}"></nav>
 
-        <!-- Content Wrapper -->
-        <div class="content-wrapper">
-            <!-- Navbar -->
-            <nav class="navbar">
-                <div class="navbar-container">
-                    <a href="#" class="navbar-logo">もふもふ</a>
-                    <ul class="navbar-menu">
-                        <li><a href="#home">홈</a></li>
-                        <li><a href="/log/indexLog">피드</a></li>
-                        <li><a href="#about">게시판</a></li>
-                        <li><a href="#contact">장소추천</a></li>
-                    </ul>
-                    <div class="navbar-icons">
-                        <div class="icon-group">
-                            <div class="noti_icon-item" onclick="openNotificationModal()">
-                                <i class="fas fa-bell"></i>
-                                알람 <span id="notification-count" class="noti_badge" style="display: none;">0</span>
-                            </div>
-                        </div>
-                        <div class="profile-group">
-                            <span class="divider"></span>
-                            <span class="profile-name">닉네임: <span th:text="${nickname}"></span></span>
-                            <button id="logoutButton" onclick="window.location.href='/user/logout'">로그아웃</button>
-                            <!-- 관리자 페이지 버튼 -->
-                            <button id="adminButton" style="display: none;" onclick="window.location.href='/admin/adminpage'">관리자 페이지</button>
-                        </div>
-                    </div>
-                </div>
-            </nav>
+		<!-- Content Wrapper -->
+		<div class="content-wrapper">
+			<!-- Navbar -->
+			<nav class="navbar">
+				<div class="navbar-container">
+					<a href="#" class="navbar-logo">もふもふ</a>
+					<ul class="navbar-menu">
+						<li><a href="#home">홈</a></li>
+						<li><a href="#services">피드</a></li>
+						<li><a href="/board/list">게시판</a></li>
+						<li><a href="/location/locationList">장소추천</a></li>
+					</ul>
+					<div class="navbar-icons">
+						<div class="icon-group">
+							<div class="noti_icon-item" onclick="openNotificationModal()">
+								<i class="fas fa-bell"></i> 알람 <span id="notification-count"
+									class="noti_badge" style="display: none;">0</span>
+							</div>
+						</div>
+						<div class="profile-group">
+							<span class="divider"></span> <span class="profile-name">닉네임:
+								<span th:text="${nickname}"></span>
+							</span>
+							<button id="logoutButton"
+								onclick="window.location.href='/user/logout'">로그아웃</button>
+							<!-- 관리자 페이지 버튼 -->
+							<button id="adminButton" style="display: none;"
+								onclick="window.location.href='/admin/adminpage'">관리자
+								페이지</button>
+						</div>
+					</div>
+				</div>
+			</nav>
 
 
-            <div class="content">
-                <!-- 캘린더 영역 -->
-                <div id='calendar'></div>
-                <!-- D-day 표시 섹션 -->
-                <div class="d-day-container">
-                    <div class="dday-buttons">
-                        <button id="select-event-btn">+</button>
-                        D- DAY
-                        <button id="custom-date-btn">*</button>
-                    </div>
-                    <div id="event-select-container" style="display: none;">
-                        <select id="event-select">
-                            <option value="">D-DAY를 선택하세요</option>
-                        </select>
-                    </div>
-                    <div id="custom-date-container" style="display: none;">
-                        <input type="date" id="custom-date-input" />
-                    </div>
-                    <div id="d-day-display"></div>
-                </div>
+			<div class="content">
+				<!-- 캘린더 영역 -->
+				<div id='calendar'></div>
+				<!-- D-day 표시 섹션 -->
+				<div class="d-day-container">
+					<div class="dday-buttons">
+						<button id="select-event-btn">+</button>
+						D- DAY
+						<button id="custom-date-btn">*</button>
+					</div>
+					<div id="event-select-container" style="display: none;">
+						<select id="event-select">
+							<option value="">D-DAY를 선택하세요</option>
+						</select>
+					</div>
+					<div id="custom-date-container" style="display: none;">
+						<input type="date" id="custom-date-input" />
+					</div>
+					<div id="d-day-display"></div>
+				</div>
 
-                <div class="all-events-container">
-                    <div class="date-navigation">
-                        <button id="prev-day"><</button>
-                        <span id="current-date"></span>
-                        <!-- 현재 날짜 표시 -->
-                        <button id="next-day">></button>
-                    </div>
-                    <ul id="event-list">
-                        <!-- 동적으로 오늘 일정이 표시됩니다. -->
-                    </ul>
-                </div>
-                
-                <!-- 모달 배경(작동시 필수) -->
-                <div id="modalBackdrop" onclick="closeNotificationModal()"></div>
+				<div class="all-events-container">
+					<div class="date-navigation">
+						<button id="prev-day"><</button>
+						<span id="current-date"></span>
+						<!-- 현재 날짜 표시 -->
+						<button id="next-day">></button>
+					</div>
+					<ul id="event-list">
+						<!-- 동적으로 오늘 일정이 표시됩니다. -->
+					</ul>
+				</div>
 
-                <!-- 알림 모달 -->
-                <div id="noti_modal" class="noti_modal">
-                    <div class="noti_modal-content">
-                        <span class="noti_close-button" onclick="closeNotificationModal()">&times;</span>
-                        <h3>현재 예정된 일정</h3>
-                        <ul id="notification-list"></ul>
-                    </div>
-                </div>
+				<!-- 모달 배경(작동시 필수) -->
+				<div id="modalBackdrop" onclick="closeNotificationModal()"></div>
 
-                <!-- 이벤트 추가 모달 -->
-                <div id="eventModal">
-                    <h3>もふもふ</h3>
-                    <label for="eventTitle">일정명:</label> <input type="text"
-                        id="eventTitle" required> <label>시작일자 및 시작시간:
-                        <button id="allDayButton">*</button>
-                    </label>
-                    <div class="time-container">
-                        <input type="date" id="startDate" required> <input
-                            type="time" id="startTime" required>
-                    </div>
-                    <label>종료일자 및 종료시간:</label>
-                    <div class="time-container">
-                        <input type="date" id="endDate" required> <input
-                            type="time" id="endTime" required>
-                    </div>
-                    <label for="eventDescription">일정내용:</label>
-                    <textarea id="eventDescription"></textarea>
+				<!-- 알림 모달 -->
+				<div id="noti_modal" class="noti_modal">
+					<div class="noti_modal-content">
+						<span class="noti_close-button" onclick="closeNotificationModal()">&times;</span>
+						<h3>현재 예정된 일정</h3>
+						<ul id="notification-list"></ul>
+					</div>
+				</div>
 
-                    <!-- 색상 선택 -->
-                    <label for="eventColorSelect">일정 종류:</label> <select
-                        id="eventColorSelect" onchange="selectColor(this.value)">
-                        <option value="#F08080" style="background-color: #F08080;" selected>병원예약</option>
-                        <option value="#FF9900" style="background-color: #FF9900;">약시간</option>
-                        <option value="#F3E591" style="background-color: #F3E591;">산책</option>
-                        <option value="#98FB98" style="background-color: #98FB98;">유치원</option>
-                        <option value="#87CEFA" style="background-color: #87CEFA;">중요</option>
-                        <option value="#8080FF" style="background-color: #8080FF;">기타</option>
-                    </select> <input type="hidden" id="eventColor" value="#F08080">
-                    <!-- 버튼을 같은 줄에 배치 -->
-                    <div class="button-container">
-                        <button id="addEventButton">일정등록</button>
-                        <button id="updateEventButton" style="display: none;">일정수정</button>
-                        <button id="deleteEventButton" style="display: none;">일정삭제</button>
-                        <button id="closeModal">취소</button>
-                    </div>
-                </div>
+				<!-- 이벤트 추가 모달 -->
+				<div id="eventModal">
+					<h3>もふもふ</h3>
+					<label for="eventTitle">일정명:</label> <input type="text"
+						id="eventTitle" required> <label>시작일자 및 시작시간:
+						<button id="allDayButton">*</button>
+					</label>
+					<div class="time-container">
+						<input type="date" id="startDate" required> <input
+							type="time" id="startTime" required>
+					</div>
+					<label>종료일자 및 종료시간:</label>
+					<div class="time-container">
+						<input type="date" id="endDate" required> <input
+							type="time" id="endTime" required>
+					</div>
+					<label for="eventDescription">일정내용:</label>
+					<textarea id="eventDescription"></textarea>
 
-                <!-- 필터끼리 보여주는 기능-->
-                <div id="filterDropdown" style="display: inline-block;">
-                    <select id="filterColor" onchange="filterByColor(this.value)">
-                        <option value="all">전체 보기</option>
-                        <option value="#F08080" style="background-color: #F08080;">병원예약</option>
-                        <option value="#FF9900" style="background-color: #FF9900;">약시간</option>
-                        <option value="#F3E591" style="background-color: #F3E591;">산책</option>
-                        <option value="#98FB98" style="background-color: #98FB98;">유치원</option>
-                        <option value="#87CEFA" style="background-color: #87CEFA;">중요</option>
-                        <option value="#8080FF" style="background-color: #8080FF;">기타</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-    </div>
-                <script src="/calendar/js/calander.js"></script>
-                <script src="/calendar/js/notifications.js"></script>
-                <script src="/calendar/js/dday.js"></script>
-                <script src="/calendar/js/event-list.js"></script> <!-- 추가된 JS -->
+					<!-- 색상 선택 -->
+					<label for="eventColorSelect">일정 종류:</label> <select
+						id="eventColorSelect" onchange="selectColor(this.value)">
+						<option value="#F08080" style="background-color: #F08080;"
+							selected>병원예약</option>
+						<option value="#FF9900" style="background-color: #FF9900;">약시간</option>
+						<option value="#F3E591" style="background-color: #F3E591;">산책</option>
+						<option value="#98FB98" style="background-color: #98FB98;">유치원</option>
+						<option value="#87CEFA" style="background-color: #87CEFA;">중요</option>
+						<option value="#8080FF" style="background-color: #8080FF;">기타</option>
+					</select>
+					
+					<!-- 반려동물 -->
+					<input type="hidden" id="eventColor" value="#F08080"> <label
+						for="petSelect">반려동물 선택:</label> <select id="petSelect">
+						<option value="">반려동물 없음</option>
+					</select>
+
+					<!-- 버튼을 같은 줄에 배치 -->
+					<div class="button-container">
+						<button id="addEventButton">일정등록</button>
+						<button id="updateEventButton" style="display: none;">일정수정</button>
+						<button id="deleteEventButton" style="display: none;">일정삭제</button>
+						<button id="closeModal">취소</button>
+					</div>
+				</div>
+
+				<!-- 필터끼리 보여주는 기능-->
+				<div id="filterDropdown" style="display: inline-block;">
+					<select id="filterColor" onchange="filterByColor(this.value)">
+						<option value="all">전체 보기</option>
+						<option value="#F08080" style="background-color: #F08080;">병원예약</option>
+						<option value="#FF9900" style="background-color: #FF9900;">약시간</option>
+						<option value="#F3E591" style="background-color: #F3E591;">산책</option>
+						<option value="#98FB98" style="background-color: #98FB98;">유치원</option>
+						<option value="#87CEFA" style="background-color: #87CEFA;">중요</option>
+						<option value="#8080FF" style="background-color: #8080FF;">기타</option>
+					</select>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script src="/calendar/js/calander.js"></script>
+	<script src="/calendar/js/notifications.js"></script>
+	<script src="/calendar/js/dday.js"></script>
+	<script src="/calendar/js/event-list.js"></script>
 </body>
 </html>

@@ -13,13 +13,13 @@
     border-radius: 12px;
     background: linear-gradient(135deg, #f5f7fa, #e2ebf0);
     transition: transform 0.2s, box-shadow 0.2s;
-    position: absolute;
+    position: fixed;
     right: 20px;
     top: 90px;
 }
 
 .d-day-container:hover {
-    transform: translateY(-5px);
+    transform: none;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
 

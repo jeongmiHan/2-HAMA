@@ -1,0 +1,86 @@
+/* 공통 컨테이너 스타일 */
+body {
+    line-height: 1.6;
+    padding: 0;
+}
+
+.board-container {
+    max-width: 1200px;
+    margin: 10px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* 제목 스타일 */
+.board-container h3 {
+    text-align: center;
+    font-size: 1.5em;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+
+/* 라벨 스타일 */
+.board-container .form-group label {
+    display: block;
+    font-size: 1em;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #555;
+}
+
+
+/* 버튼 스타일 */
+.board-container .submit-button {
+    display: block;
+    width: 100%;
+    background: #007BFF;
+    font-size: 1em;
+    font-weight: bold;
+    padding: 10px 0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: center;
+    margin-top: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.board-container .submit-button:hover {
+    background: #0056b3;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+table th, table td {
+    text-align: left;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    vertical-align: top;
+}
+
+table th {
+    width: 20%;
+    background-color: #f5f5f5;
+    color: #666;
+    font-weight: bold;
+}
+
+textarea, input[type="text"], input[type="file"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1em;
+}
+
+textarea {
+    resize: vertical;
+}
+

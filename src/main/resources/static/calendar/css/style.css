@@ -185,3 +185,16 @@ body {
   margin-bottom: 20px;
   color: #333;
 }
+
+/*알람 아이콘*/
+.navbar-icons {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+/*사이 회색 선*/
+.divider {
+  width: 1px;
+  height: 30px;
+  background-color: #ddd;
+}
