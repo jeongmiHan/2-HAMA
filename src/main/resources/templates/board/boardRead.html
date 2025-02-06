@@ -88,7 +88,7 @@
     <!-- 첨부파일 -->
     <span th:if="${file}">
         <i class="fas fa-paperclip"></i>
-        <a th:href="@{/board/board/download/{id}(id=${file.attachedFileId})}" th:text="${file.original_filename}" class="file-link">첨부파일</a>
+        <a th:href="@{/board/download/{id}(id=${file.attachedFileId})}" th:text="${file.original_filename}" class="file-link">첨부파일</a>
     </span>
 </div>
         
