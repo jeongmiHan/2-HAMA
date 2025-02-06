@@ -245,14 +245,26 @@ public class ReplyController {
 
     private boolean isAccessibleReply(Reply reply, User currentUser) {
         if (!reply.isSecret()) {
-            return true; // 공개 댓글은 접근 가능
+            return true; // 공개 댓글과 공개 대댓글은 모두 접근 가능
         }
+
         if (currentUser == null) {
-            return false; // 비로그인 사용자는 비밀댓글 접근 불가
+            return false; // 비로그인 사용자는 비밀 댓글 및 비밀 대댓글 접근 불가
         }
-        return reply.getUser().getUserId().equals(currentUser.getUserId()) || // 댓글 작성자
-               reply.getBoard().getUser().getUserId().equals(currentUser.getUserId()); // 게시글 작성자
+
+        if (reply.getParentReply() == null) {
+            // 부모 댓글이 없는 경우 (즉, 일반 댓글)
+            // 비밀 댓글이라면 댓글 작성자와 게시글 작성자만 접근 가능
+            return reply.getUser().getUserId().equals(currentUser.getUserId()) ||
+                   reply.getBoard().getUser().getUserId().equals(currentUser.getUserId());
+        } else {
+            // 부모 댓글이 있는 경우 (즉, 대댓글)
+            // 비밀 대댓글이라면 대댓글 작성자와 부모 댓글 작성자만 접근 가능
+            return reply.getUser().getUserId().equals(currentUser.getUserId()) ||
+                   reply.getParentReply().getUser().getUserId().equals(currentUser.getUserId());
+        }
     }
+
 
 
 
