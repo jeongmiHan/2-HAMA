@@ -215,7 +215,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		imageInput.value = '';
 		saveButton.dataset.mode = 'edit';
 		saveButton.dataset.petId = petId;
-		popup.style.display = 'block';
+		popup.style.display = 'flex';
 	}
 
 	// 프로필 업데이트
