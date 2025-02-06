@@ -58,8 +58,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 				</div>
 			    <div class="logPostTime">${post.timeAgo}</div>
 			</div>
-			<div class="logPostContent" data-id="${post.id}">${displayContent}</div>
-			${imagesHtml}
+			<div class="logPostContentWrapper">
+			    <div class="logPostContent" data-id="${post.id}">${displayContent}</div>
+			    ${imagesHtml}
+			</div>
 			<div class="logPostFooter">
 			    <div class="logPostComment" onclick="navigateToLogDetail(this)">
 					<i class="fas fa-comment"></i>

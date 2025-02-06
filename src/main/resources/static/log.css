@@ -331,7 +331,7 @@ form#uploadForm {
   border: 1px solid #ddd;
   border-radius: 12px; /* 모서리 둥글게 */
   margin-bottom: 20px; /* 게시물 간 여백 */
-  padding: 10px 15px 0;
+  padding: 10px 15px 0 ;
   background-color: #fff;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* 카드형 스타일 */
 }
@@ -361,10 +361,18 @@ form#uploadForm {
 }
 
 .logPostTime {
-  font-size: 14px;
+  font-size: 12px;
   color: #aaa;
 }
 
+.logPostContentWrapper {
+  display: flex;
+  justify-content: space-between; /* 텍스트를 왼쪽 정렬 */
+  align-items: flex-start; /* 세로 정렬도 왼쪽으로 */
+  gap: 15px; /* 간격 조정 */
+  width: 100%;
+  
+}
 /* 일기 본문 */
 .logPostContent {
   margin: 15px 0;
@@ -372,8 +380,19 @@ form#uploadForm {
   font-size: 16px;
   line-height: 1.5;
   color: #333;
-  text-align: left;
-  white-space: pre-wrap; /* 공백과 줄바꿈을 그대로 유지 */
+  text-align: left; /* 왼쪽 정렬 */
+  display: inline-block; /* 줄바꿈을 유지 */
+  white-space: pre-wrap; /* 공백과 줄바꿈을 유지 */
+  flex: 1; /* 남은 공간을 텍스트가 차지 */
+}
+/* 게시물 이미지 스타일 */
+.logPostImage {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 5px;
+  position: absolute;
+  right: 50px;
 }
 
 /* Footer 섹션 */
@@ -469,24 +488,6 @@ form#uploadForm {
 .reply-item[data-parent-reply-id] {
     padding-left: 40px; /* 자식 댓글은 더 깊게 들여쓰기 */
 }
-
-/* 게시물 이미지 스타일 */
-.logPostImage {
-  width: 70px;
-  height: 70px;
-  object-fit: cover;
-  border-radius: 5px;
-  position: absolute;
-  top: 40px;
-  right: 10px;
-}
-
-.logPostImageWrapper img {
-    width: 120px; /* 원하는 크기 */
-    height: auto;
-    object-fit: contain;
-}
-
 
 /* 모달 기본 스타일 */
 /* 기본 스타일 */
