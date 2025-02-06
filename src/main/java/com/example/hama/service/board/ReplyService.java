@@ -29,7 +29,7 @@ public class ReplyService {
     private final LikesRepository likesRepository;
 
     public ReplyService(ReplyRepository replyRepository, BoardRepository boardRepository
-    		, UserRepository userRepository, LikesRepository likesRepository) {
+          , UserRepository userRepository, LikesRepository likesRepository) {
         this.replyRepository = replyRepository;
         this.boardRepository = boardRepository;
         this.userRepository = userRepository;
@@ -59,7 +59,7 @@ public class ReplyService {
 
     // 특정 게시글의 댓글 목록 가져오기
     public List<Reply> getRepliesByBoardId(Long boardId) {
-    	List<Reply> replies = replyRepository.findByBoardBoardId(boardId);
+       List<Reply> replies = replyRepository.findByBoardBoardId(boardId);
         
         // 각 댓글에 대해 대댓글을 조회
         for (Reply reply : replies) {
@@ -101,95 +101,52 @@ public class ReplyService {
     }
 
 
-    public String addLike(Long replyId, User user) {
-        try {
-            Optional<likes> existingLike = likesRepository.findByUser_UserIdAndReply_ReplyId(user.getUserId(), replyId);
+    public Map<String, Object> toggleLike(Long replyId, User user) {
+        Map<String, Object> response = new HashMap<>();
 
-            if (existingLike.isPresent()) {
-                return "이미 좋아요를 눌렀습니다.";
-            }
+        // ✅ 현재 댓글 가져오기
+        Reply reply = replyRepository.findById(replyId)
+                .orElseThrow(() -> new IllegalArgumentException("댓글이 존재하지 않습니다. ID: " + replyId));
 
-            Reply reply = replyRepository.findById(replyId)
-                    .orElseThrow(() -> new IllegalArgumentException("댓글이 존재하지 않습니다. ID: " + replyId));
+        // ✅ 좋아요 여부 확인
+        Optional<likes> existingLike = likesRepository.findByUserAndReply(user, reply);
 
-            likes like = new likes();
-            like.setReply(reply);
-            like.setUser(user);
+        if (existingLike.isPresent()) {
+            // ✅ 좋아요 취소
+            likesRepository.delete(existingLike.get());
+            response.put("isLiked", false); // 🤍
+        } else {
+            // ✅ 좋아요 추가
+            likes newLike = new likes();
+            newLike.setReply(reply);
+            newLike.setUser(user);
+            likesRepository.save(newLike);
 
-            likesRepository.save(like);
-
-            return "좋아요를 추가했습니다.";
-        } catch (Exception e) {
-            System.err.println("좋아요 처리 중 오류 발생: " + e.getMessage());
-            e.printStackTrace(); // 자세한 스택 추적 출력
-            throw new RuntimeException("좋아요 처리 중 오류 발생: " + e.getMessage());
-        }
-    }
-
-
-    // 좋아요 제거
-    public String removeLike(Long replyId, User user) {
-        Optional<likes> existingLike = likesRepository.findByUser_UserIdAndReply_ReplyId(user.getUserId(), replyId);
-
-        if (existingLike.isEmpty()) {
-            return "좋아요를 누르지 않았습니다.";
+            response.put("isLiked", true); // ❤️
         }
 
-        likesRepository.delete(existingLike.get());
+        // ✅ 최신 좋아요 개수 조회
+        int likeCount = likesRepository.countByReply_ReplyId(replyId);
+        response.put("likeCount", likeCount);
 
-        return "좋아요를 취소했습니다.";
-    }
-
-    // 특정 댓글의 좋아요 개수 조회
-    public int getLikeCount(Long replyId) {
-        return likesRepository.countByReply_ReplyId(replyId);
+        return response;
     }
     
-    public List<ReplyDto> getReplies(Long boardId, String currentUserId) {
-        List<Reply> replies = replyRepository.findByBoardBoardId(boardId);
+    
+    public boolean isLikedByUser(Long replyId, User currentUser) {
+        if (currentUser == null) {
+            return false; // 로그인하지 않은 사용자는 기본적으로 좋아요 X
+        }
 
-        return replies.stream().map(reply -> {
-            boolean isAccessible = isAccessibleReply(reply, currentUserId);
-            return new ReplyDto(
-                reply.getReplyId(),
-                isAccessible ? reply.getRpContent() : "비밀댓글입니다.",
-                reply.getUser().getName(),
-                reply.getUser().getUserId(),
-                reply.getLikeCount(),
-                reply.isLikedByUser(currentUserId),
-                getChildReplies(reply, currentUserId),
-                reply.getRpCreatedTime(),
-                reply.isSecret(),  // 비밀댓글 여부
-                isAccessible       // 접근 가능 여부
-            );
-        }).collect(Collectors.toList());
+        // ✅ 댓글 정보 가져오기
+        Reply reply = replyRepository.findById(replyId)
+                .orElseThrow(() -> new IllegalArgumentException("댓글이 존재하지 않습니다. ID: " + replyId));
+
+        // ✅ 좋아요 여부 확인
+        return likesRepository.findByUserAndReply(currentUser, reply).isPresent();
     }
 
-    private boolean isAccessibleReply(Reply reply, String currentUserId) {
-        return reply.isSecret()
-            ? reply.getUser().getUserId().equals(currentUserId) ||
-              reply.getBoard().getUser().getUserId().equals(currentUserId)
-            : true;
-    }
 
-    private List<ReplyDto> getChildReplies(Reply parentReply, String currentUserId) {
-        return parentReply.getChildReplies().stream()
-            .map(childReply -> {
-                boolean isAccessible = isAccessibleReply(childReply, currentUserId);
-                return new ReplyDto(
-                    childReply.getReplyId(),
-                    isAccessible ? childReply.getRpContent() : "비밀댓글입니다.",
-                    childReply.getUser().getName(),
-                    childReply.getUser().getUserId(),
-                    childReply.getLikeCount(),
-                    childReply.isLikedByUser(currentUserId),
-                    getChildReplies(childReply, currentUserId),
-                    childReply.getRpCreatedTime(),
-                    childReply.isSecret(),  // 비밀댓글 여부
-                    isAccessible            // 접근 가능 여부
-                );
-            }).collect(Collectors.toList());
-    }
 
 
 }

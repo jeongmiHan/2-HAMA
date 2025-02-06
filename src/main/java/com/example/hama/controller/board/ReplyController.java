@@ -31,8 +31,8 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class ReplyController {
-	
-	private final UserService userService;
+   
+   private final UserService userService;
     private final BoardRepository boardRepository;
     private final ReplyRepository replyRepository;
     private final ReplyService replyService;
@@ -188,36 +188,18 @@ public class ReplyController {
     }
     
     
- // 좋아요 추가
     @PostMapping("{replyId}/like")
-    public ResponseEntity<String> addLike(@PathVariable("replyId") Long replyId) {
+    public ResponseEntity<Map<String, Object>> toggleLike(@PathVariable("replyId") Long replyId) {
         User currentUser = getAuthenticatedUser();
         if (currentUser == null) {
-            return ResponseEntity.status(401).body("로그인이 필요합니다.");
+            return ResponseEntity.status(401).body(Map.of("error", "로그인이 필요합니다."));
         }
 
-        String result = replyService.addLike(replyId, currentUser);
+        Map<String, Object> result = replyService.toggleLike(replyId, currentUser);
         return ResponseEntity.ok(result);
     }
 
-    // 좋아요 제거
-    @DeleteMapping("{replyId}/like")
-    public ResponseEntity<String> removeLike(@PathVariable("replyId") Long replyId) {
-        User currentUser = getAuthenticatedUser();
-        if (currentUser == null) {
-            return ResponseEntity.status(401).body("로그인이 필요합니다.");
-        }
 
-        String result = replyService.removeLike(replyId, currentUser);
-        return ResponseEntity.ok(result);
-    }
-
-    // 좋아요 개수 조회
-    @GetMapping("{replyId}/like-count")
-    public ResponseEntity<Integer> getLikeCount(@PathVariable("replyId") Long replyId) {
-        int likeCount = replyService.getLikeCount(replyId);
-        return ResponseEntity.ok(likeCount);
-    }
 
     
     private User getAuthenticatedUser() {
