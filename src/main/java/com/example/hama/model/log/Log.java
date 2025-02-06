@@ -64,7 +64,7 @@ public class Log {
 
     @OneToMany(mappedBy = "log", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference // 부모 객체 직렬화
-    private List<Reply> replies = new ArrayList<>(); // 댓글 목록
+    private List<LogReply> logReplies = new ArrayList<>(); // 댓글 목록
 
     @OneToMany(mappedBy = "log", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference // 순환 참조 방지

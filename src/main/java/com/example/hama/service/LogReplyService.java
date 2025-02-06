@@ -7,12 +7,12 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class ReplyService {
+public class LogReplyService {
 	
     private final LogReplyRepository logReplyRepository;
 
     // 댓글 수 가져오기
-    public Long getReplyCount(Long logId) {
+    public Long getLogReplyCount(Long logId) {
         return logReplyRepository.countRepliesByLogId(logId);
     }
 }

@@ -3,7 +3,7 @@ package com.example.hama.dto;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.example.hama.model.log.Reply;
+import com.example.hama.model.log.LogReply;
 import com.example.hama.model.user.User;
 import com.example.hama.util.SNSTime;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -36,29 +36,29 @@ public class ReplyDTO {
 	private User user;	   //사용자
     
 
-    public ReplyDTO(Reply reply) {
-        this.id = reply.getLogReplyId();
-        this.logReplyContent = reply.getLogReplyContent();
-        this.author = reply.getUser().getName();
-        this.parentReplyId = (reply.getParentReply() != null) ? reply.getParentReply().getLogReplyId() : null;
-        this.timeAgo = SNSTime.getTimeAgo(reply.getLogCreatedTime());
+    public ReplyDTO(LogReply logReply) {
+        this.id = logReply.getLogReplyId();
+        this.logReplyContent = logReply.getLogReplyContent();
+        this.author = logReply.getUser().getName();
+        this.parentReplyId = (logReply.getParentReply() != null) ? logReply.getParentReply().getLogReplyId() : null;
+        this.timeAgo = SNSTime.getTimeAgo(logReply.getLogCreatedTime());
     }
-    public ReplyDTO(Reply reply, User currentUser) {
-        this.id = reply.getLogReplyId();
-        this.logReplyContent = reply.getLogReplyContent();
-        this.author = reply.getUser() != null ? reply.getUser().getName() : "익명"; // 작성자 이름 설정
-        this.parentReplyId = (reply.getParentReply() != null) ? reply.getParentReply().getLogReplyId() : null;
-        this.timeAgo = SNSTime.getTimeAgo(reply.getLogCreatedTime());
-        this.isAuthor = currentUser != null && reply.getUser().getUserId().equals(currentUser.getUserId()); // 현재 로그인한 사용자와 댓글 작성자 비교
+    public ReplyDTO(LogReply logReply, User currentUser) {
+        this.id = logReply.getLogReplyId();
+        this.logReplyContent = logReply.getLogReplyContent();
+        this.author = logReply.getUser() != null ? logReply.getUser().getName() : "익명"; // 작성자 이름 설정
+        this.parentReplyId = (logReply.getParentReply() != null) ? logReply.getParentReply().getLogReplyId() : null;
+        this.timeAgo = SNSTime.getTimeAgo(logReply.getLogCreatedTime());
+        this.isAuthor = currentUser != null && logReply.getUser().getUserId().equals(currentUser.getUserId()); // 현재 로그인한 사용자와 댓글 작성자 비교
     }
     // currentUser를 받아 작성자인지 판단하는 생성자
-    public ReplyDTO(Reply reply, User currentUser, int likeCount) {
-        this.id = reply.getLogReplyId();
-        this.logReplyContent = reply.getLogReplyContent();
-        this.author = reply.getUser() != null ? reply.getUser().getName() : "익명"; // 작성자 이름 설정
-        this.parentReplyId = (reply.getParentReply() != null) ? reply.getParentReply().getLogReplyId() : null;
-        this.timeAgo = SNSTime.getTimeAgo(reply.getLogCreatedTime());
-        this.isAuthor = currentUser != null && reply.getUser().getUserId().equals(currentUser.getUserId()); // 현재 로그인한 사용자와 댓글 작성자 비교
+    public ReplyDTO(LogReply logReply, User currentUser, int likeCount) {
+        this.id = logReply.getLogReplyId();
+        this.logReplyContent = logReply.getLogReplyContent();
+        this.author = logReply.getUser() != null ? logReply.getUser().getName() : "익명"; // 작성자 이름 설정
+        this.parentReplyId = (logReply.getParentReply() != null) ? logReply.getParentReply().getLogReplyId() : null;
+        this.timeAgo = SNSTime.getTimeAgo(logReply.getLogCreatedTime());
+        this.isAuthor = currentUser != null && logReply.getUser().getUserId().equals(currentUser.getUserId()); // 현재 로그인한 사용자와 댓글 작성자 비교
         this.likeCount = likeCount; // 좋아요 개수 설정
     }
 }

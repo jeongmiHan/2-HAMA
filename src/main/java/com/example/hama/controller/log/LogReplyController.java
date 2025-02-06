@@ -28,7 +28,7 @@ import com.example.hama.dto.ReplyDTO;
 import com.example.hama.model.log.Log;
 import com.example.hama.model.log.LogLikes;
 import com.example.hama.model.log.LogReplyLikes;
-import com.example.hama.model.log.Reply;
+import com.example.hama.model.log.LogReply;
 import com.example.hama.model.user.User;
 import com.example.hama.repository.LogRepository;
 import com.example.hama.repository.UserRepository;
@@ -42,7 +42,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("reply")
 @RequiredArgsConstructor
-public class ReplyController {
+public class LogReplyController {
 	
 	private final LogRepository logRepository;
 	private final LogLikeRepository logLikeRepository;
@@ -85,21 +85,21 @@ public class ReplyController {
 	                .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
 
 	        // 댓글 객체 생성
-	        Reply reply = new Reply();
-	        reply.setUser(currentUser);
-	        reply.setLog(log);
-	        reply.setLogReplyContent(logReplyContent);
-	        reply.setLogCreatedTime(LocalDateTime.now());
-	        reply.setAuthor(currentUser.getUserId().equals(reply.getUser().getUserId())); // 댓글 작성자 여부 체크
+	        LogReply logReply = new LogReply();
+	        logReply.setUser(currentUser);
+	        logReply.setLog(log);
+	        logReply.setLogReplyContent(logReplyContent);
+	        logReply.setLogCreatedTime(LocalDateTime.now());
+	        logReply.setAuthor(currentUser.getUserId().equals(logReply.getUser().getUserId())); // 댓글 작성자 여부 체크
 
 	        // 부모 댓글 검증 및 설정
 	        if (parentReplyId != null) {
-	            Reply parentReply = logReplyRepository.findById(parentReplyId)
+	            LogReply parentReply = logReplyRepository.findById(parentReplyId)
 	                    .orElseThrow(() -> new IllegalArgumentException("부모 댓글이 존재하지 않습니다."));
-	            reply.setParentReply(parentReply);
+	            logReply.setParentReply(parentReply);
 	        }
 
-	        Reply savedReply = logReplyRepository.save(reply);
+	        LogReply savedReply = logReplyRepository.save(logReply);
 
 	        return ResponseEntity.ok(Map.of(
 	                "status", "success",
@@ -119,16 +119,16 @@ public class ReplyController {
 	        }
 
 	        // 댓글 조회
-	        Reply reply = logReplyRepository.findById(replyId)
+	        LogReply logReply = logReplyRepository.findById(replyId)
 	                .orElseThrow(() -> new IllegalArgumentException("댓글이 존재하지 않습니다."));
 
 	        // 댓글 삭제 상태로 변경 (isDeleted 추가 가정)
-	        reply.setDeleted(true); // 삭제 상태 플래그 설정
-	        reply.setLogReplyContent("댓글이 삭제되었습니다."); // 내용 변경
-	        logReplyRepository.save(reply); // DB 저장
+	        logReply.setDeleted(true); // 삭제 상태 플래그 설정
+	        logReply.setLogReplyContent("댓글이 삭제되었습니다."); // 내용 변경
+	        logReplyRepository.save(logReply); // DB 저장
 
 	        // 댓글 수 동기화
-	        Log log = reply.getLog();
+	        Log log = logReply.getLog();
 	        log.setLogComments(logReplyRepository.countRepliesByLogId(log.getLogId()).intValue());
 	        logRepository.save(log);
 
@@ -142,7 +142,7 @@ public class ReplyController {
 	@PostMapping("/log/{replyId}/like")
 	public ResponseEntity<?> toggleReplyLike(@PathVariable("replyId") Long replyId) {
 	    try {
-	        Reply reply = logReplyRepository.findById(replyId)
+	        LogReply logReply = logReplyRepository.findById(replyId)
 	                .orElseThrow(() -> new IllegalArgumentException("댓글이 존재하지 않습니다."));
 
 	        User user = getAuthenticatedUser();
@@ -155,20 +155,20 @@ public class ReplyController {
 	                .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
 	        // 댓글에 대한 좋아요 상태 확인 및 토글
-	        Optional<LogReplyLikes> existingLikeOpt = logReplyLikeRepository.findByUserAndReply(user, reply);
+	        Optional<LogReplyLikes> existingLikeOpt = logReplyLikeRepository.findByUserAndLogReply(user, logReply);
 	        boolean isLiked;
 
 	        if (existingLikeOpt.isPresent()) {
 	            logReplyLikeRepository.delete(existingLikeOpt.get()); // 좋아요 취소
 	            isLiked = false;
 	        } else {
-	            LogReplyLikes newLike = new LogReplyLikes(user, reply);
+	            LogReplyLikes newLike = new LogReplyLikes(user, logReply);
 	            logReplyLikeRepository.save(newLike); // 좋아요 추가
 	            isLiked = true;
 	        }
 
 	        // 댓글의 총 좋아요 수 계산
-	        int totalLikes = logReplyLikeRepository.countByReply(reply);
+	        int totalLikes = logReplyLikeRepository.countByLogReply(logReply);
 
 	        return ResponseEntity.ok(Map.of(
 	                "isLiked", isLiked,
@@ -205,8 +205,8 @@ public class ReplyController {
 	        if(currentUser == null) {
 	    	    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
 	        }
-	        List<Reply> replies = logReplyRepository.findByLog(log);
-	        List<ReplyDTO> replyHierarchy = buildReplyHierarchy(replies, currentUser);
+	        List<LogReply> logReplies = logReplyRepository.findByLog(log);
+	        List<ReplyDTO> replyHierarchy = buildReplyHierarchy(logReplies, currentUser);
 	        return ResponseEntity.ok(Map.of("status", "success", "replies", replyHierarchy));
 	    } catch (Exception e) {
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -214,13 +214,13 @@ public class ReplyController {
 	    }
 	}
     // 댓글 ID를 기준으로 매핑
-	private List<ReplyDTO> buildReplyHierarchy(List<Reply> replies, User currentUser) {
+	private List<ReplyDTO> buildReplyHierarchy(List<LogReply> logReplies, User currentUser) {
 	    Map<Long, ReplyDTO> replyMap = new HashMap<>();
 	    List<ReplyDTO> roots = new ArrayList<>();
 
-	    for (Reply reply : replies) {
-	        int likeCount = logReplyLikeRepository.countByReply(reply);
-	        ReplyDTO dto = new ReplyDTO(reply, currentUser, likeCount);
+	    for (LogReply logReply : logReplies) {
+	        int likeCount = logReplyLikeRepository.countByLogReply(logReply);
+	        ReplyDTO dto = new ReplyDTO(logReply, currentUser, likeCount);
 	        replyMap.put(dto.getId(), dto);
 	    }
 
@@ -245,7 +245,7 @@ public class ReplyController {
 	public ResponseEntity<?> editReply(@PathVariable("replyId") Long replyId, @RequestBody Map<String, String> request) {
 	    try {
 	        // 댓글 조회
-	        Reply reply = logReplyRepository.findById(replyId)
+	        LogReply logReply = logReplyRepository.findById(replyId)
 	                .orElseThrow(() -> new IllegalArgumentException("댓글이 존재하지 않습니다."));
 
 	        // 댓글 내용 수정
@@ -253,8 +253,8 @@ public class ReplyController {
 	        if (newContent == null || newContent.trim().isEmpty()) {
 	            throw new IllegalArgumentException("수정할 내용이 비어있습니다.");
 	        }
-	        reply.setLogReplyContent(newContent);
-	        logReplyRepository.save(reply); // 저장
+	        logReply.setLogReplyContent(newContent);
+	        logReplyRepository.save(logReply); // 저장
 
 	        return ResponseEntity.ok(Map.of("status", "success", "message", "댓글 수정 완료"));
 	    } catch (Exception e) {

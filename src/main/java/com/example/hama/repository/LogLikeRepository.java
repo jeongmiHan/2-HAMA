@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import com.example.hama.model.log.Log;
 import com.example.hama.model.log.LogLikes;
-import com.example.hama.model.log.Reply;
+import com.example.hama.model.log.LogReply;
 import com.example.hama.model.user.User;
 
 @Repository

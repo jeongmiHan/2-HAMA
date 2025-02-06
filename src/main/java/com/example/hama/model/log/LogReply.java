@@ -24,7 +24,7 @@ import lombok.Data;
 
 @Data
 @Entity
-public class Reply {
+public class LogReply {
 	
 	@Id
 	@Column(name="log_reply_id")
@@ -48,11 +48,11 @@ public class Reply {
 	@ManyToOne
 	@JoinColumn(name = "parent_reply_id")
 	@JsonBackReference // 부모 댓글 참조 시 직렬화 제외
-	private Reply parentReply;
+	private LogReply parentReply;
 
 	@OneToMany(mappedBy = "parentReply", cascade = CascadeType.ALL, orphanRemoval = true)
 	@JsonManagedReference // 자식 댓글 직렬화 포함
-	private List<Reply> childReplies = new ArrayList<>();
+	private List<LogReply> childReplies = new ArrayList<>();
 	
 	// 권한이 있으면 true
 	@Transient
