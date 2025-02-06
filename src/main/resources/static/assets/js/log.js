@@ -333,4 +333,34 @@ document.addEventListener("DOMContentLoaded", async () => {
 	
 });
 
+//페이지 로드 시 사용자 위치를 가져와 장소추천 버튼에 쿼리 추가
+document.addEventListener('DOMContentLoaded', function () {
+    const recommendLink = document.querySelector('.navbar-menu li a[href="/location/locationList"]');
 
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            function (position) {
+                const userLat = position.coords.latitude;
+                const userLng = position.coords.longitude;
+
+                // 장소추천 링크 클릭 시 좌표 포함 URL로 이동
+                recommendLink.onclick = function (event) {
+                    event.preventDefault(); // 기본 동작 막기
+                    location.href = `/location/locationList?userLat=${userLat}&userLng=${userLng}&region=ALL&category=ALL&filter=default`;
+                };
+            },
+            function (error) {
+                console.error("위치 정보를 가져올 수 없습니다:", error);
+                // 위치 정보를 가져오지 못하면 기본 URL로 이동
+                recommendLink.onclick = function () {
+                    location.href = `/location/locationList`;
+                };
+            }
+        );
+    } else {
+        console.error("브라우저가 위치 정보를 지원하지 않습니다.");
+        recommendLink.onclick = function () {
+            location.href = `/location/locationList`;
+        };
+    }
+});
