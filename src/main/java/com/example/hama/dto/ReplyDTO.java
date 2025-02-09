@@ -26,6 +26,8 @@ public class ReplyDTO {
     private String author; // 댓글 작성자 이름
     private String timeAgo; // 상대 시간 표시
     private int likeCount;
+    @JsonProperty("isLiked") // JSON 응답에서 "isLiked"로 출력
+    private boolean isLiked;
     @JsonProperty("isAuthor") // JSON 응답에서 "isAuthor"로 출력
     private boolean isAuthor; // 댓글 작성자인지 여부
     private List<ReplyDTO> childReplies = new ArrayList<>(); // 자식 댓글
@@ -52,13 +54,15 @@ public class ReplyDTO {
         this.isAuthor = currentUser != null && logReply.getUser().getUserId().equals(currentUser.getUserId()); // 현재 로그인한 사용자와 댓글 작성자 비교
     }
     // currentUser를 받아 작성자인지 판단하는 생성자
-    public ReplyDTO(LogReply logReply, User currentUser, int likeCount) {
+    public ReplyDTO(LogReply logReply, User currentUser, int likeCount, boolean isLiked) {
         this.id = logReply.getLogReplyId();
         this.logReplyContent = logReply.getLogReplyContent();
-        this.author = logReply.getUser() != null ? logReply.getUser().getName() : "익명"; // 작성자 이름 설정
+        this.author = logReply.getUser() != null ? logReply.getUser().getName() : "익명";
         this.parentReplyId = (logReply.getParentReply() != null) ? logReply.getParentReply().getLogReplyId() : null;
         this.timeAgo = SNSTime.getTimeAgo(logReply.getLogCreatedTime());
-        this.isAuthor = currentUser != null && logReply.getUser().getUserId().equals(currentUser.getUserId()); // 현재 로그인한 사용자와 댓글 작성자 비교
-        this.likeCount = likeCount; // 좋아요 개수 설정
+        this.isAuthor = currentUser != null && logReply.getUser().getUserId().equals(currentUser.getUserId());
+        this.likeCount = likeCount;
+        this.isLiked = isLiked; // 사용자의 좋아요 여부 추가
     }
+    
 }

@@ -139,7 +139,6 @@ public class LogReplyController {
 	    }
 	}
 	// 댓글 좋아요
-
 	@PostMapping("/log/{replyId}/like")
 	public ResponseEntity<?> toggleReplyLike(@PathVariable("replyId") Long replyId) {
 	    try {
@@ -168,9 +167,12 @@ public class LogReplyController {
 	        }
 
 	        int totalLikes = logReplyLikeRepository.countByLogReply(logReply);
+	        
+	        // 현재 사용자의 좋아요 여부를 다시 조회
+	        boolean finalLikedStatus = logReplyLikeRepository.findByUserAndLogReply(user, logReply).isPresent();
 
 	        return ResponseEntity.ok(Map.of(
-	                "isLiked", isLiked,
+	                "isLiked", finalLikedStatus,
 	                "totalLikes", totalLikes
 	        ));
 	    } catch (Exception e) {
@@ -178,6 +180,7 @@ public class LogReplyController {
 	                .body("댓글 좋아요 처리 중 오류 발생: " + e.getMessage());
 	    }
 	}
+
 
 
 
@@ -213,14 +216,14 @@ public class LogReplyController {
 	                .body(Map.of("status", "error", "message", "댓글 조회 실패" + e.getMessage()));
 	    }
 	}
-    // 댓글 ID를 기준으로 매핑
 	private List<ReplyDTO> buildReplyHierarchy(List<LogReply> logReplies, User currentUser) {
 	    Map<Long, ReplyDTO> replyMap = new HashMap<>();
 	    List<ReplyDTO> roots = new ArrayList<>();
 
 	    for (LogReply logReply : logReplies) {
 	        int likeCount = logReplyLikeRepository.countByLogReply(logReply);
-	        ReplyDTO dto = new ReplyDTO(logReply, currentUser, likeCount);
+	        boolean isLiked = logReplyLikeRepository.findByUserAndLogReply(currentUser, logReply).isPresent(); // 사용자가 좋아요 눌렀는지 확인
+	        ReplyDTO dto = new ReplyDTO(logReply, currentUser, likeCount, isLiked);
 	        replyMap.put(dto.getId(), dto);
 	    }
 
@@ -238,6 +241,7 @@ public class LogReplyController {
 	    }
 	    return roots;
 	}
+
 
 
 
