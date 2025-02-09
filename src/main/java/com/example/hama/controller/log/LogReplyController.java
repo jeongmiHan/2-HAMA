@@ -139,9 +139,14 @@ public class LogReplyController {
 	    }
 	}
 	// 댓글 좋아요
+
 	@PostMapping("/log/{replyId}/like")
 	public ResponseEntity<?> toggleReplyLike(@PathVariable("replyId") Long replyId) {
 	    try {
+	        if (replyId == null) {
+	            throw new IllegalArgumentException("댓글 ID가 유효하지 않습니다.");
+	        }
+
 	        LogReply logReply = logReplyRepository.findById(replyId)
 	                .orElseThrow(() -> new IllegalArgumentException("댓글이 존재하지 않습니다."));
 
@@ -150,24 +155,18 @@ public class LogReplyController {
 	            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
 	        }
 
-	        // 명시적으로 User 엔티티 로드
-	        user = userRepository.findById(user.getUserId())
-	                .orElseThrow(() -> new IllegalArgumentException("User not found"));
-
-	        // 댓글에 대한 좋아요 상태 확인 및 토글
 	        Optional<LogReplyLikes> existingLikeOpt = logReplyLikeRepository.findByUserAndLogReply(user, logReply);
 	        boolean isLiked;
 
 	        if (existingLikeOpt.isPresent()) {
-	            logReplyLikeRepository.delete(existingLikeOpt.get()); // 좋아요 취소
+	            logReplyLikeRepository.delete(existingLikeOpt.get());
 	            isLiked = false;
 	        } else {
 	            LogReplyLikes newLike = new LogReplyLikes(user, logReply);
-	            logReplyLikeRepository.save(newLike); // 좋아요 추가
+	            logReplyLikeRepository.save(newLike);
 	            isLiked = true;
 	        }
 
-	        // 댓글의 총 좋아요 수 계산
 	        int totalLikes = logReplyLikeRepository.countByLogReply(logReply);
 
 	        return ResponseEntity.ok(Map.of(
@@ -179,6 +178,7 @@ public class LogReplyController {
 	                .body("댓글 좋아요 처리 중 오류 발생: " + e.getMessage());
 	    }
 	}
+
 
 
 	// 댓글 개수 동기화 
