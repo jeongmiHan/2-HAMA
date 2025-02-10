@@ -271,11 +271,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 		  const likeButton = replyElement.querySelector(".like");
 		  const likeCount = replyElement.querySelector(".like-count");
 		  
+		  // 좋아요 상태 유지 (빨간색)
 		  if (reply.isLiked) {
 		      likeButton.classList.add("liked");
 		  }
-		  likeCount.textContent = reply.likeCount || 0;
-
+		  likeCount.textContent = reply.likeCount > 0 ? reply.likeCount : "";
 		  // 좋아요 버튼 클릭 이벤트 추가
 		  likeButton.addEventListener("click", () => {
 		      toggleReplyLike(likeButton, reply.id); // 좋아요 처리 함수 호출
@@ -286,7 +286,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 	      const deleteButton = replyElement.querySelector(".delete-button");
 		  const commentActions = replyElement.querySelector(".comment-actions");
 		  
-		  replyElement.querySelector(".like-count").textContent = reply.likeCount || 0;
+		  replyElement.querySelector(".like-count").textContent = reply.likeCount > 0 ? reply.likeCount : "";
 	      if (reply.isAuthor) {
 			commentActions.style.display = "block"; // 작성자만 버튼 보이기
 
@@ -656,10 +656,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 		    }
 		};
 		
-		// 댓글 좋아요 기능
+		
 		window.toggleReplyLike = async (button, replyId) => {
-			isEditMode = false; // 답글 모드로 설정
-			parentReplyId = null; // 부모 ID 설정
 		    console.log(`💡 댓글 좋아요 요청 - replyId: ${replyId}`);
 
 		    if (!replyId || isNaN(replyId)) {
@@ -686,19 +684,17 @@ document.addEventListener("DOMContentLoaded", async () => {
 		        const likeCount = button.querySelector("span.like-count");
 		        likeCount.textContent = totalLikes;
 
-		        if (isLiked) {
-		            button.classList.add("liked");
-		            localStorage.setItem(`liked-comment-${replyId}`, "true"); // Save state
-		        } else {
-		            button.classList.remove("liked");
-		            localStorage.removeItem(`liked-comment-${replyId}`); // Remove state
-		        }
+		        // 버튼의 좋아요 상태 업데이트
+				if (isLiked) {
+				    button.classList.add("liked"); // 좋아요 활성화
+				} else {
+				    button.classList.remove("liked"); // 좋아요 비활성화
+				}
 		    } catch (error) {
 		        console.error("댓글 좋아요 오류:", error);
 		        alert("댓글 좋아요 처리 중 오류가 발생했습니다.");
 		    }
 		};
-
 
 		window.toggleBookmark = async function(button) {
 
