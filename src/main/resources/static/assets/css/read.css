@@ -1,6 +1,5 @@
 /* ===== 기본 스타일 ===== */
 body {
-    line-height: 1.6;
     padding: 0;
 }
 
@@ -71,25 +70,31 @@ body {
 
 
 /*댓글 버튼*/
-/* 댓글 버튼 컨테이너 */
 .comment-toggle {
-    display: inline-flex; /* 인라인 요소처럼 동작 */
-    align-items: center; /* 수직 정렬 */
-    gap: 5px; /* 아이콘과 텍스트 사이 간격 */
-    cursor: pointer;
+    align-items: center;
+    gap: 5px;
     padding: 5px 10px;
-    border: 1px solid #ddd; /* 테두리 */
-    border-radius: 10px; /* 둥근 모서리 */
+    border: 1px solid #ddd;
+    border-radius: 4px;
     background-color: #f9f9f9;
     font-size: 14px;
     color: #555;
-    transition: background-color 0.3s ease;
-    white-space: nowrap; /* 줄바꿈 방지 */
-    display: flex;
-    justify-content: flex-start; /* 왼쪽 정렬 */
-    width: 5%;
+    white-space: nowrap;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+    width: fit-content; /* ✅ 내용 크기에 맞춤 */
+    text-align: left; /* ✅ 내부 텍스트 왼쪽 정렬 */
 }
 
+
+
+
+.comment-icon {
+    font-size: 1rem; /* 아이콘 크기 */
+}
+
+.comment-count {
+    font-weight: bold;
+}
 
 /* 마우스 오버 효과 */
 .comment-toggle:hover {
@@ -133,7 +138,7 @@ body {
 /* 댓글 컨테이너 */
 /* 댓글 컨테이너 스타일 */
 #replies {
-    width: 1000px;
+    width: 1100px;
     padding: 8px;
     margin: 0 auto; /* 수평 중앙 정렬 */
     border: 1px solid #ccc;
@@ -152,6 +157,16 @@ body {
 
 
 /* 댓글 박스 */
+/* 댓글이 없을 때 숨기기 */
+#replies:empty {
+    display: none;
+}
+
+/* 댓글이 추가되면 자동으로 보이게 설정 */
+#replies:not(:empty) {
+    display: block;
+}
+
 
 .reply {
     padding: 10px 0; /* 위아래 여백 추가 */
@@ -283,18 +298,16 @@ body {
 /* 대댓글 등록 버튼 */
 .child-reply-box button {
     margin-top: 5px;
-    padding: 5px 10px;
-    font-size: 12px;
-    border: 1px solid #ccc;
-    border-radius: 3px;
-    background-color: #007bff;
-    color: white;
-    cursor: pointer;
+    padding: 3px 6px;
+    background-color: white;
+    color: black;
+    white-space: nowrap; /* 글자가 줄바꿈되지 않도록 설정 */
+    border: 1px solid black; /* 테두리 검정 */
+    font-size: 0.8rem; /* 글자 크기 */
+    font-weight: bold; /* 글자 굵기 */
+    border-radius: 4px;
 }
 
-.child-reply-box button:hover {
-    background-color: #0056b3;
-}
 
 /* ===== 댓글 입력창 ===== */
 /* ===== 댓글 입력 영역 ===== */
@@ -307,8 +320,7 @@ body {
 
 /* 댓글 입력창 */
 #reply {
-	width: 970px;
-    flex: 1; /* 가로로 최대 확장 */
+	width: 90%;
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 5px;
@@ -320,14 +332,39 @@ body {
 /* 댓글 등록 버튼 */
 input[type="button"] {
     padding: 5px 10px;
-    font-size: 14px;
     cursor: pointer;
-    border: 1px solid #ccc;
     border-radius: 5px;
     background-color: white;
     color: black;
     white-space: nowrap; /* 글자가 줄바꿈되지 않도록 설정 */
+    border: 1px solid black; /* 테두리 검정 */
+    font-size: 1rem; /* 글자 크기 */
+    font-weight: bold; /* 글자 굵기 */
+    border-radius: 4px;
 }
+
+/* 기본 체크박스 숨기기 */
+.secret-checkbox {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* 기본 아이콘 스타일 */
+.secret-label i.fas {
+    font-size: 1.3rem;  /* 아이콘 크기 */
+    color: #555;  /* 기본 색상 (회색) */
+    transition: color 0.3s ease; /* 색상 변경 효과 */
+    cursor: pointer;  /* 클릭 가능하게 설정 */
+}
+
+/* 체크박스가 체크되었을 때 아이콘 색상 변경 */
+.secret-checkbox:checked + i.fas {
+    color: #FFD700;  /* 금색 (#FFD700) */
+}
+
+
 
 
 

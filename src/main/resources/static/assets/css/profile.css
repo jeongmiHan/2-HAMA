@@ -42,6 +42,11 @@ h1.profile-title {
     line-height: 1.5 !important;
 }
 
+p.profile-subtext {
+	color: white !important;
+    font-size: 16px !important;
+    text-align: center !important
+}
 
 
 .profile-list-wrapper {
@@ -188,18 +193,7 @@ h1.profile-title {
     object-fit: cover;
     margin-bottom: 10px;
 }
-.popup-content button {
-    width: 90%;
-    height: 45px;
-    font-size: 16px;
-    font-weight: bold;
-    text-align: center;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s ease-in-out;
-}
-
-.popup-content button:hover {
+.save-btn:hover {
     background-color: #d99b10;
 }
 
@@ -219,29 +213,44 @@ h1.profile-title {
 }
 
 
-.popup-content button {
+.popup-content {
+    position: relative;
+    padding: 20px;
+    display: flex;
+    align-items: center; /* 수직 정렬 */
+}
+
+.save-btn{
     background-color: #f4c430;
     color: white;
     padding: 12px 20px;
     border-radius: 30px;
-     width: auto; /* 버튼 크기를 내용에 맞게 조정 */
-    min-width: 80px; /* 최소 크기 지정 (너무 작아지는 것 방지) */
+    width: auto; /* 내용에 맞게 조정 */
+    min-width: 80px; /* 최소 크기 지정 */
     border: none;
+    height: 45px;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
 }
 
-
-.popup-content .close-btn {
-    font-size: 18px;
-    cursor: pointer;
+.close-btn {
     position: absolute;
     top: 10px;
     right: 10px;
+    background: none;
+    color: #888;
+    font-size: 24px;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
 }
 
-.popup-content .close-btn:hover {
-    color: #f4c430;
+.close-btn:hover {
+    color: #333; /* 마우스 올릴 때 색상 변경 */
 }
-
 /* 버튼 그룹 정렬 */
 .profile-card .button-group {
     display: flex;

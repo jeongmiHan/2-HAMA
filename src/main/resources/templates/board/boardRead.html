@@ -16,7 +16,6 @@
     <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.13/dist/cropper.min.js"></script>
     <link rel="stylesheet" href="/calendar/css/notifications.css">
      <link rel="stylesheet" href="/calendar/css/style.css">
-      <link rel="stylesheet" href="/assets/css/update.css">
 	<script th:inline="javascript">
     const currentUserId = [[${currentUserId}]];
     console.log("Current User ID:", currentUserId);
@@ -107,7 +106,6 @@
         <!-- 댓글 보기 버튼 -->
 	<div class="comment-toggle" id="toggle-comments-btn">
     <i class="far fa-comments comment-icon"></i>
-    <span>댓글</span>
     <span class="comment-count"  th:text="${replyCount}">0</span>
 	</div>
     
@@ -115,8 +113,12 @@
           	<div class="comment-container" id="comment-section" style="display: none;">
     <label for="reply"></label>
     <input type="text" id="reply" name="reply" placeholder="댓글을 입력하세요.">
-    <input type="checkbox" id="secret-reply-checkbox">
-    <label for="secret-reply-checkbox">비밀댓글</label>
+    <label for="secret-reply-checkbox" class="secret-label">
+    <input type="checkbox" id="secret-reply-checkbox" class="secret-checkbox">
+    <i class="fas fa-lock"></i> <!-- 🔒 자물쇠 아이콘 -->
+</label>
+
+
     <input type="button" value="등록" onclick="writeReply()">
     <div id="replies"></div> <!-- 댓글 목록 표시 -->
 </div>
