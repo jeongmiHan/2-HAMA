@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
 							      return;
 							  }
 							  if (isNaN(age) || age <= 0) {
-							      alert("나이는 숫자로 입력해야 합니다.");
+							      alert("나이를 입력해주세요. 나이는 숫자로 입력해야 합니다.");
 							      return;
 							  }
 							  if (!birthdate) {
