@@ -23,6 +23,15 @@ document.addEventListener('DOMContentLoaded', function() {
             , textColor: 'red' // 글자색
          }
       ],
+     
+     // Google Calendar 이벤트의 URL을 제거하는 필수 설정
+             eventDataTransform: function(event) {
+                 if (event.url) {
+                     event.url = "";  // URL을 빈 문자열로 변경하여 이동 방지
+                 }
+                 return event;
+             },
+           
       // 날짜 클릭 시 이벤트 (일정 추가 모달 표시)
       dateClick: function(info) {
       resetEventModal(); // 모달 상태 초기화
@@ -33,35 +42,41 @@ document.addEventListener('DOMContentLoaded', function() {
       },
       // 이벤트 클릭 시 이벤트 (수정 모달 표시)
       eventClick: function(info) {
+      //  공휴일 이벤트인지 확인하고 이동 방지
+              if (info.event.source && info.event.source.internalEventSource.googleCalendarId) {
+                  info.jsEvent.preventDefault();  // 기본 동작 막기
+                  info.jsEvent.stopPropagation(); // 이벤트 전파 방지
+                  return; // 더 이상 실행되지 않도록 종료
+              }
          currentEvent = info.event; // 클릭한 이벤트 저장
          showEventModalForEdit(info.event);  // 수정용 모달 창 표시
       },
       displayEventTime: false, // 캘린더에 이벤트 시간 숨기고 제목만 보여주는 기능
       // 이벤트 렌더링 후 실행 (필터링 기능을 위해 모든 이벤트 저장)
-	  eventDidMount: function(info) {
-	      if (!allEvents.some(event => event.id === info.event.id)) {
-	          allEvents.push(info.event);
-	      }
+     eventDidMount: function(info) {
+         if (!allEvents.some(event => event.id === info.event.id)) {
+             allEvents.push(info.event);
+         }
 
-	      const eventEl = info.el;
-	      const petImage = info.event.extendedProps.petImage;
-	      const eventColor = info.event.extendedProps.cd_color || "#000"; // 기본 검은색
+         const eventEl = info.el;
+         const petImage = info.event.extendedProps.petImage;
+         const eventColor = info.event.extendedProps.cd_color || "#000"; // 기본 검은색
 
-	      // 기존의 중복 요소 삭제
-	      let existingContainer = eventEl.querySelector('.event-title-container');
-	      if (existingContainer) {
-	          existingContainer.remove();
-	      }
+         // 기존의 중복 요소 삭제
+         let existingContainer = eventEl.querySelector('.event-title-container');
+         if (existingContainer) {
+             existingContainer.remove();
+         }
 
-	      // 프로필에서 사진 가져오기
-	      const titleContainer = document.createElement('div');
-	      titleContainer.classList.add('event-title-container');
-	      titleContainer.innerHTML = `
-	          ${petImage ? `<img src="${petImage}" class="event-pet-icon">` : ''}
-	      `;
+         // 프로필에서 사진 가져오기
+         const titleContainer = document.createElement('div');
+         titleContainer.classList.add('event-title-container');
+         titleContainer.innerHTML = `
+             ${petImage ? `<img src="${petImage}" class="event-pet-icon">` : ''}
+         `;
 
-	      eventEl.appendChild(titleContainer);
-	  },
+         eventEl.appendChild(titleContainer);
+     },
       // 캘린더 날짜 변경 시 필터 드롭다운을 툴바에 추가
       datesSet: function() {
          const toolbarLeft = document.querySelector('.fc-toolbar.fc-header-toolbar .fc-toolbar-chunk:first-child');
@@ -474,7 +489,7 @@ function updateEventUI(event) {
     if (existingContainer) {
         existingContainer.remove();
     }
-	
+   
     // UI 업데이트
     const titleContainer = document.createElement('div');
     titleContainer.classList.add('event-title-container');

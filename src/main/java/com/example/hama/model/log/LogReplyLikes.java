@@ -21,7 +21,7 @@ public class LogReplyLikes {
     private Long likeId;
 
     @ManyToOne
-    @JoinColumn(name = "log_reply_id", nullable = false)
+    @JoinColumn(name = "log_reply_id", nullable = true)
     private LogReply logReply;  // 좋아요가 연결된 댓글
 
     @ManyToOne(fetch = FetchType.LAZY)
