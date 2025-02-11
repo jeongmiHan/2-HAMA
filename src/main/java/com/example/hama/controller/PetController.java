@@ -179,7 +179,7 @@ public class PetController {
 
         // 이미지가 없을 경우 기본 이미지 반환
         if (pet == null || pet.getPhoto() == null) {
-            try (InputStream defaultImage = getClass().getResourceAsStream("/static/default-image.jpg")) {
+            try (InputStream defaultImage = getClass().getResourceAsStream("/images/default-profile.jpg")) {
                 if (defaultImage == null) {
                     throw new IOException("기본 이미지가 존재하지 않습니다.");
                 }

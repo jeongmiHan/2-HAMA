@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	const cropSaveButton = document.getElementById('crop-save-button');
 	const cropCancelButton = document.getElementById('crop-cancel-button');
 	const previewImage = document.getElementById('profile-preview');
+	
 
 	let currentProfileIndex = 0;
 	let cropper;
@@ -90,11 +91,29 @@ document.addEventListener('DOMContentLoaded', () => {
 		const birthdate = document.getElementById('birthdate').value.trim();
 		const mode = saveButton.dataset.mode;
 		const petId = saveButton.dataset.petId;
+		const existingImage = previewImage.src; // 기존 이미지 URL 저장
+		// ✅ 신규 등록 시 사진 업로드 필수
+		    if (mode === 'add' && !croppedImageBlob) {
+		        alert("반려동물 사진을 등록해 주세요.");
+		        return;
+		    }
 
-		if (!name || !breed || isNaN(age) || age <= 0 || !birthdate) {
-			alert("모든 항목을 올바르게 입력해주세요.");
-			return;
-		}
+							  if (!name) {
+							      alert("이름을 입력해주세요.");
+							      return;
+							  }
+							  if (!breed) {
+							      alert("품종을 입력해주세요.");
+							      return;
+							  }
+							  if (isNaN(age) || age <= 0) {
+							      alert("나이는 숫자로 입력해야 합니다.");
+							      return;
+							  }
+							  if (!birthdate) {
+							      alert("생일을 입력해주세요. 과거 또는 현재 날짜만 가능합니다.");
+							      return;
+							  }
 
 		const formData = new FormData();
 		formData.append('name', name);
@@ -103,9 +122,10 @@ document.addEventListener('DOMContentLoaded', () => {
 		formData.append('birthdate', birthdate);
 
 		// 이미지가 수정된 경우에만 Blob 추가
-		if (croppedImageBlob) {
-			formData.append('photo', croppedImageBlob);
-		}
+		// ✅ 사진을 변경한 경우만 새로 업로드
+		    if (croppedImageBlob) {
+		        formData.append('photo', croppedImageBlob);
+		    }
 
 		const url = mode === 'add' ? '/pets' : `/pets/${petId}`;
 		const method = mode === 'add' ? 'POST' : 'PUT';

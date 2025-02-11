@@ -186,6 +186,7 @@ public class BoardController {
 
 		        // 검색 결과가 없는 경우 처리
 		        if (searchList.isEmpty()) {
+		        	model.addAttribute("nickname", user.getName());
 		            model.addAttribute("emptyMsg", "검색 결과가 없습니다.");
 		            model.addAttribute("replyCounts", new HashMap<>()); // 빈 Map 추가
 		            return "/board/boardList";
@@ -200,6 +201,7 @@ public class BoardController {
 		                                               (int) searchList.getTotalElements(),
 		                                               searchList.getTotalPages());
 		        
+		        model.addAttribute("nickname", user.getName());
 				model.addAttribute("content", "board/boardList :: content");
 		        model.addAttribute("list", searchList);
 		        model.addAttribute("navi", navi);
@@ -242,8 +244,7 @@ public class BoardController {
 	      }
 
 		// 현재 로그인 사용자 ID를 모델에 추가
-		model.addAttribute("currentUserId", user.getUserId());
-		
+	      model.addAttribute("currentUserId", user.getUserId());
 		//요청할 때 날아온 쿼리 파라미터로 repository에 있는 보드 객체 하나 가져오기 
 		Board board = boardService.findBoard(id);
 		
@@ -314,13 +315,20 @@ public class BoardController {
 	@PostMapping("update")
 	public String update(@Validated @ModelAttribute BoardUpdate boardUpdate,
 	                     BindingResult result,
+	                     Model model,
 	                     @RequestParam(name="file", required = false) MultipartFile file) {
+		
+		User user = getAuthenticatedUser();
+	      if(user == null) {
+	         return "redirect:/user/login";
+	      }
+		
 	    
 	    // 유효성 검사
 	    if (result.hasErrors()) {
 	        return "boardUpdate"; // 유효성 검사 실패 시 수정 페이지로 다시 이동
 	    }
-
+	    model.addAttribute("nickname", user.getName());
 	    // 게시글 수정 처리
 	    Board updateBoard = BoardUpdate.toBoard(boardUpdate);
 	    boardService.updateBoard(updateBoard, boardUpdate.isFileRemoved(), file);
@@ -331,7 +339,17 @@ public class BoardController {
 
 	@GetMapping("read/{id}")
 	public String readUpdatedBoard(@PathVariable("id") Long id, Model model) {
+		
+		User user = getAuthenticatedUser();
+	      if(user == null) {
+	         return "redirect:/user/login";
+	      }
+	      
 	    Board board = boardService.findById(id); // 게시글 조회
+	    // 작성자와 로그인 유저가 같은지 확인
+	    boolean isWriter = board.getUser().getUserId().equals(user.getUserId());
+	    model.addAttribute("isWriter", isWriter); // 작성자 여부를 모델에 담기
+	    model.addAttribute("nickname", user.getName()); // 닉네임 추가
 	    model.addAttribute("board", board);
 	    return "board/boardRead"; // boardRead.html로 이동
 	}

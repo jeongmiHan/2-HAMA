@@ -181,11 +181,6 @@ document.addEventListener('DOMContentLoaded', () => {
 						     (<span id="like-count-${reply.replyId}">${reply.likeCount}</span>)
 						 </button>
                          </div>
-
-
-
-
-
                          <div class="child-reply-box" id="child-reply-box-${reply.replyId}" style="display: none;">
                              <textarea id="child-reply-content-${reply.replyId}" placeholder="답글을 입력하세요"></textarea>
                              <input type="checkbox" id="child-secret-checkbox-${reply.replyId}"> 비밀댓글
