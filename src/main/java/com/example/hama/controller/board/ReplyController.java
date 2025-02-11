@@ -1,6 +1,7 @@
 package com.example.hama.controller.board;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -8,9 +9,16 @@ import java.util.stream.Collectors;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.example.hama.config.CustomUserDetails;
 import com.example.hama.model.board.Board;
@@ -22,7 +30,6 @@ import com.example.hama.repository.board.ReplyRepository;
 import com.example.hama.service.UserService;
 import com.example.hama.service.board.ReplyService;
 
-import ch.qos.logback.core.model.Model;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -187,7 +194,24 @@ public class ReplyController {
         return ResponseEntity.ok(count);
     }
     
-    
+    @GetMapping("/user/likes")
+    public ResponseEntity<Map<Long, Boolean>> getUserLikes() {
+        User currentUser = getAuthenticatedUser();
+        if (currentUser == null) {
+            return ResponseEntity.status(401).body(Collections.emptyMap()); // 로그인 필요
+        }
+
+        Map<Long, Boolean> likeStatusMap = replyService.getUserLikeStatus(currentUser);
+        
+        // ✅ 디버깅 로그 추가
+        System.out.println("🔍 [DEBUG] 현재 로그인한 사용자의 좋아요 상태: " + likeStatusMap);
+
+        return ResponseEntity.ok(likeStatusMap);
+    }
+
+
+
+    // ✅ 좋아요 토글
     @PostMapping("{replyId}/like")
     public ResponseEntity<Map<String, Object>> toggleLike(@PathVariable("replyId") Long replyId) {
         User currentUser = getAuthenticatedUser();
@@ -198,8 +222,6 @@ public class ReplyController {
         Map<String, Object> result = replyService.toggleLike(replyId, currentUser);
         return ResponseEntity.ok(result);
     }
-
-
 
     
     private User getAuthenticatedUser() {

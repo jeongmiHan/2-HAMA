@@ -1,5 +1,6 @@
 package com.example.hama.service.board;
 
+
 import org.springframework.stereotype.Service;
 
 import com.example.hama.model.board.AttachedFile;
@@ -18,5 +19,7 @@ public class AttachedFileService {
 	public void saveAttachedFile(AttachedFile attachedFile) {
 		fileRepository.save(attachedFile);
 	}
+	
+
 
 }

@@ -1,7 +1,5 @@
 package com.example.hama.service.board;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -84,33 +82,33 @@ public class BoardService {
 		
 		boardrepository.save(findBoard); //PK가 있는 상황 => Update 쿼리
 	}
-	
 	//첨부파일 삭제 
-	private void removeFile(AttachedFile attachedFile) {
-		//DB에서 삭제
-		fileRepository.deleteById(attachedFile.getAttachedFileId());
-		//서버(로컬)에서 삭제
-		String fullPath = uploadPath + "/" + attachedFile.getSaved_filename();
-		fileService.deleteFile(fullPath);
-	}
-
-	public void removeBoard(Board board) {
-		//첨부파일 체크
-		AttachedFile attachedFile = findFileByBoardId(board);
-		if(attachedFile != null) {
-			removeFile(attachedFile);
+		private void removeFile(AttachedFile attachedFile) {
+			//DB에서 삭제
+			fileRepository.deleteById(attachedFile.getAttachedFileId());
+			//서버(로컬)에서 삭제
+			String fullPath = uploadPath + "/" + attachedFile.getSaved_filename();
+			fileService.deleteFile(fullPath);
 		}
-		boardrepository.deleteById(board.getBoardId());
-	}
 
-	public AttachedFile findFileByBoardId(Board board) {
-		AttachedFile file = fileRepository.findByBoard(board);
-		return file;
-	}
-	public AttachedFile findFileByAttachedFileId(Long id) {
-	Optional<AttachedFile> attachedFile = fileRepository.findById(id);
-		return attachedFile.orElse(null);
-	}
+		public void removeBoard(Board board) {
+			//첨부파일 체크
+			AttachedFile attachedFile = findFileByBoardId(board);
+			if(attachedFile != null) {
+				removeFile(attachedFile);
+			}
+			boardrepository.deleteById(board.getBoardId());
+		}
+	 
+
+	    public AttachedFile findFileByBoardId(Board board) {
+			AttachedFile file = fileRepository.findByBoard(board);
+			return file;
+		}
+		public AttachedFile findFileByAttachedFileId(Long id) {
+		Optional<AttachedFile> attachedFile = fileRepository.findById(id);
+			return attachedFile.orElse(null);
+		}
 
 	public Page<Board> findSearch(String searchText, String searchType, Pageable pageable) {
 	    if ("title".equals(searchType)) {

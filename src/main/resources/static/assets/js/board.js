@@ -92,20 +92,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
          // 댓글 및 대댓글 불러오기
-         window.getReplies = function() {
-             let boardId = $('.board').data('board-id'); // 게시글 ID 가져오기
-             $.ajax({
-                 url: "/reply/" + boardId,
-                 type: "GET",
-                 success: function(data) {
-                     console.log("댓글 데이터 확인:", data); // 댓글 데이터를 출력
-                     renderReplies(data, $('#replies')); // 댓글 렌더링 호출
-                 },
-                 error: function(xhr, status, error) {
-                     console.error("댓글 데이터 불러오기 실패:", error);
-                 }
-             });
-         };
+		 // ✅ 댓글 데이터가 로드된 후 실행하도록 변경
+		 window.getReplies = function() {
+		     let boardId = $('.board').data('board-id'); // 게시글 ID 가져오기
+		     $.ajax({
+		         url: "/reply/" + boardId,
+		         type: "GET",
+		         success: function(data) {
+		             console.log("✅ [DEBUG] 현재 게시글의 댓글 데이터 확인:", data);
+		             renderReplies(data, $('#replies'));
+
+		             // ✅ 댓글이 렌더링된 후 좋아요 상태 복원 실행
+		             restoreLikeStatus();
+		         },
+		         error: function(xhr, status, error) {
+		             console.error("❌ 댓글 데이터 불러오기 실패:", error);
+		         }
+		     });
+		 };
+
 
          // 댓글 및 대댓글 불러오기
             window.loadMoreReplies = function () {
@@ -150,11 +155,10 @@ document.addEventListener('DOMContentLoaded', () => {
                  let content = reply.secret
                      ? `<span class="secret-icon">🔒</span> ${reply.accessible ? reply.rpContent : '비밀댓글입니다.'}`
                      : reply.rpContent;
-
-                 // ✅ 좋아요 상태 (localStorage 활용)
-                 let storedLike = localStorage.getItem(`like-${reply.replyId}`) || (reply.isLiked ? "❤️" : "🤍");
-                 let likeClass = storedLike === "❤️" ? "liked" : "";
-
+					 
+				 // ✅ `isLiked` 값 기반으로 `liked` 클래스 설정
+						 let likeClass = reply.liked ? "liked" : "";
+						 
                  // ✅ HTML 구조 생성
                  let html = `
                      <div class="reply" id="reply-${reply.replyId}">
@@ -172,13 +176,16 @@ document.addEventListener('DOMContentLoaded', () => {
                          <span class="time">${formattedTime}</span>
                          <div class="actions">
                              <button onclick="showReplyBox(${reply.replyId})">답글</button>
-                             <button onclick="toggleLike(${reply.replyId})">
-                                 <span id="like-icon-${reply.replyId}" class="${likeClass}">
-                                     ${storedLike}
-                                 </span>
-                                 (<span id="like-count-${reply.replyId}">${reply.likeCount}</span>)
-                             </button>
+						 <button onclick="toggleLike(${reply.replyId})">
+						     <i id="like-icon-${reply.replyId}" class="fas fa-heart like-icon ${reply.liked ? 'liked' : ''}"></i>
+						     (<span id="like-count-${reply.replyId}">${reply.likeCount}</span>)
+						 </button>
                          </div>
+
+
+
+
+
                          <div class="child-reply-box" id="child-reply-box-${reply.replyId}" style="display: none;">
                              <textarea id="child-reply-content-${reply.replyId}" placeholder="답글을 입력하세요"></textarea>
                              <input type="checkbox" id="child-secret-checkbox-${reply.replyId}"> 비밀댓글
@@ -285,39 +292,72 @@ document.addEventListener('DOMContentLoaded', () => {
                  }
              });
          };
-         
-         
-         window.toggleLike = function(replyId) {
-             let likeIcon = document.getElementById(`like-icon-${replyId}`);
-             let likeCount = document.getElementById(`like-count-${replyId}`);
-
-             if (!likeIcon || !likeCount) {
-                 console.error("Error: Element not found for replyId:", replyId);
-                 return;
-             }
-
-             fetch(`/reply/${replyId}/like`, {
-                 method: "POST",
-                 headers: { "Content-Type": "application/json" }
-             })
-             .then(response => response.json())
-             .then(data => {
-                 console.log("Server Response:", data);
-                 likeIcon.textContent = data.isLiked ? "❤️" : "🤍"; // ✅ 서버 응답 기반으로 좋아요 상태 업데이트
-                 likeCount.textContent = data.likeCount;
-
-                 // ✅ 상태를 localStorage에 저장하여 새로고침 후에도 유지
-                 localStorage.setItem(`like-${replyId}`, data.isLiked ? "❤️" : "🤍");
-             })
-             .catch(error => {
-                 console.error("Error:", error);
-             });
-         };
-         
-         
+		 
+		 let boardIdElement = document.querySelector(".board");
+		    if (!boardIdElement) {
+		        console.error("❌ boardId를 찾을 수 없습니다.");
+		        return;
+		    }
 
 
+			// ✅ 좋아요 버튼 클릭 시 실행
+			window.toggleLike = function (replyId) {
+			    fetch(`/reply/${replyId}/like`, {
+			        method: "POST",
+			        headers: { "Content-Type": "application/json" }
+			    })
+			    .then(response => response.json())
+			    .then(data => {
+			        console.log(`✅ [DEBUG] 서버 응답: 댓글 ID: ${replyId}, liked: ${data.isLiked}, likeCount: ${data.likeCount}`);
 
+			        let likeIcon = document.getElementById(`like-icon-${replyId}`);
+			        let likeCount = document.getElementById(`like-count-${replyId}`);
+
+			        if (likeIcon && likeCount) {
+			            // ✅ `liked` 클래스 토글
+			            likeIcon.classList.toggle("liked", !!data.isLiked);
+			            likeCount.textContent = data.likeCount;
+
+			            console.log(`🔍 [DEBUG] 좋아요 상태 변경 후 클래스 목록:`, likeIcon.classList);
+			        }
+			    })
+			    .catch(error => console.error("❌ 좋아요 토글 실패:", error));
+			};
+
+
+
+
+			window.restoreLikeStatus = function () {
+			    console.log("✅ [DEBUG] 좋아요 데이터 복원 실행");
+
+			    fetch("/reply/user/likes", {
+			        method: "GET",
+			        headers: { "Content-Type": "application/json" }
+			    })
+			    .then(response => response.json())
+			    .then(data => {
+			        console.log("✅ [DEBUG] 서버에서 받아온 좋아요 상태:", data);
+
+			        setTimeout(() => { // ✅ DOM 렌더링 완료 후 실행
+			            Object.keys(data || {}).forEach(replyId => {
+			                let likeIcon = document.getElementById(`like-icon-${String(replyId)}`);
+
+			                if (likeIcon) { // ✅ 현재 페이지에 존재하는 댓글 ID만 적용
+			                    console.log(`🔍 [DEBUG] 적용 대상 댓글 ID: ${replyId}, 현재 liked 상태: ${data[replyId]}`);
+			                    likeIcon.classList.toggle("liked", !!data[replyId]);
+			                }
+			            });
+			        }, 1000); // ✅ 1초 후 실행 (DOM 렌더링 완료 후 적용)
+			    })
+			    .catch(error => console.error("❌ 좋아요 상태 불러오기 실패:", error));
+			};
+			restoreLikeStatus();
+
+			window.handleLogout = function () {
+			    console.log("✅ 로그아웃 실행: localStorage 초기화");
+			    localStorage.clear();  // ✅ 기존 사용자 데이터 제거
+			    window.location.href = "/login";  // ✅ 로그인 페이지로 이동
+			};
 
 
 

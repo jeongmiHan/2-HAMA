@@ -18,7 +18,12 @@
 	<link rel="stylesheet" href="/calendar/css/notifications.css">
    <link rel="stylesheet" href="/calendar/css/style.css">
   <link rel="stylesheet" href="/assets/css/update.css">
-
+<script>
+       function removeFile(){
+    	   document.getElementById("fileRemoved").value = "true";
+    	   document.getElementById("attachedFile").style.display = "none";
+       }
+    </script>
 </head>
 <body id="updatePage">
    <script src="/assets/js/board.js"></script>
@@ -80,10 +85,10 @@
               <tr>
                 <th>첨부파일</th>
                 <td>
-                  <div id="attachedFile" th:if="${file}">
-                    <span th:text="${file.original_filename}"></span>
-                    <input type="button" onclick="removeFile()" value="삭제"> 
-                  </div>
+                   <div id="attachedFile" th:if="${file}">
+            <span th:text="${file.original_filename}"></span>
+            <input type="button" onclick="removeFile()" value="삭제"> 
+          </div>
                   <input type="file" name="file">
                 </td>
               </tr>
@@ -98,7 +103,6 @@
         
             <p>
           <div class="center">
-            <input type="button" onclick="location.href='/'" value="메인으로">
             <input type="submit" value="수정하기" >
            <input type="button" value="취소" th:onclick="|location.href='@{/board/read(id=${boardUpdate.boardId})}'|">
 

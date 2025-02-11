@@ -391,3 +391,15 @@ input[type="button"] {
 .post-attachment .file-link:hover {
     text-decoration: underline;
 }
+/* 🤍 기본 하트 (좋아요 안 누른 상태) */
+/* 기본 하트 스타일 */
+/* 빈 하트 (좋아요 X) */
+.like-icon {
+    color: gray !important; /* 기본 색상: 회색 */
+}
+
+/* 채워진 하트 (좋아요 O) */
+.like-icon.liked {
+    color: red !important; /* 변경된 좋아요 색상 */
+}
+

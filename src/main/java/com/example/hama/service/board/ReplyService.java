@@ -5,13 +5,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
 import com.example.hama.model.board.Board;
 import com.example.hama.model.board.Reply;
-import com.example.hama.model.board.ReplyDto;
 import com.example.hama.model.board.likes;
 import com.example.hama.model.user.User;
 import com.example.hama.repository.UserRepository;
@@ -101,6 +101,8 @@ public class ReplyService {
     }
 
 
+
+    // ✅ 좋아요 토글 기능 (최신 데이터 유지)
     public Map<String, Object> toggleLike(Long replyId, User user) {
         Map<String, Object> response = new HashMap<>();
 
@@ -121,7 +123,6 @@ public class ReplyService {
             newLike.setReply(reply);
             newLike.setUser(user);
             likesRepository.save(newLike);
-
             response.put("isLiked", true); // ❤️
         }
 
@@ -131,23 +132,24 @@ public class ReplyService {
 
         return response;
     }
-    
-    
-    public boolean isLikedByUser(Long replyId, User currentUser) {
-        if (currentUser == null) {
-            return false; // 로그인하지 않은 사용자는 기본적으로 좋아요 X
-        }
 
-        // ✅ 댓글 정보 가져오기
-        Reply reply = replyRepository.findById(replyId)
-                .orElseThrow(() -> new IllegalArgumentException("댓글이 존재하지 않습니다. ID: " + replyId));
+	public Map<Long, Boolean> getUserLikeStatus(User currentUser) {
+		 List<Reply> allReplies = replyRepository.findAll(); // ✅ 모든 댓글 가져오기
+		    List<likes> userLikes = likesRepository.findByUser(currentUser); // ✅ 사용자가 좋아요한 댓글 가져오기
 
-        // ✅ 좋아요 여부 확인
-        return likesRepository.findByUserAndReply(currentUser, reply).isPresent();
-    }
+		    // ✅ 좋아요한 댓글 목록을 `Set`으로 변환
+		    Set<Long> likedReplyIds = userLikes.stream()
+		            .map(like -> like.getReply().getReplyId())
+		            .collect(Collectors.toSet());
 
+		    // ✅ 모든 댓글을 순회하면서 좋아요 여부를 확인
+		    Map<Long, Boolean> likeStatusMap = new HashMap<>();
+		    for (Reply reply : allReplies) {
+		        likeStatusMap.put(reply.getReplyId(), likedReplyIds.contains(reply.getReplyId()));
+		    }
 
-
+		    return likeStatusMap;
+	}
 
 }
     
