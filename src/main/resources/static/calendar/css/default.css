@@ -97,3 +97,11 @@
     outline: none !important; /* 클릭 시 발생하는 외곽선 제거 */
     box-shadow: none !important; /* 그림자 제거 */
 }
+
+.fc-col-header-cell {
+    background-color: #FFD1DC !important; /* ✅ 배경색 변경 */
+    color: white !important; /* ✅ 글자 색상 변경 */
+    font-weight: bold; /* ✅ 글자 굵게 */
+    text-transform: uppercase; /* ✅ 대문자로 표시 */
+    border-bottom: 2px solid #FF3399 !important; /* ✅ 하단 테두리 추가 */
+}

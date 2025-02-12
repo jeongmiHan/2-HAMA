@@ -33,6 +33,7 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     border-radius: 10px;
     z-index: 1000;
+     text-align: center; 
 }
 
 #resultsList {
@@ -44,7 +45,7 @@
 
 #resultsList li {
     padding: 10px 0;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid white;
     cursor: pointer;
 }
 
