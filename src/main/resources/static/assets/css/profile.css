@@ -16,13 +16,6 @@ h1, h2, h3, p, ul, li, a, input, button, filter, select, textarea, div {
 	font-family: 'Gowun Dodum', sans-serif;
 }
 
-.profile-sidebar {
-    width: 350px; /* 사이드바 너비 */
-    height: 100vh; /* 화면 전체 높이 */
-    background-color: #f4f4f4; /* 배경색 */
-    padding: 20px;
-    box-sizing: border-box; /* 패딩 포함 크기 설정 */
-}
 
 .profile-container {
    margin-top: 70px; /* 사이드바 상단과의 거리 조절 */
@@ -36,17 +29,9 @@ h1, h2, h3, p, ul, li, a, input, button, filter, select, textarea, div {
     text-align: center;
 }
 
-h1.profile-title {
-    color: white !important;
-    font-size: 32px !important;
-    margin-top: 30px !important;
-    margin-bottom: 50px !important;
-    text-align: center !important;
-    font-weight: 700 !important;
-    line-height: 1.5 !important;
-}
 
 p.profile-subtext {
+	margin-top: 20px;
 	color: white !important;
     font-size: 16px !important;
     text-align: center !important
@@ -60,6 +45,7 @@ p.profile-subtext {
     overflow: hidden;
     margin-bottom: 20px;
     width: 100%;
+    display: flex;
 }
 
 #profile-list {
@@ -136,15 +122,17 @@ p.profile-subtext {
 
 .add-profile {
     margin-top: 20px;
+     text-align: center;
 }
 
 #add-button {
-    background-color: white;
-    color: black;
-    border: none;
-    padding: 10px 15px;
+    background: none;  /* 배경 제거 */
+    color: white; /* + 색상 변경 */
+    border: none; /* 테두리 제거 */
+    padding: 0; /* 내부 여백 제거 */
     border-radius: 30px;
-    font-size: 20px;
+    font-size: 30px; /* + 크기 조절 */
+    font-weight:bold;
     cursor: pointer;
     transition: background-color 0.3s;
     line-height: normal;
@@ -197,18 +185,14 @@ p.profile-subtext {
     object-fit: cover;
     margin-bottom: 10px;
 }
-.save-btn:hover {
-    background-color: #d99b10;
-}
 
 
 .popup-content h2 {
-    color: #f4c430;
+    color:#ff8080;
     font-size: 26px;
     margin-bottom: 20px;
     text-align: center;
 }
-
 .popup-content label {
     font-size: 16px;
     color: #333;
@@ -225,7 +209,7 @@ p.profile-subtext {
 }
 
 .save-btn{
-    background-color: #f4c430;
+    background-color: #ff8080;
     color: white;
     padding: 12px 20px;
     border-radius: 30px;
@@ -315,7 +299,7 @@ p.profile-subtext {
  background-color: #fff6e5;}
 
 .select-button:hover {
-    background-color: #0056b3;
+    background-color: #f9f9f9;
 }
 
 /* 캘린더에서기능사용하기위한수정-캘린더 일정 사진 */

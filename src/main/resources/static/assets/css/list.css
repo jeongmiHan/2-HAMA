@@ -1,7 +1,4 @@
 /* 기본 스타일 설정 */
-body {
-    padding: 0;
-}
 #container {
     max-width: 1200px;
     margin: 10px;
@@ -9,6 +6,11 @@ body {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     padding: 20px;
     border-radius: 8px;
+    box-shadow: 0 0 5px #FFD1DC;
+    margin-right: 0px;
+    min-height: 600px;
+    margin-left: 360px;
+    margin-top: 50px;
 }
 
 
@@ -27,15 +29,15 @@ body {
 
 .right input[type="button"] {
     padding: 5px 10px;
-    background-color: #007BFF;
-    color: #fff;
-    border: none;
     border-radius: 4px;
     cursor: pointer;
+    background-color: white; /* 배경 흰색 */
+    color: black; /* 글자 검정 */
+    border: 1px solid black; /* 테두리 검정 */
 }
 
 .right input[type="button"]:hover {
-    background-color: #0056b3;
+    background-color: #f5f5f5;
 }
 
 /* 테이블 스타일 */
@@ -65,7 +67,7 @@ table tr:hover {
 }
 
 table a {
-    color: #007BFF;
+    color: black;
     text-decoration: none;
 }
 
@@ -115,28 +117,37 @@ table th:nth-child(5), table td:nth-child(5) {
 #navigator a {
     margin: 0 5px;
     text-decoration: none;
-    color: #007BFF;
+    color: black;
 }
 
 #navigator a:hover {
     text-decoration: underline;
-    color: #0056b3;
+    color: black;
 }
 
 /* 버튼 스타일 */
-input[type="button"] {
-    padding: 8px 15px;
-    background-color: #28a745;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
+/* 글쓰기 버튼 스타일 */
+/* 글쓰기 버튼 스타일 */
+.Write-button {
+    background-color: white; /* 배경 흰색 */
+    color: black; /* 글자 검정 */
+    border: 1px solid black; /* 테두리 검정 */
+    font-size: 1rem; /* 글자 크기 */
+    font-weight: bold; /* 글자 굵기 */
+    padding: 5px 10px; /* 내부 여백 */
     cursor: pointer;
-    margin: 5px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    display: block;
+    margin-left: auto; /* 오른쪽 정렬 */
+    border-radius: 4px;
 }
 
-input[type="button"]:hover {
-    background-color: #218838;
+/* 버튼 호버 효과 */
+.Write-button:hover {
+     background-color: #f5f5f5;
 }
+
+
 
 /* 정렬 옵션 전체 Wrapper */
 .sort-options {

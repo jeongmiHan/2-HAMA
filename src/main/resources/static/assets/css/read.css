@@ -25,9 +25,13 @@ body {
     margin: 10px;              /* 중앙 정렬 */
     padding: 20px;               /* 내부 여백 추가 */
     background-color: #fff;      /* 배경 색상 */
-    border: 1px solid #ddd;      /* 테두리 */
     border-radius: 8px;          /* 모서리 둥글게 */
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+     margin-left: 0px;
+    margin-right: 0px;
+    box-shadow: 0 0 5px #FFD1DC;
+    margin-top: 50px;
+    margin-left: 360px;
 }
 
 

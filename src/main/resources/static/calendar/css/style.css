@@ -19,15 +19,16 @@ body {
 
 /* 사이드바 */
 .sidebar {
+	position: fixed;
   width: 300px;
   background-color:#FFD1DC;
   color: white;
   display: flex;
   flex-direction: column;
-  margin:30px; /*사이드바 왼쪽에서 좀 띄우기 2/7*/
   border-radius: 20px; /* 모서리를 둥글게 2/7 */
-  height:760px;/*2/7*/
-  box-shadow: 0 0 10px #FFB7C5;/*2/7*/
+  height:620px;/*2/7*/
+  bottom: 16px;
+  margin-left:30px;
 }
 
 .sidebar-header {
@@ -53,9 +54,6 @@ body {
   display: block;
 }
 
-.sidebar-menu a:hover {
-  background-color: #2e59d9;
-}
 
 /* 메인 콘텐츠와 상단 네비게이션 바를 감싸는 컨테이너 */
 .content-wrapper {
@@ -84,7 +82,29 @@ body {
   align-items: center;
   justify-content: space-between;
   width: 100%;
+  position: fixed;
+  height: 50px;
 }
+.navbar-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 60px; /* 높이 설정 */
+    background-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    box-shadow:0 0 5px 	#FFD1DC;
+}
+
+.navbar-container div {
+    flex: 1; /* 내부 요소들이 균등하게 배치되도록 설정 */
+}
+
 
 .navbar-logo {
   font-size: 24px;
@@ -208,10 +228,10 @@ body {
   background-color: #ddd;
 }
 /*로고 이미지 2/7*/
-.logoimage{
-	height: auto; /* 비율 유지 */
+/* .logoimage{
+	height: auto; 비율 유지
 	width: 70%;
-}
+} */
 /*로그아웃 버튼 색 2/7*/
 #logoutButton{
 	background-color:	#FFD1DC;
