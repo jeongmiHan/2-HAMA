@@ -95,6 +95,13 @@
   background: #999; /* 호버 시 스크롤바 색상 */
 }
 
+.modal-content img {
+  max-width: 100%; /* 모달 너비를 넘지 않음 */
+  max-height: 70vh; /* 모달 높이의 70% 이하 */
+  display: block;
+  margin: 0 auto; /* 중앙 정렬 */
+  object-fit: contain; /* 이미지 비율 유지 */
+}
 
 /* 댓글 목록 */
 #commentList {
