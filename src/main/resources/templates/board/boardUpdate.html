@@ -74,7 +74,6 @@
             </nav>
 
       <!-- Main Content --> <!--Main Content : 메인 콘텐츠 영역-->
-      <div class="content">
         <div id="container">
          <form th:action="@{/board/update(boardId=${boardUpdate.boardId})}" method="post" th:object="${boardUpdate}" enctype="multipart/form-data">
             <table>
@@ -124,7 +123,6 @@
   		  <input type="hidden" th:field="*{user}">
   		  <input type="hidden" th:field="*{fileRemoved}">
           </form>
-        </div>
         </div>
         <!-- 알림 모달 -->
                 <div id="noti_modal" class="noti_modal">

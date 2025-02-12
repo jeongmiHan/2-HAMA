@@ -316,3 +316,9 @@ p.profile-subtext {
     border-radius: 50%;
     object-fit: cover;
 }
+
+.logoimage{
+	height: auto; 
+	width: 40%;
+}
+

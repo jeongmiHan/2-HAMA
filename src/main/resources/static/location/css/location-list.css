@@ -190,7 +190,7 @@
 /* 전체 페이지를 감싸는 하얀 배경 */
 .centered-container {
     display: flex;
-
+ 	margin-right: 10px;
     align-items: center;
     min-height: 100vh; /* 화면 전체 높이 */
     background-color: #f8f9fc;
