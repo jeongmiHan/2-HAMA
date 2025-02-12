@@ -183,8 +183,12 @@ document.addEventListener('DOMContentLoaded', () => {
                          </div>
                          <div class="child-reply-box" id="child-reply-box-${reply.replyId}" style="display: none;">
                              <textarea id="child-reply-content-${reply.replyId}" placeholder="답글을 입력하세요"></textarea>
-                             <input type="checkbox" id="child-secret-checkbox-${reply.replyId}"> 비밀댓글
-                             <button onclick="writeReply(${reply.replyId})">등록</button>
+							 <label for="child-secret-checkbox-${reply.replyId}" class="secret-label">
+							     <input type="checkbox" id="child-secret-checkbox-${reply.replyId}" class="secret-checkbox">
+							     <i class="fas fa-lock"></i> <!-- 🔒 자물쇠 아이콘 -->
+							 </label>
+							 <button onclick="writeReply(${reply.replyId})">등록</button>
+
                          </div>
                          <div class="child-replies" id="child-replies-${reply.replyId}"></div>
                      </div>`;
