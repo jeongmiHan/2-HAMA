@@ -13,7 +13,7 @@
 }
 .locationbutton{
 	font-size: 13px;
-	background-color: #007bff;
+	background-color: 	#FFD1DC;
 	color: white;
 	border: none;
 	border-radius: 5px;
@@ -32,7 +32,7 @@
     transform: scale(1.05);
 }
 .locationsearch{
-	background-color: #007bff;
+	background-color: 	#FFD1DC;
 	color: white;
 	border:none;
 	border-radius: 5px;
@@ -116,7 +116,8 @@
     border: 1px solid #ddd;
     padding: 15px;
     border-radius: 5px;
-    background-color: #f9f9f9;
+    background-color: rgb(255, 255, 255);
+    box-shadow: 0 0 5px 	#FFD1DC;
 }
 .location-header {
     display: flex;
@@ -189,11 +190,12 @@
 /* 전체 페이지를 감싸는 하얀 배경 */
 .centered-container {
     display: flex;
-    justify-content: center;
+
     align-items: center;
     min-height: 100vh; /* 화면 전체 높이 */
-    background-color: #f0f0f0; /* 페이지 배경색 (밝은 회색) */
-    padding: 20px;
+    background-color: #f8f9fc;
+    margin-top:20px;
+   
     box-sizing: border-box;
 }
 
@@ -201,25 +203,33 @@
 .white-background {
     background-color: #ffffff; /* 하얀 배경 */
     border-radius: 10px; /* 모서리를 둥글게 */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* 부드러운 그림자 */
+    box-shadow:0 0 5px 	#FFD1DC;
     max-width: 1200px; /* 최대 너비 */
     width: 100%; /* 화면에 꽉 차도록 설정 */
     padding: 20px; /* 내부 여백 */
+
     box-sizing: border-box; /* 박스 크기 포함 */
+    margin-bottom:20px;
 }
+
+
 
 .help-icon-container {
     position: fixed;
     top: 20%;
     right: 20px;
     z-index: 2;
+    /*애니메이션 효과*/
+    opacity: 0;
+    transform: translateX(50px);
+    animation: slideLeft 1s ease-in-out forwards 0.2s;
 }
 
 .help-icon {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background-color: #007bff;
+    background-color: 	#FFD1DC;
     color: white;
     display: flex;
     justify-content: center;

@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="/calendar/css/notifications.css">
 <link rel="stylesheet" href="/location/css/location-read.css">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&family=Do+Hyeon&family=Nanum+Gothic&family=Nanum+Pen+Script&display=swap" rel="stylesheet">
 <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=278940b595d1bf12680c71409de85eda&libraries=services"></script>
 </head>
 
@@ -25,7 +26,14 @@
 			<!--Navbar: 페이지 상단에 위치한 검색창과 알림 프로필 등-->
 			 <nav class="navbar">
                 <div class="navbar-container">
-                    <a href="#" class="navbar-logo">もふもふ</a>
+                
+                    <!-- 2/7 -->
+					<div class="logo">
+						<a href="/calendar">
+	    					<img src="/images/logo2.jpg" alt="로고 이미지" class="logoimage" />
+	  					</a>
+					</div>
+					
                     <ul class="navbar-menu">
                         <li><a href="/calendar">홈</a></li>
                         <li><a href="/log/indexLog">피드</a></li>
@@ -209,7 +217,7 @@
 
 <!-- 더보기 버튼 -->
 <div style="text-align: center; margin-top: 20px;">
-    <button id="loadMoreReviewsBtn" style="padding: 10px 20px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">더보기</button>
+    <button id="loadMoreReviewsBtn" style="padding: 10px 20px; font-size: 16px; background-color: 	#FFD1DC; color: white; border: none; border-radius: 5px; cursor: pointer;">더보기</button>
 </div>
 
 </div>
@@ -351,7 +359,7 @@ var infoWindowContent = `
     <div style="padding:10px; text-align:center; font-size:14px;">
         <strong>${locationName}</strong><br>
         <button onclick="openRoute(${locationLat}, ${locationLng}, '${locationName}')"
-                style="margin-top:5px; padding:5px 10px; background-color:#007bff; color:white; border:none; border-radius:5px; cursor:pointer;">
+                style="margin-top:5px; padding:5px 10px; background-color:	#FFD1DC; color:white; border:none; border-radius:5px; cursor:pointer;">
             길찾기
         </button>
     </div>

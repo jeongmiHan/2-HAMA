@@ -19,11 +19,15 @@ body {
 
 /* 사이드바 */
 .sidebar {
-  width: 350px;
-  background-color: #4e73df;
+  width: 300px;
+  background-color:#FFD1DC;
   color: white;
   display: flex;
   flex-direction: column;
+  margin:30px; /*사이드바 왼쪽에서 좀 띄우기 2/7*/
+  border-radius: 20px; /* 모서리를 둥글게 2/7 */
+  height:760px;/*2/7*/
+  box-shadow: 0 0 10px #FFB7C5;/*2/7*/
 }
 
 .sidebar-header {
@@ -68,6 +72,11 @@ body {
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid #ddd;
+  margin-top:30px; /*2/7*/
+  margin-right:20px; /*2/7*/
+  border-radius:15px; /*2/7*/
+  transition: transform 0.2s ease-in-out;/*2/7*/
+  box-shadow: 0 0 5px 	#FFD1DC;/*2/7*/
 }
 
 .navbar-container {
@@ -104,7 +113,7 @@ body {
 }
 
 .navbar-menu a:hover {
-  background-color: #4e73df;
+  background-color: 	#FFD1DC;
   color: white;
 }
 
@@ -197,4 +206,13 @@ body {
   width: 1px;
   height: 30px;
   background-color: #ddd;
+}
+/*로고 이미지 2/7*/
+.logoimage{
+	height: auto; /* 비율 유지 */
+	width: 70%;
+}
+/*로그아웃 버튼 색 2/7*/
+#logoutButton{
+	background-color:	#FFD1DC;
 }

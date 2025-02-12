@@ -1,5 +1,5 @@
 body {
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Gowun Dodum', sans-serif;
     
     justify-content: flex-start; /* 왼쪽 정렬 */
     align-items: flex-start; /* 상단 정렬 */
@@ -11,6 +11,10 @@ body {
     text-align: left;
 }
 
+/*2/7*/
+h1, h2, h3, p, ul, li, a, input, button, filter, select, textarea, div {
+	font-family: 'Gowun Dodum', sans-serif;
+}
 
 .profile-sidebar {
     width: 350px; /* 사이드바 너비 */
