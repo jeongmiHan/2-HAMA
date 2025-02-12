@@ -1,15 +1,17 @@
 .all-events-container {
-    position: fixed;
+    position: absolute;
     right: 20px;
-    top: 320px;
+    top: 350px;
     width: 210px; /* 너비 줄이기 */
     padding: 10px; /* 내부 여백 줄이기 */
     border: 1px solid #ddd;
     border-radius: 8px;
-    background-color: #f9f9f9;
+    background-color: white;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     max-height: 350px; /* 스크롤 가능한 최대 높이 줄이기 */
     overflow-y: auto;
+        box-shadow: 0 0 5px 	#FFD1DC;/*2/7*/
+        max-height: 400px;
 }
 
 .date-navigation {
@@ -20,7 +22,7 @@
 }
 
 .date-navigation button {
-    background-color: #87cefa;
+    background-color:#FFD1DC;
     border: none;
     color: white;
     padding: 3px 8px; /* 버튼 크기 줄이기 */
@@ -30,7 +32,7 @@
 }
 
 .date-navigation button:hover {
-    background-color: #4682b4;
+    background-color:#FF3399;
 }
 
 #event-list li {
@@ -41,6 +43,9 @@
     display: flex; /* 아이콘과 텍스트 정렬 */
     align-items: flex-start;
     gap: 10px; /* 아이콘과 텍스트 간격 */
+}
+#titlename{
+	color:#d64aa0;
 }
 
 .event-item {
