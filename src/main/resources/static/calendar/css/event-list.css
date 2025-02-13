@@ -1,7 +1,7 @@
 .all-events-container {
     position: absolute;
     right: 20px;
-    top: 350px;
+    top: 300px;
     width: 210px; /* 너비 줄이기 */
     padding: 10px; /* 내부 여백 줄이기 */
     border: 1px solid #ddd;

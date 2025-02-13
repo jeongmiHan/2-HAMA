@@ -151,7 +151,7 @@ p.profile-subtext {
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 2;
+    z-index: 1000;
     margin-top:30px;
 }
 
