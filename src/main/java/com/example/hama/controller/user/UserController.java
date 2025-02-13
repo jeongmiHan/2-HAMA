@@ -72,7 +72,7 @@ public class UserController {
     @GetMapping("login")
     public String loginForm(Model model) {
         model.addAttribute("userLogin", new UserLogin());
-        return "user/login";
+        return "redirect:/";
     }
 
     /**
