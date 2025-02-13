@@ -157,7 +157,7 @@ p.profile-subtext {
 
 .popup-content {
     width: 450px;  /* 팝업 너비 고정 */
-    height: 600px; /* 팝업 높이 고정 */
+    height: 610px; /* 팝업 높이 고정 */
     background-color: #fff;
     padding: 20px;
     border-radius: 12px;
@@ -212,7 +212,7 @@ p.profile-subtext {
 .save-btn{
     background-color: #ff8080;
     color: white;
-    padding: 12px 20px;
+    padding: 6px 14px;
     border-radius: 30px;
     width: auto; /* 내용에 맞게 조정 */
     min-width: 80px; /* 최소 크기 지정 */
