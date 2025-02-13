@@ -4,9 +4,8 @@
   width: 880px;
   max-height: 90vh; /* 화면의 60%를 최대 높이로 설정하여 세로 길이를 제한합니다. */
   position: relative; /* left 속성을 사용하려면 상대적인 위치 지정이 필요 */
-  margin-left: 0px;
-  margin-right:0px; /* 왼쪽에서 20px 떨어지게 설정 */
-  margin-top:20px;
+  margin-left:360px;
+  margin-top:50px;
 }
 
 
