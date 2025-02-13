@@ -93,9 +93,6 @@ body {
     box-shadow:0 0 5px 	#FFD1DC;
 }
 
-.navbar-container div {
-    flex: 1; /* 내부 요소들이 균등하게 배치되도록 설정 */
-}
 
 
 .navbar-logo {
@@ -212,6 +209,7 @@ body {
   display: flex;
   align-items: center;
   gap: 20px;
+  margin-right: 35px !important;
 }
 /*사이 회색 선*/
 .divider {
@@ -220,10 +218,12 @@ body {
   background-color: #ddd;
 }
 /*로고 이미지 2/7*/
-.logoimage{
-	height: auto; 
-	width: 40%;
+.logoimage {
+	margin-left: 15px !important;
+    height: auto !important;
+    width: 50% !important;
 }
+
 
 /*로그아웃 버튼 색 2/7*/
 #logoutButton{
