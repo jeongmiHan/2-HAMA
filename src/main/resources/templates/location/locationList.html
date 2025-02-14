@@ -100,7 +100,7 @@
 
 <div class="searchLocation"> 
 <div class="locationbuttons">
-    <input type="button" class="locationbutton" value="게시글 작성" onclick="window.open('/location/locationwrite', 'popup', 'width=890,height=400')">
+    <input type="button" class="locationbutton" value="게시글 작성" onclick="window.open('/location/locationwrite', 'popup', 'width=890,height=450')">
     <input type="button" class="locationbutton" onclick="location.href='/calendar'" value="메인으로">
 </div>
 <!-- 지역 필터 추가 -->
@@ -167,7 +167,7 @@
 	<!-- 수정 및 삭제 버튼 -->
 	<div class="button-group">
   		<button class="edit-btn" th:if="${sessionUser.userId == location.user.userId}"
-         		 th:onclick="window.open('/location/locationUpdate?id=[[${location.locationId}]]', 'popup', 'width=890,height=400')">
+         		 th:onclick="window.open('/location/locationUpdate?id=[[${location.locationId}]]', 'popup', 'width=890,height=450')">
       	<i class="fa fa-edit"></i>
   		</button>
   		<button class="delete-btn" th:if="${sessionUser.userId == location.user.userId}"

@@ -1,3 +1,7 @@
+/*2/7*/
+h1, h2, h3, p, ul, li, a, input, button, filter, select, textarea, div {
+	font-family: 'Gowun Dodum', sans-serif;
+}
 .modal-content {
   
 }
@@ -5,12 +9,12 @@
     border-radius: 5px;
 }
 .btn-primary {
-    background-color: #007bff;
-    border-color: #007bff;
+    background-color: pink;
+    border-color: pink;
 }
 .btn-primary:hover {
-    background-color: #0056b3;
-    border-color: #0056b3;
+    background-color: pink;
+    border-color: pink;
 }
 .category-icons span {
     margin-right: 8px;

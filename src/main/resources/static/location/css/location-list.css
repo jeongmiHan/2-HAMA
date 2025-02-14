@@ -215,13 +215,10 @@
 
 .help-icon-container {
     position: fixed;
-    top: 20%;
+    top: 15%;
     right: 20px;
     z-index: 2;
-    /*애니메이션 효과*/
-    opacity: 0;
-    transform: translateX(50px);
-    animation: slideLeft 1s ease-in-out forwards 0.2s;
+  
 }
 
 .help-icon {

@@ -348,6 +348,7 @@
     margin-top: 50px;
     margin-left: 360px;
     box-sizing: border-box;
+    max-width:1140px;
 }
 
 /* 콘텐츠 영역 */
@@ -399,7 +400,7 @@
 
 .help-icon-container {
     position: fixed;
-    top: 20%;
+    top: 15%;
     right: 20px;
     z-index: 2;
 }

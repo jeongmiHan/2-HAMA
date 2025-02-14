@@ -1,3 +1,7 @@
+/*2/7*/
+h1, h2, h3, p, ul, li, a, input, button, filter, select, textarea, div {
+	font-family: 'Gowun Dodum', sans-serif;
+}
 .star-rating {
     display: inline-flex;
     font-size: 2rem; /* 아이콘 크기 */
@@ -54,12 +58,12 @@ textarea {
     border-radius: 5px;
 }
 .btn-primary {
-    background-color: #007bff;
-    border-color: #007bff;
+    background-color: pink;
+    border-color: pink;
 }
 .btn-primary:hover {
-    background-color: #0056b3;
-    border-color: #0056b3;
+    background-color: pink;
+    border-color: pink;
 }
 .modal-header {
 	margin-bottom : 15px;
