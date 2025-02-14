@@ -190,12 +190,12 @@
 /* 전체 페이지를 감싸는 하얀 배경 */
 .centered-container {
     display: flex;
-
+ 	margin-right: 10px;
     align-items: center;
     min-height: 100vh; /* 화면 전체 높이 */
     background-color: #f8f9fc;
-    margin-top:20px;
-   
+    margin-top: 50px;
+    margin-left: 360px;
     box-sizing: border-box;
 }
 
@@ -207,7 +207,6 @@
     max-width: 1200px; /* 최대 너비 */
     width: 100%; /* 화면에 꽉 차도록 설정 */
     padding: 20px; /* 내부 여백 */
-
     box-sizing: border-box; /* 박스 크기 포함 */
     margin-bottom:20px;
 }

@@ -6,8 +6,12 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     padding: 20px;
     border-radius: 8px;
+    box-shadow: 0 0 5px #FFD1DC;
+    margin-right: 10px;
+    min-height: 600px;
+    margin-left: 360px;
+    margin-top: 50px;
 }
-
 
 /* 검색 영역 스타일 */
 .right {
@@ -49,7 +53,6 @@ table th, table td {
 }
 
 table th {
-    background-color: #f4f4f4;
     font-weight: bold;
 }
 

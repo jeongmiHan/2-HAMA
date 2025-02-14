@@ -208,7 +208,6 @@ body {
 
 
 
-
 /* 글쓰기 버튼 */
 #writeButton {
   position: fixed;
@@ -316,6 +315,8 @@ form#uploadForm {
   margin: 20px auto;
   padding: 20px;
   position: relative;
+  margin-top: 10px;
+    margin-left: 455px;
   z-index: 1; /* 게시글은 팝업보다 뒤로 이동 */
 }
 
@@ -556,6 +557,8 @@ form#uploadForm {
     object-fit: contain;
     display: block; /* 가운데 정렬 보장 */
     padding: 0; /* 패딩 제거 */
+    margin-top: 50px;
+    margin-left: 475px;
 }
         
 /* 더보기 꾸미기 */

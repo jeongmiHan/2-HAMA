@@ -14,8 +14,8 @@
 
 #calendarSearch button {
     padding: 5px 10px;
-    background-color: #87CEFA;
-    color: #fff;
+    background-color:#FFD1DC;
+    color:white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -28,11 +28,12 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: #fff;
+    background:white;
     padding: 20px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     border-radius: 10px;
     z-index: 1000;
+     text-align: center; 
 }
 
 #resultsList {
@@ -44,7 +45,7 @@
 
 #resultsList li {
     padding: 10px 0;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid white;
     cursor: pointer;
 }
 
@@ -52,8 +53,9 @@
     margin-top: 10px;
     padding: 5px 10px;
     border: none;
-    background: #87CEFA;
-    color: #fff;
+    background: #FFD1DC;
+    color: white;
     border-radius: 5px;
     cursor: pointer;
+            box-shadow: 0 0 5px 	#FFD1DC;/*2/7*/
 }
