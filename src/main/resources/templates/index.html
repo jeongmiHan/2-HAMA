@@ -7,6 +7,7 @@
 <meta name="viewport"
 	content="width=device-width, initial-scale=1, user-scalable=no" />
 <link rel="stylesheet" href="assets/css/main.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&family=Do+Hyeon&family=Nanum+Gothic&family=Nanum+Pen+Script&display=swap" rel="stylesheet">
 <noscript>
 	<link rel="stylesheet" href="assets/css/noscript.css" />
@@ -32,7 +33,7 @@
 		<div class="inner-container">
 			
 			<div class="inner">
-				<h2>もふもふ</h2>
+				<p style="font-size:50px; margin-bottom:30px;">もふもふ</p>
 				<p>
 					당신의 반려동물과의 소중한 일상을 기록하고 관리하세요!<br /> <br />
 				</p>
@@ -42,37 +43,37 @@
             
             <form action="/user/login" method="POST">
                 <div class="form-group">
-                    <label for="userId">아이디</label>
+                    <label for="userId" style="color:pink">아이디</label>
                     <input type="text" id="userId" name="userId" placeholder="아이디를 입력하세요" required>
                 </div>
                 <div class="form-group">
-                    <label for="password">비밀번호</label>
+                    <label for="password" style="color:pink">비밀번호</label>
                     <input type="password" id="password" name="password" placeholder="비밀번호를 입력하세요" required>
                 </div>
-                <button type="submit" class="btn">로그인</button>
+                
+                <div class="login-btn" style=" display: flex; justify-content: center;">
+	                <!-- 소셜 로그인 버튼 -->
+		            <div class="social-login" style="margin-right:40px;">
+		                <a href="/oauth2/authorization/google" class="btn social-btn google">
+		                    Google로 로그인
+		                </a>
+		            </div>
+		            <!-- 페이지 로그인 -->
+	                <!-- <button type="submit" class="btn" style="color:pink; border:2px solid pink">로그인</button> -->
+	                <a href="#" class="text-button" onclick="document.querySelector('form').submit();">로그인</a>
+                </div>
+                
             </form>
             <div class="additional-links">
                 <a href="/user/find-id">아이디 찾기</a>
-                <a href="/user/reset-password">비밀번호 찾기</a>
+                <a href="/user/reset-password" style="margin:10px;">비밀번호 찾기</a>
                 <a href="/user/register">회원가입</a>
             </div>
-            <!-- 소셜 로그인 버튼 -->
-            <div class="social-login">
-                <a href="/oauth2/authorization/google" class="btn social-btn google">
-                    Google로 로그인
-                </a>
-            </div>
+            
         </div>
     </div>
 				
-				
-				
-				<ul class="actions special">
-					<li><a href="#" class="button primary"
-						onclick="location.href='/user/register'">회원가입</a></li>
-					<li><a href="#" class="button primary"
-						onclick="location.href='/user/login'">로그인</a></li>
-				</ul>
+
 			</div>
 			</div>
 			
@@ -82,7 +83,7 @@
         
 		</div>
 			
-			<a href="#one" class="more scrolly">Learn More</a>
+			<a href="#one" class="more scrolly">Learn More <i class="fa-solid fa-arrow-down"></i> </a>
 		</section>
 
 		<!-- One -->
@@ -122,10 +123,10 @@
 					<img src="images/petCalendar.jpg" alt="" />
 				</div>
 				<div class="content">
-					<h2>
+					<h2 style="color:pink;">
 						Calendar<br />
 					</h2>
-					<h2>
+					<h2 style="color:pink;">
 						캘린더로 일정을 관리하세요<br />
 					</h2>
 					<p>
@@ -140,16 +141,16 @@
 					<img src="images/petFeed3.jpg" alt="" />
 				</div>
 				<div class="content-l">
-					<h2>
+					<h2 style="color:pink;">
 						Feed<br />
 					</h2>
-					<h2>
+					<h2 style="color:pink;">
 						반려동물의 하루를 적어보세요<br />
 					</h2>
 					<p>
 						반려동물과 함께한 하루의 특별한 순간들을 기록해보세요. 귀여운 사진과 따뜻한 글로<br> 추억을 남길 수 있는
 						일지 작성 기능은 반려동물과의 일상을 <br>더욱 의미 있게 만들어줍니다.<br> 반려동물의 성장 과정을 시간순으로
-						정리하고, 필요한 경우 언제든지 다시 확인할 수 있어<br> 소중한 순간을 놓치지 않도록 돕습니다.
+						정리하고, 필요한 경우 언제든지 다시 확인할 수 있어 소중한 순간을 놓치지 않도록 돕습니다.
 					</p>
 				</div>
 			</section>
@@ -158,10 +159,10 @@
 					<img src="images/petBoard2.jpg" alt="" />
 				</div>
 				<div class="content">
-					<h2>
+					<h2 style="color:pink;">
 						Notice board<br />
 					</h2>
-					<h2>
+					<h2 style="color:pink;">
 						커뮤니티<br />
 					</h2>
 					<p>
@@ -176,10 +177,10 @@
 				<img src="images/petLocation2.jpg" alt="" />
 			</div>
 			<div class="content-l">
-				<h2>
+				<h2 style="color:pink;">
 					Location&Review<br />
 				</h2>
-				<h2>
+				<h2 style="color:pink;">
 					장소추천<br />
 				</h2>
 				<p>
@@ -236,7 +237,7 @@
 			<div class="inner">
 				<header>
 					<h2>지금 바로 시작해보세요!</h2>
-					<p>회원가입을 통해 반려동물과의 추억을 기록하고 특별한 기능을 경험해보세요.</p>
+					<p style="color:pink">회원가입을 통해 반려동물과의 추억을 기록하고 특별한 기능을 경험해보세요.</p>
 				</header>
 				<ul class="actions stacked">
 					<li><a href="#" class="button fit primary">맨 위로</a></li>

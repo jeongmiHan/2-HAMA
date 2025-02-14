@@ -5,12 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>회원가입</title>
     <link rel="stylesheet" href="/assets/css/register.css">
+    <link href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&family=Do+Hyeon&family=Nanum+Gothic&family=Nanum+Pen+Script&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="page-wrapper">
+    <div class="r-container">
+    
+        <div class="image-container">			
+				<div class="image">
+						<img src="/images/pet13.jpg" alt="" />
+				</div>
+			</div>
         <div class="container">
-            <h1>회원가입</h1>
+        
             <form id="registerForm" action="#" method="POST" class="signup-form">
+            	<h1>회원가입</h1>
                 <!-- 아이디 입력 -->
                 <div class="form-group">
                     <label for="userId">아이디</label>
@@ -44,6 +53,7 @@
                     <div id="emailError" class="error-message"></div>
                     <div id="emailSuccessMessage" class="success-message"></div>
                 </div>
+                <p></p>
                 <!-- 인증 코드 -->
                 <div class="form-group">
                     <label for="verificationCode">인증 코드</label>
@@ -57,6 +67,7 @@
                 <button type="submit" class="btn">가입하기</button>
             </form>
         </div>
+    </div>
     </div>
     <script src="/assets/js/register.js"></script>
 </body>

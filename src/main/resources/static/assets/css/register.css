@@ -1,32 +1,35 @@
 body {
-    font-family: 'Arial', sans-serif;
-    background: linear-gradient(135deg, #1d3557, #457b9d);
+    font-family: 'Gowun Dodum', sans-serif;
+ 
     margin: 0;
-    padding: 0;
+ 
     height: 100vh;
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    padding-top: 40px;
+  
     box-sizing: border-box;
+}
+/*2/7*/
+h1, h2, h3, p, ul, li, a, input, button, filter, select, textarea, div {
+	font-family: 'Gowun Dodum', sans-serif;
 }
 
 .container {
-    max-width: 400px;
-    background: #f1faee;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    text-align: center;
+    width: 50vw; /* 화면의 나머지 50% */
+    height: 100vh;
+    display: flex;
+
+    justify-content: center; /* 가로 중앙 정렬 */
+    background-color:white;
+    color:pink;
 }
 .signup-form{
 	background-color: #ffffff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+	margin: 40px 20px 20px 100px;
     width: 100%;
-    max-width: 300px;
-    margin: 0 auto;
+    margin-bottom:10px;
+ 
 }
 
 h1 {
@@ -40,14 +43,14 @@ input {
     border: 1px solid #ccc;
     padding: 10px;
     border-radius: 5px;
-    width: 100%;
+   width:80%;
     box-sizing: border-box;
-    margin-bottom: 15px;
+    
     font-size: 14px;
 }
 
 input:focus {
-    border-color: #007bff;
+    border-color: pink;
     outline: none;
 }
 
@@ -60,20 +63,20 @@ label {
 }
 
 .btn {
-    width: 100%;
+    width: 90px;
+    height: 43px;
     padding: 10px;
-    background: #007bff;
+    background: pink;
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     font-size: 16px;
     transition: background 0.3s ease;
-    margin-top: 10px;
 }
 
 .btn:hover {
-    background: #0056b3;
+    background-color: #ff99cc;
 }
 
 .btn:disabled {
@@ -92,7 +95,29 @@ label {
 .error-message {
     color: #dc3545;
     font-size: 12px;
-    margin-top: -10px;
+    margin-top: 10px;
     margin-bottom: 10px;
     text-align: left;
+}
+
+.r-container {
+    display: flex; /* 좌우 배치 */
+    align-items:center;
+    justify-content:center;
+    height: 100vh; /* 전체 높이 */
+}
+/* 좌측 50% 이미지 컨테이너 */
+.image-container {
+    width: 50vw; /* 전체 너비의 50% */
+    height: 100vh; /* 전체 높이 */
+    overflow: hidden; /* 넘치는 부분 제거 */
+    
+}
+
+/* 이미지 크기 설정 */
+.image-container img {
+    width: 100%;
+    height: 100%;
+
+   
 }
