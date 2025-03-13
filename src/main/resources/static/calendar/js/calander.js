@@ -2,7 +2,7 @@ let calendar, currentEvent = null;
 let allEvents = []; // 모든 이벤트를 저장하는 배열
 let petImages = {};
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
    var calendarEl = document.getElementById('calendar');  // 캘린더가 표시될 요소
    // FullCalendar 초기화
    calendar = new FullCalendar.Calendar(calendarEl, {
@@ -54,6 +54,7 @@ document.addEventListener('DOMContentLoaded', function() {
       displayEventTime: false, // 캘린더에 이벤트 시간 숨기고 제목만 보여주는 기능
       // 이벤트 렌더링 후 실행 (필터링 기능을 위해 모든 이벤트 저장)
      eventDidMount: function(info) {
+      updateEventUI(info.event); // 이벤트 UI 업데이트
          if (!allEvents.some(event => event.id === info.event.id)) {
              allEvents.push(info.event);
          }
@@ -86,8 +87,12 @@ document.addEventListener('DOMContentLoaded', function() {
       }
    });
    calendar.render(); // 캘린더 렌더링
-   loadEvents();
-   loadPets(); // 반려동물 목록 불러오기
+   try {
+        await loadPets();  // ✅ 반려동물 데이터를 먼저 로드
+        await loadEvents(); // ✅ 이후 이벤트 데이터 로드
+     } catch (error) {
+        console.error("데이터 로딩 중 오류 발생:", error);
+     }
 
 
 
@@ -483,6 +488,12 @@ function updateEventUI(event) {
 
     const petImage = event.extendedProps.petImage;
     const eventColor = event.extendedProps.cd_color || "#000"; // 기본 검은색
+
+   // 반려동물 이미지가 없을 경우, 다시 로드하여 업데이트
+       if (!petImage && petId && petImages[petId]) {
+           petImage = petImages[petId];
+           event.setProp('extendedProps', { ...event.extendedProps, petImage });
+       }
 
     //기존의 중복 요소 삭제
     let existingContainer = eventEl.querySelector('.event-title-container');

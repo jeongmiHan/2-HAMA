@@ -44,30 +44,32 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // 일정 가져오기 및 특정 날짜로 필터링
-    async function fetchAndDisplayEvents() {
-        try {
-            const response = await fetch(`/api/events`);
-            const events = await response.json();
+   async function fetchAndDisplayEvents() {
+       try {
+           const response = await fetch(`/api/events`);
+           const events = await response.json();
 
-            // 현재 날짜를 기준으로 일정 필터링 (시작일과 종료일 사이에 포함되는 일정)
-            const formattedDate = formatDate(currentDate);
-            const filteredEvents = events.filter((event) => {
-                const eventStartDate = new Date(event.eventDateStart);
-                const eventEndDate = new Date(event.eventDateEnd);
+           // 현재 날짜를 'YYYY-MM-DD' 형식으로 변환
+           const formattedDate = formatDate(currentDate);
 
-                // 현재 날짜가 일정 시작일과 종료일 사이에 포함되는지 확인
-                return eventStartDate <= currentDate && currentDate <= eventEndDate;
-            });
+           // 일정 필터링: 'YYYY-MM-DD' 형식으로 변환 후 비교
+           const filteredEvents = events.filter((event) => {
+               const eventStartDate = formatDate(new Date(event.eventDateStart));
+               const eventEndDate = formatDate(new Date(event.eventDateEnd));
 
-            // 시간순으로 정렬
-            filteredEvents.sort((a, b) => new Date(a.eventDateStart) - new Date(b.eventDateStart));
+               // 현재 날짜가 일정 시작일과 종료일 사이에 포함되는 경우
+               return eventStartDate <= formattedDate && formattedDate <= eventEndDate;
+           });
 
-            // 일정 표시
-            displayEvents(filteredEvents);
-        } catch (error) {
-            eventList.innerHTML = "<li>일정을 불러오는 데 실패했습니다.</li>";
-        }
-    }
+           // 시간순 정렬
+           filteredEvents.sort((a, b) => new Date(a.eventDateStart) - new Date(b.eventDateStart));
+
+           // 일정 표시
+           displayEvents(filteredEvents);
+       } catch (error) {
+           eventList.innerHTML = "<li>일정을 불러오는 데 실패했습니다.</li>";
+       }
+   }
 
     // 일정 목록을 화면에 표시
     function displayEvents(events) {
