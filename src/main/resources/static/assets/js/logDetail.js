@@ -73,9 +73,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 	    // 삭제 대기 목록 초기화 (삭제 예정 상태 취소)
 	    deletedFiles = [];
-
 	    // 기존 상태 복원은 하지 않음 (모달 닫고 끝냄)
 	});
+	
 	const maxLength = 300; // 글자 제한
 	// 팝업 저장 버튼 클릭
 	logSubmitButton.addEventListener("click", async () => {
@@ -85,7 +85,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 		    alert(content ? `글자 수는 최대 ${maxLength}자까지 입력 가능합니다. (${content.length}자 입력됨)` : "내용을 입력하세요!");
 		    return;
 		}
-
 
 	    const formData = new FormData();
 	    formData.append("content", content);
@@ -133,7 +132,24 @@ document.addEventListener("DOMContentLoaded", async () => {
 	        .map((image) => `<img src="/log/images/${image}" alt="${image}" />`)
 	        .join("");
 	}
+	
+	// DB 댓글 갯수 동기화
+	window.updateReplyCount = async (postId) => {
+	   try {
+	       const response = await fetch(`/reply/log/${postId}/count`);
+	       if (!response.ok) throw new Error("댓글 수 조회 실패");
 
+	      const data = await response.json();
+	      const countElement = document.getElementById(`comment-count-${postId}`); // ID로 찾기
+	      countElement.textContent = data.count;
+	      if (countElement) {
+	          countElement.textContent = data.count > 0 ? data.count : "";; // 댓글 수 동기화
+	      }
+	   } catch (error) {
+	       console.error("댓글 수 조회 오류:", error);
+	   }
+	};
+	
 	// 게시글 로드
 	async function loadLogDetail() {
 	    try {
@@ -150,6 +166,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 	        } else {
 	            document.getElementById("menuButton").style.display = "none"; // 버튼 숨기기
 	        }
+			
 			// 댓글 개수 업데이트
 			const commentCountElement = document.querySelector(".logPostComment span");
 			if (log.comments > 0) {
@@ -160,7 +177,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 			// 좋아요 상태 반영
 			const likeButton = document.querySelector(".logPostLike");
 			const likeCount = likeButton.querySelector("span");
-			likeCount.textContent = log.likes || 0;
+			likeCount.textContent = log.likes || "";
 			if (log.isLiked) {
 			    likeButton.classList.add("liked");
 			} else {
@@ -170,7 +187,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 			// 즐겨찾기 상태 반영
 			const bookmarkButton = document.querySelector(".logPostBookmark");
 			const bookmarkCount = bookmarkButton.querySelector("span");
-			bookmarkCount.textContent = log.bookmarks || 0;
+			bookmarkCount.textContent = log.bookmarks || "";
 			if (log.isBookmarked) {
 			    bookmarkButton.classList.add("bookmarked");
 			} else {
@@ -208,6 +225,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 	closeModal.addEventListener("click", () => {
 	    modal.style.display = "none";
 	});
+	
 	// 이전 이미지 보기
 	prevImage.addEventListener("click", () => {
 	    currentImageIndex = (currentImageIndex - 1 + imageList.length) % imageList.length;
@@ -295,8 +313,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 	          prepareEditReply(reply.id, reply.logReplyContent);
 	        });
 
-	        // 삭제 버튼 이벤트
-	        deleteButton.addEventListener("click", () => {
+	       // 삭제 버튼 이벤트
+	       deleteButton.addEventListener("click", () => {
+		 	  // 삭제 확인 창
+			  const isConfirmed = confirm("정말 삭제하시겠습니까?");
+
+		   	  if (!isConfirmed) {
+			    return; // 취소하면 함수 종료
+			  }
 	          deleteReply(null, reply.id);
 	          reply.logReplyContent = "댓글이 삭제되었습니다.";
 	          replyElement.innerHTML = "";
@@ -334,7 +358,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 	    parentElement.appendChild(clone);
 	  });
 	}
-
   
 	let isEditMode = false; // 수정 모드 여부
 	let editReplyId = null; // 수정할 댓글 ID
@@ -358,7 +381,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 	    commentInput.focus(); // 입력창 포커스
 	};
 
-	// 댓글 추가/수정 함수
+	// 댓글 추가
 	window.addReply = async () => {
 		try {
 		    const replyText = commentInput.value.trim();
@@ -433,9 +456,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // 댓글 삭제 함수
     window.deleteReply = async function(button, replyId) {
-        const confirmed = confirm("정말로 삭제하시겠습니까?");
-        if (!confirmed) return;
-
         try {
             const response = await fetch(`/reply/log/${replyId}/del`, { method: 'DELETE' });
             if (!response.ok) throw new Error('댓글 삭제 실패');
@@ -543,7 +563,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 		}
 		
 	};
-	
+
 	function toggleEditMode(isEdit) {
 	    const logContent = document.getElementById("logContent");
 	    const logEditContent = document.getElementById("logEditContent");
@@ -735,23 +755,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 		        alert("즐겨찾기 처리 중 오류가 발생했습니다.");
 		    }
 		};
-		// DB 댓글 갯수 동기화
-		window.updateReplyCount = async (postId) => {
-		   try {
-		       const response = await fetch(`/reply/log/${postId}/count`);
-		       if (!response.ok) throw new Error("댓글 수 조회 실패");
 
-		      const data = await response.json();
-		       const countElement = document.getElementById(`comment-count-${postId}`); // ID로 찾기
-		      countElement.textContent = data.count;
-		      if (countElement) {
-		          countElement.textContent = data.count > 0 ? data.count : "";; // 댓글 수 동기화
-		      }
-		   } catch (error) {
-		       console.error("댓글 수 조회 오류:", error);
-		   }
-		};
-		window.navigateToLogDetail = function(commentButton) {
+		window.navigateToLogDetail = function() {
 		    if (logId) {
 		        // logDetail로 이동하면서 해시 추가
 		        window.location.href = `/detail/${logId}#commentList`;
